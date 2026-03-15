@@ -54,7 +54,7 @@
 
 #include <sys/openss7/config.h>
 
-#ifndef HAVE_KTYPE_BOOL
+#if !defined(__KERNEL__) && !defined(HAVE_KTYPE_BOOL)
 #include <stdbool.h>
 #endif
 
@@ -91,7 +91,7 @@
 #ifdef HAVE_KINC_LINUX_SECURITY_H
 #include <linux/security.h>
 #endif
-#ifndef HAVE_KTYPE_IRQRETURN_T
+#if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,19) && !defined(HAVE_KTYPE_IRQRETURN_T)
 typedef void irqreturn_t;
 #endif
 #undef IRQ_NONE

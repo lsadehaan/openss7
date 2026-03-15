@@ -129,7 +129,7 @@ MODULE_VERSION(PACKAGE_ENVR);
 #define LOGIO(sp, fmt, ...)  SCTPLOG(sp, STRLOGIO, SL_TRACE, fmt, ##__VA_ARGS__)
 #define LOGDA(sp, fmt, ...)  SCTPLOG(sp, STRLOGDA, SL_TRACE, fmt, ##__VA_ARGS__)
 
-#if !defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER
+#if !defined(HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER) && LINUX_VERSION_CODE < KERNEL_VERSION(2,6,24)
 #if !defined HAVE_KFUNC_SKB_TRANSPORT_HEADER
 static inline unsigned char *skb_tail_pointer(const struct sk_buff *skb)
 {
@@ -969,37 +969,40 @@ STATIC atomic_t sctp_stream_count = ATOMIC_INIT(0);
 #define SCTPCB_FLAG_RETRANS	    0x4000
 #define SCTPCB_FLAG_SACKED	    0x8000
 
-#if !defined HAVE_OPENSS7_SCTP && !defined HAVE_LKSCTP_SCTP
+#if !defined(HAVE_KINC_LINUX_SNMP_H)
 /*
  *  In accordance with draft-ietf-sigtran-sctp-mib-07
  */
+enum {
+	SctpRtoAlgorithm = 0,
+	SctpRtoMin,
+	SctpRtoMax,
+	SctpRtoInitial,
+	SctpMaxAssoc,
+	SctpValCookieLife,
+	SctpMaxInitRetr,
+	SctpCurrEstab,
+	SctpActiveEstabs,
+	SctpPassiveEstabs,
+	SctpAborteds,
+	SctpShutdowns,
+	SctpOutOfBlues,
+	SctpChecksumErrors,
+	SctpOutCtrlChunks,
+	SctpOutOrderChunks,
+	SctpOutUnorderChunks,
+	SctpInCtrlChunks,
+	SctpInOrderChunks,
+	SctpInUnorderChunks,
+	SctpFragUsrMsgs,
+	SctpReasmUsrMsgs,
+	SctpOutSCTPPacks,
+	SctpInSCTPPacks,
+	SctpDiscontinuityTime,
+	SCTP_MIB_MAX
+};
 struct sctp_mib {
-	unsigned long SctpRtoAlgorithm;
-	unsigned long SctpRtoMin;
-	unsigned long SctpRtoMax;
-	unsigned long SctpRtoInitial;
-	unsigned long SctpMaxAssoc;
-	unsigned long SctpValCookieLife;
-	unsigned long SctpMaxInitRetr;
-	unsigned long SctpCurrEstab;
-	unsigned long SctpActiveEstabs;
-	unsigned long SctpPassiveEstabs;
-	unsigned long SctpAborteds;
-	unsigned long SctpShutdowns;
-	unsigned long SctpOutOfBlues;
-	unsigned long SctpChecksumErrors;
-	unsigned long SctpOutCtrlChunks;
-	unsigned long SctpOutOrderChunks;
-	unsigned long SctpOutUnorderChunks;
-	unsigned long SctpInCtrlChunks;
-	unsigned long SctpInOrderChunks;
-	unsigned long SctpInUnorderChunks;
-	unsigned long SctpFragUsrMsgs;
-	unsigned long SctpReasmUsrMsgs;
-	unsigned long SctpOutSCTPPacks;
-	unsigned long SctpInSCTPPacks;
-	unsigned long SctpDiscontinuityTime;
-	unsigned long __pad[0];
+	unsigned long mibs[SCTP_MIB_MAX];
 } ____cacheline_aligned;
 
 #ifdef DEFINE_SNMP_STAT
@@ -1007,11 +1010,11 @@ DEFINE_SNMP_STAT(struct sctp_mib, sctp_statistics);
 #else
 struct sctp_mib sctp_statistics[NR_CPUS * 2];
 #endif				/* DEFINE_SNMP_STAT */
-#else				/* HAVE_OPENSS7_SCTP || HAVE_LKSCTP_SCTP */
+#else				/* HAVE_KINC_LINUX_SNMP_H */
 #ifdef DEFINE_SNMP_STAT
 DEFINE_SNMP_STAT(struct sctp_mib, sctp_statistics);
 #endif				/* DEFINE_SNMP_STAT */
-#endif				/* HAVE_OPENSS7_SCTP || HAVE_LKSCTP_SCTP */
+#endif				/* HAVE_KINC_LINUX_SNMP_H */
 
 #define SCTP_INC_STATS(field)		SNMP_INC_STATS(sctp_statistics, field)
 #define SCTP_INC_STATS_BH(field)	SNMP_INC_STATS(sctp_statistics, field)
@@ -3733,7 +3736,7 @@ sctp_init_hashes(void)
 	/* size and allocate vtag hash table */
 #if   defined HAVE_NUM_PHYSPAGES_EXPORT
 	goal = num_physpages >> (20 - PAGE_SHIFT);
-#elif defined HAVE__TOTALRAM_PAGES_EXPORT
+#elif defined(HAVE__TOTALRAM_PAGES_EXPORT) || LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
 	goal = totalram_pages() >> (20 - PAGE_SHIFT);
 #else
 	goal = totalram_pages >> (20 - PAGE_SHIFT);
@@ -4191,7 +4194,7 @@ __sctp_get_addrs(sctp_t * sp, uint32_t daddr)
 	struct net_device *dev;
 
 	read_lock(&dev_base_lock);
-#if ! ( defined HAVE_KFUNC_RCU_READ_LOCK || defined HAVE_KMACRO_RCU_READ_LOCK )
+#if ! ( defined HAVE_KFUNC_RCU_READ_LOCK || defined HAVE_KMACRO_RCU_READ_LOCK ) && LINUX_VERSION_CODE < KERNEL_VERSION(2,6,24)
 	read_lock(&inetdev_lock);
 #endif
 	for (dev = first_net_device(); dev; dev = next_net_device(dev)) {
@@ -4201,7 +4204,7 @@ __sctp_get_addrs(sctp_t * sp, uint32_t daddr)
 #if ( defined HAVE_KFUNC_RCU_READ_LOCK || defined HAVE_KMACRO_RCU_READ_LOCK )
 		rcu_read_lock();
 #endif
-#ifdef HAVE_KFUNC___IN_DEV_GET_RCU
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24) || defined HAVE_KFUNC___IN_DEV_GET_RCU
 		if (!(in_dev = __in_dev_get_rcu(dev))) {
 #else
 		if (!(in_dev = __in_dev_get(dev))) {
@@ -4211,7 +4214,7 @@ __sctp_get_addrs(sctp_t * sp, uint32_t daddr)
 #endif
 			continue;
 		}
-#if !( defined HAVE_KFUNC_RCU_READ_LOCK || defined HAVE_KMACRO_RCU_READ_LOCK )
+#if !( defined HAVE_KFUNC_RCU_READ_LOCK || defined HAVE_KMACRO_RCU_READ_LOCK ) && LINUX_VERSION_CODE < KERNEL_VERSION(2,6,24)
 		read_lock(&in_dev->lock);
 #endif
 		/* get primary or secondary addresses for each interface */
@@ -4227,13 +4230,13 @@ __sctp_get_addrs(sctp_t * sp, uint32_t daddr)
 			if (sctp_saddr_include(sp, ifa->ifa_local, &err))
 				allocated++;
 		}
-#if ( defined HAVE_KFUNC_RCU_READ_LOCK || defined HAVE_KMACRO_RCU_READ_LOCK )
+#if ( defined HAVE_KFUNC_RCU_READ_LOCK || defined HAVE_KMACRO_RCU_READ_LOCK ) || LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
 		rcu_read_unlock();
 #else
 		read_unlock(&in_dev->lock);
 #endif
 	}
-#if ! ( defined HAVE_KFUNC_RCU_READ_LOCK || defined HAVE_KMACRO_RCU_READ_LOCK )
+#if ! ( defined HAVE_KFUNC_RCU_READ_LOCK || defined HAVE_KMACRO_RCU_READ_LOCK ) && LINUX_VERSION_CODE < KERNEL_VERSION(2,6,24)
 	read_unlock(&inetdev_lock);
 #endif
 	read_unlock(&dev_base_lock);
@@ -5573,7 +5576,7 @@ sctp_update_routes(struct sctp *sp, int force_reselect)
  *  -------------------------------------------------------------------------
  *  We need this broken out so that we can use the netfilter hooks.
  */
-#ifdef HAVE_KFUNC_DST_OUTPUT
+#if defined(HAVE_KFUNC_DST_OUTPUT) || LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
 STATIC INLINE int
 #if defined HAVE_KFUNC_NF_HOOK_OKFN_2_ARG
 sctp_queue_xmit(struct sock *sk, struct sk_buff *skb)
@@ -5588,7 +5591,8 @@ sctp_queue_xmit(struct sk_buff *skb)
 
 #ifdef NETIF_F_TSO
 #if defined HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS_SEGS || \
-    defined HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS_SEGS
+    defined HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS_SEGS || \
+    LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
 	__ip_select_ident(iph, rt_dst(rt), 0);
 #elif defined HAVE_KFUNC_IP_SELECT_IDENT_MORE_SK_BUFF
 	ip_select_ident_more(skb, rt_dst(rt), NULL, 0);
@@ -5602,7 +5606,15 @@ sctp_queue_xmit(struct sk_buff *skb)
 #ifndef NF_IP_LOCAL_OUT
 #define NF_IP_LOCAL_OUT NF_INET_LOCAL_OUT
 #endif
-#ifdef HAVE_KFUNC_IP_DST_OUTPUT
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
+#if defined HAVE_KFUNC_NF_HOOK_OKFN_2_ARG
+	return dst_output(sock_net(sk), sk, skb);
+#elif defined HAVE_KFUNC_NF_HOOK_OKFN_3_ARG
+	return dst_output(net, sk, skb);
+#else
+	return dst_output(dev_net(rt_dst(rt)->dev), NULL, skb);
+#endif
+#elif defined(HAVE_KFUNC_IP_DST_OUTPUT)
 	return NF_HOOK_(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, rt_dst(rt)->dev, ip_dst_output);
 #else
 	return NF_HOOK_(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, rt_dst(rt)->dev, dst_output_);
@@ -5715,7 +5727,7 @@ sctp_xmit_ootb(uint32_t daddr, uint32_t saddr, mblk_t *mp)
 			iph->saddr = saddr;
 			iph->protocol = 132;
 			iph->tot_len = htons(tlen);
-#if defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER
+#if defined(HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER) || LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
 #if defined NET_SKBUFF_DATA_USES_OFFSET || defined HAVE_SK_BUFF_NETWORK_HEADER_OFFSET
 			skb->network_header = (unsigned char *) iph - skb->head;
 #else				/* defined NET_SKBUFF_DATA_USES_OFFSET */
@@ -5725,7 +5737,9 @@ sctp_xmit_ootb(uint32_t daddr, uint32_t saddr, mblk_t *mp)
 			skb->nh.iph = iph;
 #endif				/* defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER */
 #ifndef HAVE_KFUNC_DST_OUTPUT
-#ifdef HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
+			__ip_select_ident(iph, rt_dst(rt), 0);
+#elif defined HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS
 			__ip_select_ident(iph, rt_dst(rt));
 #else
 #ifdef HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS
@@ -5839,7 +5853,7 @@ sctp_xmit_msg(uint32_t saddr, uint32_t daddr, mblk_t *mp, struct sctp *sp)
 			iph->saddr = saddr;
 			iph->protocol = sp->protocol;
 			iph->tot_len = htons(tlen);
-#if defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER
+#if defined(HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER) || LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
 #if defined NET_SKBUFF_DATA_USES_OFFSET || defined HAVE_SK_BUFF_NETWORK_HEADER_OFFSET
 			skb->network_header = (unsigned char *) iph - skb->head;
 #else				/* defined NET_SKBUFF_DATA_USES_OFFSET */
@@ -5849,7 +5863,9 @@ sctp_xmit_msg(uint32_t saddr, uint32_t daddr, mblk_t *mp, struct sctp *sp)
 			skb->nh.iph = iph;
 #endif				/* defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER */
 #ifndef HAVE_KFUNC_DST_OUTPUT
-#ifdef HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
+			__ip_select_ident(iph, rt_dst(rt), 0);
+#elif defined HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS
 			__ip_select_ident(iph, rt_dst(rt));
 #else
 #ifdef HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS
@@ -6004,7 +6020,7 @@ sctp_send_msg(struct sctp *sp, struct sctp_daddr *sd, mblk_t *mp)
 		iph->saddr = sd->saddr;
 		iph->protocol = sp->protocol;
 		iph->tot_len = htons(tlen);
-#if defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER
+#if defined(HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER) || LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
 #if defined NET_SKBUFF_DATA_USES_OFFSET || defined HAVE_SK_BUFF_NETWORK_HEADER_OFFSET
 		skb->network_header = (unsigned char *) iph - skb->head;
 #else				/* defined NET_SKBUFF_DATA_USES_OFFSET */
@@ -6014,7 +6030,9 @@ sctp_send_msg(struct sctp *sp, struct sctp_daddr *sd, mblk_t *mp)
 		skb->nh.iph = iph;
 #endif				/* defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER */
 #ifndef HAVE_KFUNC_DST_OUTPUT
-#if defined HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
+		__ip_select_ident(iph, sd->dst_cache, 0);
+#elif defined HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS
 		__ip_select_ident(iph, sd->dst_cache);
 #elif defined HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS
 		__ip_select_ident(iph, sd->dst_cache, 0);
@@ -12109,7 +12127,11 @@ sctp_recv_cookie_echo(struct sctp *sp, mblk_t *mp)
 #endif
 #endif
 #else
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
+			NET_INC_STATS(sp->net, LINUX_MIB_LISTENOVERFLOWS);
+#else
 			NET_INC_STATS_BH(ListenOverflows);
+#endif
 #endif
 		return (err);
 	}
@@ -13748,7 +13770,10 @@ sctp_conn_req(struct sctp *sp, uint16_t dport, struct sockaddr_in *dsin, size_t 
 		goto eisconn;
 	if (!num)
 		goto eaddrnotavail;
-#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,5,0)
+	if (num < PROT_SOCK && !uid_eq(sp->cred.cr_uid, GLOBAL_ROOT_UID))
+		goto eacces;
+#elif defined(HAVE_KMEMB_STRUCT_CRED_UID_VAL)
 	if (num < PROT_SOCK && sp->cred.cr_uid.val != 0)
 		goto eacces;
 #else
@@ -14369,7 +14394,10 @@ sctp_bind_req(struct sctp *sp, uint16_t sport, struct sockaddr_in *ssin, size_t 
 		goto einval;
 	num = ntohs(sport);
 	usual(num);
-#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,5,0)
+	if (num && num < PROT_SOCK && !uid_eq(sp->cred.cr_uid, GLOBAL_ROOT_UID))
+		goto eacces;
+#elif defined(HAVE_KMEMB_STRUCT_CRED_UID_VAL)
 	if (num && num < PROT_SOCK && sp->cred.cr_uid.val != 0)
 		goto eacces;
 #else
@@ -16666,7 +16694,10 @@ n_conn_res(struct sctp *sp, mblk_t *mp)
 	if (ap->i_state == NS_IDLE && ap->conind)
 		goto badtoken2;
 	/* protect at least r00t streams from users */
-#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,5,0)
+	if (!uid_eq(sp->cred.cr_uid, GLOBAL_ROOT_UID) && !uid_eq(ap->cred.cr_uid, sp->cred.cr_uid))
+		goto access;
+#elif defined(HAVE_KMEMB_STRUCT_CRED_UID_VAL)
 	if (sp->cred.cr_uid.val != 0 && (ap->cred.cr_uid.val != sp->cred.cr_uid.val))
 		goto access;
 #else
@@ -28471,7 +28502,10 @@ t_conn_res(struct sctp *sp, mblk_t *mp)
 	if (unlikely(ap->i_state == TS_IDLE && ap->conind))
 		goto resqlen;
 	/* protect at least r00t streams from users */
-#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,5,0)
+	if (unlikely(!uid_eq(sp->cred.cr_uid, GLOBAL_ROOT_UID) && !uid_eq(ap->cred.cr_uid, sp->cred.cr_uid)))
+		goto acces;
+#elif defined(HAVE_KMEMB_STRUCT_CRED_UID_VAL)
 	if (unlikely(sp->cred.cr_uid.val != 0 && ap->cred.cr_uid.val != sp->cred.cr_uid.val))
 		goto acces;
 #else
@@ -30529,7 +30563,11 @@ sctp_v4_err(struct sk_buff *skb, uint32_t info)
       drop:
 #ifdef HAVE_KINC_LINUX_SNMP_H
 #ifndef ICMP_INC_STATS_BH
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
+	ICMP_INC_STATS(dev_net(skb->dev), ICMP_MIB_INERRORS);
+#else
 	__ICMP_INC_STATS(dev_net(skb->dev), ICMP_MIB_INERRORS);
+#endif
 #else
 #ifdef HAVE_ICMP_INC_STATS_BH_2_ARGS
 	ICMP_INC_STATS_BH(dev_net(skb->dev), ICMP_MIB_INERRORS);
@@ -30538,7 +30576,11 @@ sctp_v4_err(struct sk_buff *skb, uint32_t info)
 #endif
 #endif
 #else
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
+	ICMP_INC_STATS(dev_net(skb->dev), ICMP_MIB_INERRORS);
+#else
 	ICMP_INC_STATS_BH(IcmpInErrors);
+#endif
 #endif
 #if defined HAVE_NET_PROTOCOL_ERR_HANDLER_RETURNS_INT
 	return(0);
@@ -30574,7 +30616,7 @@ sctp_v4_rcv(struct sk_buff *skb)
 	/* For now...  We should actually place non-linear fragments into seperate mblks and pass
 	   them up as a chain, or deal with non-linear sk_buffs directly.  As it winds up, the
 	   netfilter hooks linearize anyway. */
-#ifdef HAVE_KFUNC_SKB_LINEARIZE_1_ARG
+#if defined(HAVE_KFUNC_SKB_LINEARIZE_1_ARG) || LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
 	if (skb_is_nonlinear(skb) && skb_linearize(skb) != 0)
 		goto linear_fail;
 #else				/* HAVE_KFUNC_SKB_LINEARIZE_1_ARG */
@@ -30603,13 +30645,14 @@ sctp_v4_rcv(struct sk_buff *skb)
 	   full STREAMS message block and copy the data into the STREAMS message block and free the 
 	   SKBUFF. */
 	{
-		size_t plen = skb->len + (skb->data - skb->nh.raw);
+		unsigned char *nh = skb_network_header(skb);
+		size_t plen = skb->len + (skb->data - nh);
 
 		if (!(mp = allocb(plen, BPRI_MED)))
 			goto no_buffers;
-		bcopy(skb->nh.raw, mp->b_wptr, plen);
+		bcopy(nh, mp->b_wptr, plen);
 		mp->b_wptr += plen;
-		mp->b_rptr += (skb->data - skb->nh.raw);
+		mp->b_rptr += (skb->data - nh);
 	}
 #else
 	if (!(mp = skballoc(skb, BPRI_MED)))
@@ -30737,7 +30780,7 @@ sctp_notifier(struct notifier_block *self, unsigned long msg, void *data)
 #if ( defined HAVE_KFUNC_RCU_READ_LOCK || defined HAVE_KMACRO_RCU_READ_LOCK )
 	rcu_read_lock();
 #endif
-#ifdef HAVE_KFUNC___IN_DEV_GET_RCU
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24) || defined HAVE_KFUNC___IN_DEV_GET_RCU
 	if (!(in_dev = __in_dev_get_rcu(dev)))
 		goto done;
 #else
@@ -30766,7 +30809,7 @@ sctp_notifier(struct notifier_block *self, unsigned long msg, void *data)
 			/* stream must be wildcard bound */
 			if (sp->userlocks & SCTP_BINDADDR_LOCK)
 				continue;
-#if !( defined HAVE_KFUNC_RCU_READ_LOCK || defined HAVE_KMACRO_RCU_READ_LOCK )
+#if !( defined HAVE_KFUNC_RCU_READ_LOCK || defined HAVE_KMACRO_RCU_READ_LOCK ) && LINUX_VERSION_CODE < KERNEL_VERSION(2,6,24)
 			read_lock(&in_dev->lock);
 #endif
 			for (ifa = in_dev->ifa_list; ifa; ifa = ifa->ifa_next) {
@@ -30785,7 +30828,7 @@ sctp_notifier(struct notifier_block *self, unsigned long msg, void *data)
 					ss->flags &= ~SCTP_SRCEF_DEL_REQUEST;
 				/* should we clear del pending too? */
 			}
-#if ! ( defined HAVE_KFUNC_RCU_READ_LOCK || defined HAVE_KMACRO_RCU_READ_LOCK )
+#if ! ( defined HAVE_KFUNC_RCU_READ_LOCK || defined HAVE_KMACRO_RCU_READ_LOCK ) && LINUX_VERSION_CODE < KERNEL_VERSION(2,6,24)
 			read_unlock(&in_dev->lock);
 #endif
 #if 0
@@ -30821,7 +30864,7 @@ sctp_notifier(struct notifier_block *self, unsigned long msg, void *data)
 			/* socket must be wildcard bound */
 			if (sp->userlocks & SCTP_BINDADDR_LOCK)
 				continue;
-#if !( defined HAVE_KFUNC_RCU_READ_LOCK || defined HAVE_KMACRO_RCU_READ_LOCK )
+#if !( defined HAVE_KFUNC_RCU_READ_LOCK || defined HAVE_KMACRO_RCU_READ_LOCK ) && LINUX_VERSION_CODE < KERNEL_VERSION(2,6,24)
 			read_lock(&in_dev->lock);
 #endif
 			for (ifa = in_dev->ifa_list; ifa; ifa = ifa->ifa_next) {
@@ -30837,7 +30880,7 @@ sctp_notifier(struct notifier_block *self, unsigned long msg, void *data)
 					/* should we clear add pending too? */
 				}
 			}
-#if !( defined HAVE_KFUNC_RCU_READ_LOCK || defined HAVE_KMACRO_RCU_READ_LOCK )
+#if !( defined HAVE_KFUNC_RCU_READ_LOCK || defined HAVE_KMACRO_RCU_READ_LOCK ) && LINUX_VERSION_CODE < KERNEL_VERSION(2,6,24)
 			read_unlock(&in_dev->lock);
 #endif
 #if 0
@@ -31002,7 +31045,7 @@ sctp_term_proto(void)
 }
 #endif				/* HAVE_KMEMB_STRUCT_INET_PROTOCOL_NO_POLICY */
 
-#ifdef HAVE_KMEMB_STRUCT_NET_PROTOCOL_NO_POLICY
+#if defined(HAVE_KMEMB_STRUCT_NET_PROTOCOL_NO_POLICY) || LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
 STATIC struct net_protocol sctp_protocol = {
 	.handler = sctp_v4_rcv,		/* SCTP data handler */
 	.err_handler = sctp_v4_err,	/* SCTP error control */
@@ -31084,5 +31127,3 @@ sctp_exit(void)
 
 module_init(sctp_init);
 module_exit(sctp_exit);
-
-

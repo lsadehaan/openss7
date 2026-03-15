@@ -1,0 +1,28 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\"
+.\" @(#) doc/man/man8/mxconfig.8.man
+.\"
+.TH MXCONFIG 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Administration"
+.SH NAME
+.B mxconfig
+\- multiplex configuration utility
+.SH SYNOPSIS
+.HP 12
+\fBmxconfig\fP [\fIoptions\fP]
+.SH DESCRIPTION
+.PP
+.B mxconfig
+is a multiplex configuration utility for the OpenSS7 package.
+.SH OPTIONS
+.TP
+\fB-h\fP, \fB--help\fP
+Display usage information and exit.
+.TP
+\fB-V\fP, \fB--version\fP
+Display version information and exit.
+.TP
+\fB-C\fP, \fB--copying\fP
+Display copying permissions and exit.
+.SH "SEE ALSO"
+.BR soconfig (8).

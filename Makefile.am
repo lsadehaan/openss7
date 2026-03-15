@@ -246,6 +246,19 @@ streams.o: stamp-verobjs
 	$(ECHO_V) "$(LD) -r -o $@ $$list" ; \
 	$(LD) -r -o $@ $$list
 
+KERNEL_KERNEL_ALIAS_OBJECTS	= $(patsubst libOS7kernel_a-%.o,$(kpre)%.o,$(filter libOS7kernel_a-%.o,$(KERNEL_MODULES)))
+KERNEL_MODULE_ALIAS_OBJECTS	= $(patsubst libOS7modules_a-%.o,$(kpre)%.o,$(filter libOS7modules_a-%.o,$(KERNEL_MODULES)))
+KERNEL_DRIVER_ALIAS_OBJECTS	= $(patsubst libOS7drivers_a-%.o,$(kpre)%.o,$(filter libOS7drivers_a-%.o,$(KERNEL_MODULES)))
+
+$(KERNEL_KERNEL_ALIAS_OBJECTS): $(kpre)%.o: libOS7kernel_a-%.o
+	ln -f "$<" "$@" 2>/dev/null || cp -f "$<" "$@"
+
+$(KERNEL_MODULE_ALIAS_OBJECTS): $(kpre)%.o: libOS7modules_a-%.o
+	ln -f "$<" "$@" 2>/dev/null || cp -f "$<" "$@"
+
+$(KERNEL_DRIVER_ALIAS_OBJECTS): $(kpre)%.o: libOS7drivers_a-%.o
+	ln -f "$<" "$@" 2>/dev/null || cp -f "$<" "$@"
+
 ## =====================================================================
 
 noinst_LIBRARIES		+= libOS7kernel.a
@@ -2347,7 +2360,9 @@ sbin_PROGRAMS			+= osid
 ## ---------------------------------------------------------------------
 ## =====================================================================
 
-TEST_INCLUDES			= -I$(top_builddir)/src/test -I$(top_srcdir)/src/test $(PKG_INCLUDES) $(USER_CPPFLAGS)
+TEST_INCLUDES			= -I$(top_builddir)/src/test -I$(top_srcdir)/src/test \
+				  -include $(top_srcdir)/src/test/test-compat.h \
+				  $(PKG_INCLUDES) $(USER_CPPFLAGS)
 
 ## =====================================================================
 

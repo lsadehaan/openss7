@@ -53,7 +53,7 @@ static char const ident[] = "src/drivers/mux.c (" PACKAGE_ENVR ") " PACKAGE_DATE
  *  This driver provides a multiplexing driver as an example and a test program.
  */
 
-#ifndef HAVE_KTYPE_BOOL
+#if !defined(__KERNEL__) && !defined(HAVE_KTYPE_BOOL)
 #include <stdbool.h>
 #endif
 

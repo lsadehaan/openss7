@@ -58,6 +58,7 @@ static char const ident[] = "src/drivers/inet.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 #define _MPS_SOURCE	1
 
 #include <sys/os7/compat.h>
+#include <sys/os7/bufq.h>
 
 #if defined HAVE_OPENSS7_SCTP
 #if !defined CONFIG_SCTP && !defined CONFIG_SCTP_MODULE
@@ -95,6 +96,20 @@ static char const ident[] = "src/drivers/inet.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 
 #include <linux/errqueue.h>
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
+#undef HAVE_OLD_SOCK_STRUCTURE
+#undef HAVE_TRN_SOCK_STRUCTURE
+#ifndef HAVE_NEW_SOCK_STRUCTURE
+#define HAVE_NEW_SOCK_STRUCTURE 1
+#endif
+#ifndef HAVE_KMEMB_STRUCT_MSGHDR_MSG_ITER
+#define HAVE_KMEMB_STRUCT_MSGHDR_MSG_ITER 1
+#endif
+#ifndef HAVE_KMEMB_STRUCT_PROTO_OPS_GETNAME_3_ARGS
+#define HAVE_KMEMB_STRUCT_PROTO_OPS_GETNAME_3_ARGS 1
+#endif
+#endif
+
 #if 0
 /* Turn on some tracing and debugging. */
 #undef ensure
@@ -102,6 +117,16 @@ static char const ident[] = "src/drivers/inet.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 
 #define ensure __ensure
 #define assure __assure
+#endif
+
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
+#define ss_uid_is_root(_uid) uid_eq((_uid), GLOBAL_ROOT_UID)
+#else
+#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+#define ss_uid_is_root(_uid) ((_uid).val == 0)
+#else
+#define ss_uid_is_root(_uid) ((_uid) == 0)
+#endif
 #endif
 
 /* Compatibility functions between 2.4 and 2.6. */
@@ -197,7 +222,11 @@ static char const ident[] = "src/drivers/inet.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 #define sock_tst_destroy(_sk)		(sock_flag(_sk, SOCK_DESTROY) ? 1 : 0)
 #define sock_tst_broadcast(_sk)		(sock_flag(_sk, SOCK_BROADCAST) ? 1 : 0)
 #define sock_tst_localroute(_sk)	(((struct sock *)_sk)->sk_localroute ? 1 : 0)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
+#define sock_tst_debug(_sk)		(0)
+#else
 #define sock_tst_debug(_sk)		(((struct sock *)_sk)->sk_debug ? 1 : 0)
+#endif
 
 #define sock_set_dead(_sk)		(sock_set_flag(_sk, SOCK_DEAD))
 #define sock_set_done(_sk)		(sock_set_flag(_sk, SOCK_DONE))
@@ -207,7 +236,11 @@ static char const ident[] = "src/drivers/inet.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 #define sock_set_destroy(_sk)		(sock_set_flag(_sk, SOCK_DESTROY))
 #define sock_set_broadcast(_sk)		(sock_set_flag(_sk, SOCK_BROADCAST))
 #define sock_set_localroute(_sk)	(((struct sock *)_sk)->sk_localroute = 1)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
+#define sock_set_debug(_sk)		do { } while (0)
+#else
 #define sock_set_debug(_sk)		(((struct sock *)_sk)->sk_debug = 1)
+#endif
 
 #define sock_clr_dead(_sk)		(sock_reset_flag(_sk, SOCK_DEAD))
 #define sock_clr_done(_sk)		(sock_reset_flag(_sk, SOCK_DONE))
@@ -217,7 +250,11 @@ static char const ident[] = "src/drivers/inet.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 #define sock_clr_destroy(_sk)		(sock_reset_flag(_sk, SOCK_DESTROY))
 #define sock_clr_broadcast(_sk)		(sock_reset_flag(_sk, SOCK_BROADCAST))
 #define sock_clr_localroute(_sk)	(((struct sock *)_sk)->sk_localroute = 0)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
+#define sock_clr_debug(_sk)		do { } while (0)
+#else
 #define sock_clr_debug(_sk)		(((struct sock *)_sk)->sk_debug = 0)
+#endif
 
 #define sock_saddr(_sk)			(inet_sk(_sk)->saddr)
 #define sock_sport(_sk)			(inet_sk(_sk)->sport)
@@ -248,7 +285,9 @@ static char const ident[] = "src/drivers/inet.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 #else
 #define sock_tst_localroute(_sk)	(sock_flag(_sk, SOCK_LOCALROUTE) ? 1 : 0)
 #endif
-#ifdef HAVE_KMEMB_STRUCT_SOCK_SK_DEBUG
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
+#define sock_tst_debug(_sk)		(0)
+#elif defined HAVE_KMEMB_STRUCT_SOCK_SK_DEBUG
 #define sock_tst_debug(_sk)		(((struct sock *)_sk)->sk_debug ? 1 : 0)
 #else
 #define sock_tst_debug(_sk)		(sock_flag(_sk, SOCK_DBG) ? 1 : 0)
@@ -266,7 +305,9 @@ static char const ident[] = "src/drivers/inet.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 #else
 #define sock_set_localroute(_sk)	(sock_set_flag(_sk, SOCK_LOCALROUTE))
 #endif
-#ifdef HAVE_KMEMB_STRUCT_SOCK_SK_DEBUG
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
+#define sock_set_debug(_sk)		do { } while (0)
+#elif defined HAVE_KMEMB_STRUCT_SOCK_SK_DEBUG
 #define sock_set_debug(_sk)		(((struct sock *)_sk)->sk_debug = 1)
 #else
 #define sock_set_debug(_sk)		(sock_set_flag(_sk, SOCK_DBG))
@@ -284,7 +325,9 @@ static char const ident[] = "src/drivers/inet.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 #else
 #define sock_clr_localroute(_sk)	(sock_reset_flag(_sk, SOCK_LOCALROUTE))
 #endif
-#ifdef HAVE_KMEMB_STRUCT_SOCK_SK_DEBUG
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
+#define sock_clr_debug(_sk)		do { } while (0)
+#elif defined HAVE_KMEMB_STRUCT_SOCK_SK_DEBUG
 #define sock_clr_debug(_sk)		(((struct sock *)_sk)->sk_debug = 0)
 #else
 #define sock_clr_debug(_sk)		(sock_reset_flag(_sk, SOCK_DBG))
@@ -362,6 +405,44 @@ static char const ident[] = "src/drivers/inet.c (" PACKAGE_ENVR ") " PACKAGE_DAT
 #error One of HAVE_OLD_SOCK_STRUCTURE, HAVE_TRN_SOCK_STRUCTURE or HAVE_NEW_SOCK_STRUCTURE must be defined.
 #endif
 #endif
+#endif
+
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
+#undef sk_no_check
+#define sk_no_check			sk_no_check_tx
+#ifndef UDP_CSUM_DEFAULT
+#define UDP_CSUM_DEFAULT		0
+#endif
+#ifndef UDP_CSUM_NOXMIT
+#define UDP_CSUM_NOXMIT			1
+#endif
+
+#undef sock_saddr
+#define sock_saddr(_sk)			(inet_sk(_sk)->inet_saddr)
+#undef sock_sport
+#define sock_sport(_sk)			(inet_sk(_sk)->inet_sport)
+#undef sock_daddr
+#define sock_daddr(_sk)			(inet_sk(_sk)->inet_daddr)
+#undef sock_dport
+#define sock_dport(_sk)			(inet_sk(_sk)->inet_dport)
+
+#undef sock_syn_retries
+#define sock_syn_retries(_sk)		(inet_csk(_sk)->icsk_syn_retries)
+#undef sock_defer_accept
+#define sock_defer_accept(_sk)		(inet_csk(_sk)->icsk_accept_queue.rskq_defer_accept)
+#undef sock_accept_queue_head
+#define sock_accept_queue_head(_sk)	(inet_csk(_sk)->icsk_accept_queue.rskq_accept_head)
+#undef sock_accept_queue_tail
+#define sock_accept_queue_tail(_sk)	(inet_csk(_sk)->icsk_accept_queue.rskq_accept_tail)
+#undef sock_accept_queue_lock
+#define sock_accept_queue_lock(_sk)	spin_lock_bh(&inet_csk(_sk)->icsk_accept_queue.rskq_lock)
+#undef sock_accept_queue_unlock
+#define sock_accept_queue_unlock(_sk)	spin_unlock_bh(&inet_csk(_sk)->icsk_accept_queue.rskq_lock)
+
+#undef open_request
+#define open_request			request_sock
+#undef tcp_openreq_fastfree
+#define tcp_openreq_fastfree(__req)	reqsk_free(__req)
 #endif
 
 #if !defined HAVE_OPENSS7_SCTP
@@ -517,6 +598,8 @@ static inline __u32 sysctl_wmem_max_(void)
 
 #ifndef sysctl_tcp_fin_timeout
 #ifdef HAVE_KMEMB_STRUCT_NETNS_IPV4_SYSCTL_TCP_FIN_TIMEOUT
+#define sysctl_tcp_fin_timeout init_net.ipv4.sysctl_tcp_fin_timeout
+#elif LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
 #define sysctl_tcp_fin_timeout init_net.ipv4.sysctl_tcp_fin_timeout
 #else
 #ifndef HAVE_SYSCTL_TCP_FIN_TIMEOUT_SYMBOL
@@ -11413,13 +11496,13 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 						t->options.tcp.nodelay = *valp;
 #if !defined CONFIG_KERNEL_WEAK_MODULES || defined HAVE_TCP_PUSH_PENDING_FRAMES_EXPORT || \
     ( defined HAVE_TCP_CURRENT_MSS_EXPORT && defined HAVE_TCP___PUSH_PENDING_FRAMES_EXPORT)
-#if !defined HAVE_KFUNC_TCP_PUSH_PENDING_FRAMES_1_ARG
-						if ((tp->nonagle = (*valp == T_YES) ? 1 : 0))
-							tcp_push_pending_frames(sk, tp);
-#else				/* !defined HAVE_KFUNC_TCP_PUSH_PENDING_FRAMES_1_ARG */
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24) || defined HAVE_KFUNC_TCP_PUSH_PENDING_FRAMES_1_ARG
 						if ((tp->nonagle = (*valp == T_YES) ? 1 : 0))
 							tcp_push_pending_frames(sk);
-#endif				/* !defined HAVE_KFUNC_TCP_PUSH_PENDING_FRAMES_1_ARG */
+#else
+						if ((tp->nonagle = (*valp == T_YES) ? 1 : 0))
+							tcp_push_pending_frames(sk, tp);
+#endif
 #endif
 					}
 					if (ih->name != T_ALLOPT)
@@ -13110,7 +13193,7 @@ sock_listen(struct socket *sock, uint cons)
 	return sock->ops->listen(sock, cons);
 }
 
-#ifdef HAVE_SOCK_ALLOC_SYMBOL
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24) || defined(HAVE_SOCK_ALLOC_SYMBOL)
 #if defined HAVE_SOCK_ALLOC_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 struct socket *sock_alloc(void);
 #else
@@ -15855,10 +15938,10 @@ t_conn_req(ss_t *ss, queue_t *q, mblk_t *mp)
 		if (dst_in->sin_port == 0)
 			goto badaddr;
 #ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
-		if (ss->cred.cr_uid.val != 0 && ntohs(dst_in->sin_port) == IPPROTO_RAW)
+		if (!ss_uid_is_root(ss->cred.cr_uid) && ntohs(dst_in->sin_port) == IPPROTO_RAW)
 			goto acces;
 #else
-		if (ss->cred.cr_uid != 0 && ntohs(dst_in->sin_port) == IPPROTO_RAW)
+		if (!ss_uid_is_root(ss->cred.cr_uid) && ntohs(dst_in->sin_port) == IPPROTO_RAW)
 			goto acces;
 #endif
 		break;
@@ -16010,10 +16093,10 @@ t_conn_res(ss_t *ss, queue_t *q, mblk_t *mp)
 	if (unlikely(ss_get_state(as) == TS_IDLE && as->conind))
 		goto resqlen;
 #ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
-	if (unlikely(ss->cred.cr_uid.val != 0 && as->cred.cr_uid.val == 0))
+	if (unlikely(!ss_uid_is_root(ss->cred.cr_uid) && ss_uid_is_root(as->cred.cr_uid)))
 		goto acces;
 #else
-	if (unlikely(ss->cred.cr_uid != 0 && as->cred.cr_uid == 0))
+	if (unlikely(!ss_uid_is_root(ss->cred.cr_uid) && ss_uid_is_root(as->cred.cr_uid)))
 		goto acces;
 #endif
 	opt = mp->b_rptr + p->OPT_offset;
@@ -16412,10 +16495,10 @@ t_bind_req(ss_t *ss, queue_t *q, mblk_t *mp)
 		}
 		add_in = (typeof(add_in)) add;
 #ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
-		if (ss->p.prot.type == SOCK_RAW && ss->cred.cr_uid.val != 0)
+		if (ss->p.prot.type == SOCK_RAW && !ss_uid_is_root(ss->cred.cr_uid))
 			goto acces;
 #else
-		if (ss->p.prot.type == SOCK_RAW && ss->cred.cr_uid != 0)
+		if (ss->p.prot.type == SOCK_RAW && !ss_uid_is_root(ss->cred.cr_uid))
 			goto acces;
 #endif
 		ss->port = ntohs(add_in->sin_port);
@@ -16542,10 +16625,10 @@ t_unitdata_req(ss_t *ss, queue_t *q, mblk_t *mp)
 	    || (p->DEST_length < ss_addr_size((struct sockaddr *) (mp->b_rptr + p->DEST_length))))
 		goto badadd;
 #ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
-	if (unlikely(ss->p.prot.type == SOCK_RAW && ss->cred.cr_uid.val != 0))
+	if (unlikely(ss->p.prot.type == SOCK_RAW && !ss_uid_is_root(ss->cred.cr_uid)))
 		goto acces;
 #else
-	if (unlikely(ss->p.prot.type == SOCK_RAW && ss->cred.cr_uid != 0))
+	if (unlikely(ss->p.prot.type == SOCK_RAW && !ss_uid_is_root(ss->cred.cr_uid)))
 		goto acces;
 #endif
 	else {

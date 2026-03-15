@@ -132,7 +132,7 @@ struct sockaddr_storage {
 #include <sys/debug.h>
 #include <sys/ddi.h>
 
-#include <os7/bufq.h>
+#include "bufq.h"
 
 #include "sctp.h"
 #include "sctp_defs.h"
@@ -248,7 +248,8 @@ sctp_xmit_ootb(daddr, saddr, mp)
 #ifndef HAVE_KFUNC_DST_OUTPUT
 #ifdef HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS
 			__ip_select_ident(iph, rt_dst(rt));
-#elif defined HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS
+#elif defined HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS || \
+      LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
 			__ip_select_ident(iph, rt_dst(rt), 0);
 #else
 #error HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS or HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS must be defined.
@@ -340,7 +341,8 @@ sctp_xmit_msg(daddr, mp, sp)
 #ifndef HAVE_KFUNC_DST_OUTPUT
 #ifdef HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS
 			__ip_select_ident(iph, rt_dst(rt));
-#elif defined HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS
+#elif defined HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS || \
+      LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
 			__ip_select_ident(iph, rt_dst(rt), 0);
 #else
 #error HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS or HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS must be defined.
@@ -468,7 +470,11 @@ sctp_send_msg(sp, sd, mp)
 				iph->protocol = sp->ip_proto;
 				iph->tot_len = htons(tlen);
 				skb->nh.iph = iph;
+#if defined HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS
 				__ip_select_ident(iph, sd->dst_cache);
+#else
+				__ip_select_ident(iph, sd->dst_cache, 0);
+#endif
 
 				for (bp = mp; bp; bp = bp->b_next) {
 					mblk_t *db;

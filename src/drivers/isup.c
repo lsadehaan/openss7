@@ -25334,7 +25334,9 @@ isup_w_ioctl(queue_t *q, mblk_t *mp)
 		switch (nr) {
 		case _IOC_NR(I_PLINK):
 			ptrace(("%s: %p: I_PLINK\n", DRV_NAME, cc));
-#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,5,0)
+			if (!uid_eq(iocp->ioc_cr->cr_uid, GLOBAL_ROOT_UID))
+#elif defined(HAVE_KMEMB_STRUCT_CRED_UID_VAL)
 			if (iocp->ioc_cr->cr_uid.val != 0)
 #else
 			if (iocp->ioc_cr->cr_uid != 0)
@@ -25368,7 +25370,9 @@ isup_w_ioctl(queue_t *q, mblk_t *mp)
 			break;
 		case _IOC_NR(I_PUNLINK):
 			ptrace(("%s: %p: I_PUNLINK\n", DRV_NAME, cc));
-#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,5,0)
+			if (!uid_eq(iocp->ioc_cr->cr_uid, GLOBAL_ROOT_UID))
+#elif defined(HAVE_KMEMB_STRUCT_CRED_UID_VAL)
 			if (iocp->ioc_cr->cr_uid.val != 0)
 #else
 			if (iocp->ioc_cr->cr_uid != 0)

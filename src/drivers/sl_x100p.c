@@ -57,6 +57,8 @@ static char const ident[] = "src/drivers/sl_x100p.c (" PACKAGE_ENVR ") " PACKAGE
 #define _SUN_SOURCE	1
 
 #include <sys/os7/compat.h>
+#include <sys/os7/priv.h>
+#include <sys/os7/queue.h>
 
 #ifndef KBUILD_MODNAME
 #define KBUILD_MODNAME KBUILD_BASENAME
@@ -467,7 +469,7 @@ STATIC struct pci_device_id xp_pci_tbl[] __devinitdata = {
 STATIC int __devinit xp_probe(struct pci_dev *, const struct pci_device_id *);
 STATIC void __devexit xp_remove(struct pci_dev *);
 #ifdef CONFIG_PM
-#ifndef HAVE_KTYPE_PM_MESSAGE_T
+#if !defined(HAVE_KTYPE_PM_MESSAGE_T) && LINUX_VERSION_CODE < KERNEL_VERSION(2,6,24)
 typedef u32 pm_message_t;
 #endif
 STATIC int xp_suspend(struct pci_dev *pdev, pm_message_t state);
@@ -475,13 +477,13 @@ STATIC int xp_resume(struct pci_dev *pdev);
 #endif
 
 STATIC struct pci_driver xp_driver = {
-	name:DRV_NAME,
-	probe:xp_probe,
-	remove:__devexit_p(xp_remove),
-	id_table:xp_pci_tbl,
+	.name = DRV_NAME,
+	.probe = xp_probe,
+	.remove = __devexit_p(xp_remove),
+	.id_table = xp_pci_tbl,
 #ifdef CONFIG_PM
-	suspend:xp_suspend,
-	resume:xp_resume,
+	.suspend = xp_suspend,
+	.resume = xp_resume,
 #endif
 };
 

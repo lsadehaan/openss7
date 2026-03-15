@@ -135,7 +135,7 @@ struct sockaddr_storage {
 #include <sys/npi.h>
 #include <sys/npi_sctp.h>
 
-#include <os7/bufq.h>
+#include "bufq.h"
 
 #include "sctp.h"
 #include "sctp_defs.h"

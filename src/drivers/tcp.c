@@ -71,6 +71,9 @@ static char const ident[] = "src/drivers/tcp.c (" PACKAGE_ENVR ") " PACKAGE_DATE
  */
 
 #include <sys/os7/compat.h>
+#include <sys/os7/priv.h>
+#include <sys/os7/queue.h>
+#include <sys/os7/bufq.h>
 
 #ifdef LINUX
 #undef ASSERT
@@ -232,7 +235,7 @@ MODULE_STATIC struct streamtab tpi_info = {
 	.st_wrinit = &tpi_winit,	/* Upper write queue */
 };
 
-#if !defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER
+#if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,22) && !defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER
 #if !defined HAVE_KFUNC_SKB_TRANSPORT_HEADER
 static inline unsigned char *skb_tail_pointer(const struct sk_buff *skb)
 {
@@ -487,10 +490,14 @@ enum {
 #define t_clr_bit(nr,addr) tpi_clr_bit(nr,addr)
 
 #ifdef LINUX
-#if defined HAVE_KTYPE_STRUCT_NET_PROTOCOL
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24) || defined HAVE_KTYPE_STRUCT_NET_PROTOCOL
 struct inet_protocol {
 	struct net_protocol proto;
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
+	const struct net_protocol *next;
+#else
 	struct net_protocol *next;
+#endif
 	struct module *kmod;
 };
 #endif				/* defined HAVE_KTYPE_STRUCT_NET_PROTOCOL */
@@ -4208,7 +4215,7 @@ t_build_options(struct tpi *t, unsigned char *ip, size_t ilen, unsigned char *op
 #define MAX_INET_SLOTS		1
 #define BASE_INET_PROTOCOL	IPPROTO_TCP
 
-#if defined HAVE_KTYPE_STRUCT_INET_PROTOCOL
+#if defined HAVE_KTYPE_STRUCT_INET_PROTOCOL && LINUX_VERSION_CODE < KERNEL_VERSION(2,6,24)
 
 struct inet_protocol tpi_proto[MAX_INET_SLOTS] = { };
 
@@ -4302,7 +4309,7 @@ tpi_term_nproto(unsigned char proto)
 	return (0);
 }
 
-#elif defined HAVE_KTYPE_STRUCT_NET_PROTOCOL
+#elif LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24) || defined HAVE_KTYPE_STRUCT_NET_PROTOCOL
 
 /*
  *  Under 2.6, attempt to do the equivalent of inet_add_protocol().  If it fails (as would be
@@ -4384,19 +4391,24 @@ tpi_init_nproto(unsigned char proto)
 	if ((ip = tpi_bhash[slot].ipproto) != NULL)
 		return (-EALREADY);	/* already initialized */
 	ip = tpi_bhash[slot].ipproto = &tpi_proto[slot];
-	/* reduces to inet_add_protocol() if no protocol registered */
-	net_protocol_lock();
-	if ((ip->next = (struct net_protocol *)inet_protos[hash]) != NULL) {
+	ip->next = READ_ONCE(inet_protos[hash]);
+	if (ip->next != NULL) {
 		if ((ip->kmod = streams_module_address((ulong) ip->next))
-		    && ip->kmod != THIS_MODULE) {
-			if (!try_module_get(ip->kmod)) {
-				net_protocol_unlock();
-				return (-EAGAIN);
-			}
+		    && ip->kmod != THIS_MODULE && !try_module_get(ip->kmod))
+			return (-EAGAIN);
+		if (inet_del_protocol(ip->next, proto) != 0) {
+			if (ip->kmod != NULL && ip->kmod != THIS_MODULE)
+				module_put(ip->kmod);
+			return (-EAGAIN);
 		}
 	}
-	inet_protos[hash] = &ip->proto;
-	net_protocol_unlock();
+	if (inet_add_protocol(&ip->proto, proto) != 0) {
+		if (ip->next != NULL)
+			inet_add_protocol(ip->next, proto);
+		if (ip->kmod != NULL && ip->kmod != THIS_MODULE)
+			module_put(ip->kmod);
+		return (-EAGAIN);
+	}
 #if defined HAVE_KFUNC_IN_ATOMIC || defined in_atomic
 	if (!in_interrupt() && !in_atomic())
 #else
@@ -4422,10 +4434,9 @@ tpi_term_nproto(unsigned char proto)
 
 	if ((ip = tpi_bhash[slot].ipproto) == NULL)
 		return (-EALREADY);	/* already terminated */
-	/* reduces to inet_del_protocol() if no protocol was registered */
-	net_protocol_lock();
-	inet_protos[hash] = ip->next;
-	net_protocol_unlock();
+	(void) inet_del_protocol(&ip->proto, proto);
+	if (ip->next != NULL)
+		(void) inet_add_protocol(ip->next, proto);
 #if defined HAVE_KFUNC_IN_ATOMIC || defined in_atomic
 	if (!in_interrupt() && !in_atomic())
 #else
@@ -4726,7 +4737,25 @@ t_tpi_disconnect(struct tpi *tpi)
 	return (0);
 }
 
-#if defined HAVE_KFUNC_DST_OUTPUT
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
+STATIC INLINE int
+t_tpi_queue_xmit(struct net *net, struct sock *sk, struct sk_buff *skb)
+{
+	struct rtable *rt = skb_rtable(skb);
+	struct iphdr *iph = (typeof(iph)) skb_network_header(skb);
+
+#if defined NETIF_F_TSO
+	__ip_select_ident(iph, rt_dst(rt), 0);
+#else
+	ip_select_ident(iph, rt_dst(rt), NULL);
+#endif
+	ip_send_check(iph);
+#ifndef NF_IP_LOCAL_OUT
+#define NF_IP_LOCAL_OUT NF_INET_LOCAL_OUT
+#endif
+	return NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, net, sk, skb, NULL, rt_dst(rt)->dev, dst_output);
+}
+#elif defined HAVE_KFUNC_DST_OUTPUT
 STATIC INLINE int
 #if defined HAVE_KFUNC_NF_HOOK_OKFN_2_ARG
 t_tpi_queue_xmit(struct sock *sk, struct sk_buff *skb)
@@ -4777,7 +4806,7 @@ t_tpi_queue_xmit(struct sk_buff *skb)
 		return skb->dst->output(skb);
 	}
 }
-#endif				/* defined HAVE_KFUNC_DST_OUTPUT */
+#endif				/* modern kernels or HAVE_KFUNC_DST_OUTPUT */
 
 uint32_t
 cksum_generate(struct tcphdr *th, size_t plen)
@@ -4852,7 +4881,7 @@ t_tpi_xmitmsg(queue_t *q, mblk_t *dp, struct sockaddr_in *sin, struct tpi_option
 			iph->frag_off = 0;
 			/* Can be set using the T_IP_TTL option at the T_INET_IP level. */
 			iph->ttl = opts->ip.ttl;
-#ifdef HAVE_KMEMB_STRUCT_RTABLE_RT_DST
+#if defined(HAVE_KMEMB_STRUCT_RTABLE_RT_DST) && LINUX_VERSION_CODE < KERNEL_VERSION(2,6,24)
 			iph->daddr = rt->rt_dst;
 #else
 			iph->daddr = sin->sin_addr.s_addr;
@@ -4869,7 +4898,7 @@ t_tpi_xmitmsg(queue_t *q, mblk_t *dp, struct sockaddr_in *sin, struct tpi_option
 #endif
 			iph->protocol = IPPROTO_TCP;
 			iph->tot_len = htons(tlen);
-#if defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24) || defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER
 #if defined NET_SKBUFF_DATA_USES_OFFSET || defined HAVE_SK_BUFF_NETWORK_HEADER_OFFSET
 			skb->network_header = (unsigned char *) iph - skb->head;
 #else				/* defined NET_SKBUFF_DATA_USES_OFFSET */
@@ -4878,7 +4907,7 @@ t_tpi_xmitmsg(queue_t *q, mblk_t *dp, struct sockaddr_in *sin, struct tpi_option
 #else				/* defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER */
 			skb->nh.iph = iph;
 #endif				/* defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER */
-#if !defined HAVE_KFUNC_DST_OUTPUT
+#if !defined HAVE_KFUNC_DST_OUTPUT && LINUX_VERSION_CODE < KERNEL_VERSION(2,6,24)
 #if defined HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS
 			__ip_select_ident(iph, rt_dst(rt));
 #elif defined HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS
@@ -4901,11 +4930,14 @@ t_tpi_xmitmsg(queue_t *q, mblk_t *dp, struct sockaddr_in *sin, struct tpi_option
 			if (!(dev->features & DONT_CHECKSUM))
 				th->check = htonl(cksum_generate(th, plen));
 			// TCP_INC_STATS(UdpOutPackets);
-#if defined HAVE_KFUNC_DST_OUTPUT
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
+			NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, dev_net(dev), NULL, skb, NULL, dev,
+				t_tpi_queue_xmit);
+#elif defined HAVE_KFUNC_DST_OUTPUT
 			NF_HOOK_(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, dev, t_tpi_queue_xmit);
 #else				/* !defined HAVE_KFUNC_DST_OUTPUT */
 			t_tpi_queue_xmit(skb);
-#endif				/* defined HAVE_KFUNC_DST_OUTPUT */
+#endif				/* modern kernels or HAVE_KFUNC_DST_OUTPUT */
 			return (QR_DONE);
 		}
 		/* Note that this is kind of a sneaky trick.  When we are able to allocate a
@@ -5771,10 +5803,10 @@ t_bind_req(queue_t *q, mblk_t *mp)
 		ADDR_buffer = (typeof(ADDR_buffer)) (mp->b_rptr + p->ADDR_offset);
 	}
 	add_in = (typeof(add_in)) ADDR_buffer;
-#ifndef HAVE_KFUNC_INET_ADDR_TYPE_2_ARGS
-	type = inet_addr_type(add_in->sin_addr.s_addr);
-#else
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
 	type = inet_addr_type(&init_net, add_in->sin_addr.s_addr);
+#else
+	type = inet_addr_type(add_in->sin_addr.s_addr);
 #endif
 	err = TNOADDR;
 	if (sysctl_ip_nonlocal_bind == 0 && add_in->sin_addr.s_addr != INADDR_ANY
@@ -6810,7 +6842,7 @@ tpi_v4_rcv(struct sk_buff *skb)
 	/* For now... We should actually place non-linear fragments into separate mblks and pass
 	   them up as a chain, or deal with non-linear sk_buffs directly.  As it winds up, the
 	   netfilter hooks linearize anyway. */
-#ifdef HAVE_KFUNC_SKB_LINEARIZE_1_ARG
+#if defined(HAVE_KFUNC_SKB_LINEARIZE_1_ARG) || LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,18)
 	if (skb_is_nonlinear(skb) && skb_linearize(skb) != 0)
 		goto linear_fail;
 #else				/* HAVE_KFUNC_SKB_LINEARIZE_1_ARG */
@@ -6968,7 +7000,9 @@ tpi_v4_err(struct sk_buff *skb, u32 info)
 	tpi_v4_err_next(skb, info);
 	goto drop;
       drop:
-#ifdef HAVE_KINC_LINUX_SNMP_H
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
+	ICMP_INC_STATS(dev_net(skb->dev), ICMP_MIB_INERRORS);
+#elif defined HAVE_KINC_LINUX_SNMP_H
 #ifndef ICMP_INC_STATS_BH
         __ICMP_INC_STATS(dev_net(skb->dev), ICMP_MIB_INERRORS);
 #else
@@ -7231,6 +7265,8 @@ tpi_init_hashes(void)
 	goal = num_physpages >> (20 - PAGE_SHIFT);
 #elif defined HAVE__TOTALRAM_PAGES_EXPORT
 	goal = totalram_pages() >> (20 - PAGE_SHIFT);
+#elif LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
+	goal = totalram_pages() >> (20 - PAGE_SHIFT);
 #else
 	goal = totalram_pages >> (20 - PAGE_SHIFT);
 #endif
@@ -7288,8 +7324,8 @@ tpi_init_protos(void)
 		ip->no_policy = 1;
 #endif
 #endif				/* defined HAVE_KTYPE_STRUCT_INET_PROTOCOL */
-#if defined HAVE_KTYPE_STRUCT_NET_PROTOCOL
-#if defined HAVE_KMEMB_STRUCT_NET_PROTOCOL_PROTO
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24) || defined HAVE_KTYPE_STRUCT_NET_PROTOCOL
+#if defined(HAVE_KMEMB_STRUCT_NET_PROTOCOL_PROTO) && LINUX_VERSION_CODE < KERNEL_VERSION(2,6,24)
 		ip->proto.proto = proto;
 #endif				/* defined HAVE_KMEMB_STRUCT_NET_PROTOCOL_PROTO */
 		ip->proto.handler = &tpi_v4_rcv;

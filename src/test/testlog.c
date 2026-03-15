@@ -62,6 +62,18 @@
 
 #include <config.h>
 
+#ifndef PACKAGE_ENVR
+#ifdef PACKAGE_VERSION
+#define PACKAGE_ENVR PACKAGE_VERSION
+#else
+#define PACKAGE_ENVR "unknown"
+#endif
+#endif
+
+#ifndef PACKAGE_DATE
+#define PACKAGE_DATE __DATE__
+#endif
+
 static char const ident[] __attribute__ ((unused)) = "src/test/testlog.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*

@@ -15006,6 +15006,9 @@ m_bind_req(queue_t *q, mblk_t *mp)
 #ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
 		if (src->si < 3 && mtp->cred.cr_uid.val != 0)
 			goto access;
+#elif LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
+		if (src->si < 3 && !uid_eq(mtp->cred.cr_uid, GLOBAL_ROOT_UID))
+			goto access;
 #else
 		if (src->si < 3 && mtp->cred.cr_uid != 0)
 			goto access;
@@ -15110,6 +15113,9 @@ m_conn_req(queue_t *q, mblk_t *mp)
 				goto noaddr;
 #ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
 			if (dst->si < 3 && mtp->cred.cr_uid.val != 0)
+				goto access;
+#elif LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
+			if (dst->si < 3 && !uid_eq(mtp->cred.cr_uid, GLOBAL_ROOT_UID))
 				goto access;
 #else
 			if (dst->si < 3 && mtp->cred.cr_uid != 0)
@@ -15482,6 +15488,9 @@ t_conn_req(queue_t *q, mblk_t *mp)
 #ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
 		if (dst->si < 3 && mtp->cred.cr_uid.val != 0)
 			goto acces;
+#elif LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
+		if (dst->si < 3 && !uid_eq(mtp->cred.cr_uid, GLOBAL_ROOT_UID))
+			goto acces;
 #else
 		if (dst->si < 3 && mtp->cred.cr_uid != 0)
 			goto acces;
@@ -15703,6 +15712,9 @@ t_bind_req(queue_t *q, mblk_t *mp)
 #ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
 		if (src->si < 3 && mtp->cred.cr_uid.val != 0)
 			goto acces;
+#elif LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
+		if (src->si < 3 && !uid_eq(mtp->cred.cr_uid, GLOBAL_ROOT_UID))
+			goto acces;
 #else
 		if (src->si < 3 && mtp->cred.cr_uid != 0)
 			goto acces;
@@ -15795,6 +15807,9 @@ t_unitdata_req(queue_t *q, mblk_t *mp)
 			goto badaddr;
 #ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
 		if (dst->si < 3 && mtp->cred.cr_uid.val != 0)
+			goto acces;
+#elif LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
+		if (dst->si < 3 && !uid_eq(mtp->cred.cr_uid, GLOBAL_ROOT_UID))
 			goto acces;
 #else
 		if (dst->si < 3 && mtp->cred.cr_uid != 0)
@@ -16386,6 +16401,9 @@ n_bind_req(queue_t *q, mblk_t *mp)
 #ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
 	if (src.si < 3 || mtp->cred.cr_uid.val != 0)
 		goto access;
+#elif LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
+	if (src.si < 3 || !uid_eq(mtp->cred.cr_uid, GLOBAL_ROOT_UID))
+		goto access;
 #else
 	if (src.si < 3 || mtp->cred.cr_uid != 0)
 		goto access;
@@ -16485,6 +16503,9 @@ n_unitdata_req(queue_t *q, mblk_t *mp)
 		goto badaddr;
 #ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
 	if (dst.si < 3 && mtp->cred.cr_uid.val != 0)
+		goto access;
+#elif LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
+	if (dst.si < 3 && !uid_eq(mtp->cred.cr_uid, GLOBAL_ROOT_UID))
 		goto access;
 #else
 	if (dst.si < 3 && mtp->cred.cr_uid != 0)
@@ -19555,6 +19576,8 @@ mtp_i_plink(queue_t *q, struct mtp *mtp, mblk_t *mp)
 
 #ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
 	if (ioc->ioc_cr->cr_uid.val == 0)
+#elif LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
+	if (uid_eq(ioc->ioc_cr->cr_uid, GLOBAL_ROOT_UID))
 #else
 	if (ioc->ioc_cr->cr_uid == 0)
 #endif
@@ -19588,6 +19611,8 @@ mtp_i_punlink(queue_t *q, struct mtp *mtp, mblk_t *mp)
 
 #ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
 	if (ioc->ioc_cr->cr_uid.val == 0)
+#elif LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
+	if (uid_eq(ioc->ioc_cr->cr_uid, GLOBAL_ROOT_UID))
 #else
 	if (ioc->ioc_cr->cr_uid == 0)
 #endif

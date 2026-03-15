@@ -64,6 +64,10 @@ static char const ident[] = "src/drivers/ip_to_dlpi.c (" PACKAGE_ENVR ") " PACKA
 #include <linux/if_arp.h>
 #include <net/arp.h>
 
+#ifndef UTS_RELEASE
+#include <generated/utsrelease.h>
+#endif
+
 #include <sys/dlpi.h>
 
 #define IP2XINET_DESCRIP	"INET Data Link Provider (IP_TO_DLPI) STREAMS Driver"
@@ -1387,7 +1391,7 @@ ip2xinet_devinit(struct net_device *dev)
 {
 	/* Assign other fields in dev, using ether_setup() and some hand assignments */
 	ether_setup(dev);
-#if !defined HAVE_KTYPE_STRUCT_NET_DEVICE_OPS
+#if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,29) && !defined HAVE_KTYPE_STRUCT_NET_DEVICE_OPS
 	dev->open = ip2xinet_devopen;
 	dev->stop = ip2xinet_release;
 	dev->set_config = ip2xinet_config;
@@ -1422,7 +1426,7 @@ ip2xinet_devinit(struct net_device *dev)
 
 struct ip2xinet_dev ip2xinet_devs[NUMIP2XINET];
 
-#if defined HAVE_KTYPE_STRUCT_NET_DEVICE_OPS
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,29) || defined HAVE_KTYPE_STRUCT_NET_DEVICE_OPS
 struct net_device_ops ip2xinet_dev_ops =
 {
     .ndo_init = ip2xinet_devinit,
@@ -1458,7 +1462,7 @@ init_linuxip(void)
 		memset(dev, 0, sizeof(*dev));
 		memcpy(dev->dev.name, "ip2x0", 6);
 		dev->dev.name[4] = (char) ('0' + i);
-#if defined HAVE_KTYPE_STRUCT_NET_DEVICE_OPS
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,29) || defined HAVE_KTYPE_STRUCT_NET_DEVICE_OPS
 		dev->dev.netdev_ops = &ip2xinet_dev_ops;
 #else
 		dev->dev.init = ip2xinet_devinit;
@@ -1541,4 +1545,3 @@ ip2xinet_exit(void)
 module_init(ip2xinet_init);
 module_exit(ip2xinet_exit);
 #endif
-

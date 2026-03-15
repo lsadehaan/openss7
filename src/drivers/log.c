@@ -353,7 +353,7 @@ log_alloc_ctl(queue_t *q, short mid, short sid, char level, unsigned short flags
 		lp->level = level;
 		lp->flags = flags;
 		lp->ttime = jiffies;
-#if defined HAVE_KFUNC_KTIME_GET_REAL_TS64
+#if defined(HAVE_KFUNC_KTIME_GET_REAL_TS64) || LINUX_VERSION_CODE >= KERNEL_VERSION(3,17,0)
 		lp->ltime = ktime_get_real_seconds();
 #else
 		{
@@ -418,7 +418,10 @@ log_wput(queue_t *q, mblk_t *mp)
 		switch (ioc->iocblk.ioc_cmd) {
 		case I_CONSLOG:
 			err = -EPERM;
-#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,5,0)
+			if (!uid_eq(ioc->iocblk.ioc_uid, GLOBAL_ROOT_UID))
+				goto nak;
+#elif defined(HAVE_KMEMB_STRUCT_CRED_UID_VAL)
 			if (ioc->iocblk.ioc_uid.val != 0)
 				goto nak;
 #else
@@ -436,7 +439,10 @@ log_wput(queue_t *q, mblk_t *mp)
 			goto ack;
 		case I_ERRLOG:
 			err = -EPERM;
-#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,5,0)
+			if (!uid_eq(ioc->iocblk.ioc_uid, GLOBAL_ROOT_UID))
+				goto nak;
+#elif defined(HAVE_KMEMB_STRUCT_CRED_UID_VAL)
 			if (ioc->iocblk.ioc_uid.val != 0)
 				goto nak;
 #else
@@ -454,7 +460,10 @@ log_wput(queue_t *q, mblk_t *mp)
 			goto ack;
 		case I_TRCLOG:
 			err = -EPERM;
-#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,5,0)
+			if (!uid_eq(ioc->iocblk.ioc_uid, GLOBAL_ROOT_UID))
+				goto nak;
+#elif defined(HAVE_KMEMB_STRUCT_CRED_UID_VAL)
 			if (ioc->iocblk.ioc_uid.val != 0)
 				goto nak;
 #else

@@ -72,6 +72,15 @@
 #include <linux/compiler.h>	/* for likely */
 #include <linux/slab.h>		/* for kmem_cache_t */
 
+#ifndef kmem_cachep_t
+#define kmem_cachep_t struct kmem_cache *
+#endif
+
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,23)
+#undef kmem_create_cache
+#define kmem_create_cache(a1,a2,a3,a4,a5,a6) kmem_cache_create(a1,a2,a3,a4,a5)
+#endif
+
 #include <sys/stream.h>
 #include <sys/sad.h>
 
@@ -101,7 +110,10 @@ struct termsw {
 struct strevent {
 	union {
 		struct {
-#ifdef HAVE_KFUNC_PID_NR
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,38)
+			struct pid *pid;
+			struct pid *tgid;
+#elif defined HAVE_KFUNC_PID_NR
 			struct pid *pid;
 			struct pid *tgid;
 #else

@@ -67,6 +67,10 @@
 #define __EXTERN_INLINE extern __inline__
 #endif
 
+#ifdef HAVE_KINC_LINUX_TIMEKEEPING_H
+#include <linux/timekeeping.h>
+#endif
+
 #ifndef __SUN_EXTERN_INLINE
 #define __SUN_EXTERN_INLINE __EXTERN_INLINE streamscall
 #endif				/* __SUN_EXTERN_INLINE */
@@ -103,7 +107,9 @@ ddi_get_pid(void)
 __SUN_EXTERN_INLINE time_t
 ddi_get_time(void)
 {
-#if defined HAVE_KFUNC_KTIME_GET_REAL_TS64
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,38)
+	return (time_t) ktime_get_real_seconds();
+#elif defined HAVE_KFUNC_KTIME_GET_REAL_TS64
 	return (time_t) ktime_get_real_seconds();
 #else
 	struct timeval tv;

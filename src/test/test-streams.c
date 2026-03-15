@@ -78,6 +78,15 @@ static char const ident[] __attribute__ ((unused)) = "src/test/test-streams.c ("
 #include <sys/ioctl.h>
 #include <sys/time.h>
 #include <sys/poll.h>
+#include <sys/wait.h>
+
+#ifndef POLLMSG
+#ifdef POLL_MSG
+#define POLLMSG POLL_MSG
+#else
+#define POLLMSG 0
+#endif
+#endif
 #include <stdio.h>
 #include <sys/stat.h>
 #include <fcntl.h>

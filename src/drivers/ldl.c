@@ -180,7 +180,7 @@ struct streamtab ldl_info = {
 };
 
 
-#if !defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER
+#if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,22) && !defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER
 #if !defined HAVE_KFUNC_SKB_TRANSPORT_HEADER
 static inline unsigned char *skb_tail_pointer(const struct sk_buff *skb)
 {
@@ -606,6 +606,9 @@ STATIC char *ldl_pkt_type(unsigned saptype);
 #ifdef HAVE_KMEMB_STRUCT_PACKET_TYPE_FUNC_4_ARGS
 STATIC int rcv_func(struct sk_buff *skb, struct ldldev *dev, struct packet_type *pt,
 		    struct ldldev *dev2);
+#elif LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
+STATIC int rcv_func(struct sk_buff *skb, struct ldldev *dev, struct packet_type *pt,
+		    struct ldldev *dev2);
 #else
 STATIC int rcv_func(struct sk_buff *skb, struct ldldev *dev, struct packet_type *pt);
 #endif
@@ -860,7 +863,9 @@ sap_create(struct dl *dl, sap_t dlsap, dl_ushort saptype)
 		pt->pt.type = saptype;
 		pt->pt.dev = dl->ndev->dev;
 		pt->pt.func = rcv_func;
-#ifdef HAVE_KMEMB_STRUCT_PACKET_TYPE_AF_PACKET_PRIV
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
+		pt->pt.af_packet_priv = (void *) 1;	/* indicate "new style" packet handler */
+#elif defined HAVE_KMEMB_STRUCT_PACKET_TYPE_AF_PACKET_PRIV
 		pt->pt.af_packet_priv = (void *) 1;	/* indicate "new style" packet handler */
 #else
 #ifdef HAVE_KMEMB_STRUCT_PACKET_TYPE_DATA
@@ -869,7 +874,9 @@ sap_create(struct dl *dl, sap_t dlsap, dl_ushort saptype)
 #error Must have HAVE_KMEMB_STRUCT_PACKET_TYPE_DATA or HAVE_KMEMB_STRUCT_PACKET_TYPE_AF_PACKET_PRIV defined.
 #endif
 #endif
-#ifdef HAVE_KMEMB_STRUCT_PACKET_TYPE_NEXT
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
+		INIT_LIST_HEAD(&pt->pt.list);
+#elif defined HAVE_KMEMB_STRUCT_PACKET_TYPE_NEXT
 		pt->pt.next = NULL;
 #else
 #ifdef HAVE_KMEMB_STRUCT_PACKET_TYPE_LIST
@@ -1140,7 +1147,7 @@ ndev_find(struct ldldev *dev)
 }
 
 #if !defined HAVE_DEV_BASE_HEAD_SYMBOL
-#if defined HAVE_KFUNC_FIRST_NET_DEVICE_1_ARG
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24) || defined HAVE_KFUNC_FIRST_NET_DEVICE_1_ARG
 #define first_net_device() first_net_device(&init_net)
 #else				/* defined HAVE_KFUNC_FIRST_NET_DEVICE_1_ARG */
 static inline struct net_device *
@@ -2720,6 +2727,8 @@ mblk_destructor(caddr_t arg)
 STATIC int
 #ifdef HAVE_KMEMB_STRUCT_PACKET_TYPE_FUNC_4_ARGS
 rcv_func(struct sk_buff *skb, struct ldldev *dev, struct packet_type *pt, struct ldldev *dev2)
+#elif LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
+rcv_func(struct sk_buff *skb, struct ldldev *dev, struct packet_type *pt, struct ldldev *dev2)
 #else
 rcv_func(struct sk_buff *skb, struct ldldev *dev, struct packet_type *pt)
 #endif
@@ -2749,7 +2758,7 @@ rcv_func(struct sk_buff *skb, struct ldldev *dev, struct packet_type *pt)
 		kfree_skb(skb);
 		if (b == NULL)
 			return 0;
-#ifdef HAVE_KFUNC_SKB_LINEARIZE_1_ARG
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24) || defined HAVE_KFUNC_SKB_LINEARIZE_1_ARG
 		if (skb_linearize(b)) {
 			kfree_skb(b);
 			return 0;
@@ -4210,7 +4219,7 @@ ws_enabmulti(struct dl *dl, mblk_t *mp)
 
 	reqp = (dl_enabmulti_req_t *) mp->b_rptr;
 
-#ifdef HAVE_KFUNC_DEV_MC_ADD_2_ARGS
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24) || defined HAVE_KFUNC_DEV_MC_ADD_2_ARGS
 	result = dev_mc_add(dl->ndev->dev, mp->b_rptr + reqp->dl_addr_offset);
 #else
 	result = dev_mc_add(dl->ndev->dev, mp->b_rptr + reqp->dl_addr_offset, reqp->dl_addr_length, 0);

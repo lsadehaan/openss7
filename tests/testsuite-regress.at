@@ -1,0 +1,51 @@
+dnl vim: ft=config sw=4 noet nocin com+=b\:dnl fo+=or tw=78
+
+m4_divert_push([DEFAULTS])
+function test_lib_regress() {
+    test-lib-regress "$@"
+}
+m4_divert_pop([DEFAULTS])
+
+AT_TESTED([test-lib-regress])
+
+AT_BANNER([Regression Tests])
+
+dnl Enable the dlpi linkname regression case after __dlpi_linkname_r() stops
+dnl crashing via the broken __dlpi_putuser cleanup handler.
+
+AT_SETUP([getpmsg ioctl marshalling])
+AT_KEYWORDS([regress getpmsg])
+AT_CHECK([test_lib_regress getpmsg-ioctl], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([putpmsg ioctl marshalling])
+AT_KEYWORDS([regress putpmsg])
+AT_CHECK([test_lib_regress putpmsg-ioctl], [], [ignore], [], [], [])
+AT_CLEANUP
+
+AT_SETUP([kernel flag extraction sanity])
+AT_KEYWORDS([regress kernel configure])
+AT_CHECK([
+	makefile="$abs_top_builddir/Makefile"
+	test -r "$makefile" || exit 77
+	kernel_cflags=`sed -n 's/^KERNEL_CFLAGS = //p' "$makefile"`
+	kernel_cppflags=`sed -n 's/^KERNEL_CPPFLAGS = //p' "$makefile"`
+	kernel_modflags=`sed -n 's/^KERNEL_MODFLAGS = //p' "$makefile"`
+	test -n "$kernel_cflags" || exit 1
+	test -n "$kernel_cppflags" || exit 1
+	case " $kernel_cppflags " in
+	    (*" -D__KERNEL__ "*) ;;
+	    (*) exit 1 ;;
+	esac
+	case " $kernel_cppflags " in
+	    (*" -include "*|*" -I"*) ;;
+	    (*) exit 1 ;;
+	esac
+	if test -n "$kernel_modflags" ; then
+	    case " $kernel_modflags " in
+		(*" -DMODULE "*) ;;
+		(*) exit 1 ;;
+	    esac
+	fi
+    ], [], [ignore], [], [], [])
+AT_CLEANUP

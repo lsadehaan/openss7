@@ -358,7 +358,7 @@ MODULE_STATIC struct streamtab tp_info = {
 #define T_USER	    1
 #endif
 
-#if !defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER
+#if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,22) && !defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER
 #if !defined HAVE_KFUNC_SKB_TRANSPORT_HEADER
 static inline unsigned char *
 skb_tail_pointer(const struct sk_buff *skb)
@@ -1272,10 +1272,14 @@ STATIC rwlock_t tp_prot_lock = RW_LOCK_UNLOCKED;
 #endif
 
 #ifdef LINUX
-#if defined HAVE_KTYPE_STRUCT_NET_PROTOCOL
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24) || defined HAVE_KTYPE_STRUCT_NET_PROTOCOL
 struct inet_protocol {
 	struct net_protocol proto;
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
+	const struct net_protocol *next;
+#else
 	struct net_protocol *next;
+#endif
 	struct module *kmod;
 };
 #endif				/* defined HAVE_KTYPE_STRUCT_NET_PROTCCOL */
@@ -1416,23 +1420,29 @@ tp_v4_steal(struct sk_buff *skb)
 #ifdef HAVE_KFUNC_NF_RESET
 	nf_reset(skb);
 #endif
-#ifdef HAVE_KTYPE_STRUCT_INET_PROTOCOL
-	skb->nh.iph->protocol = 255;
-	skb->protocol = 255;
+#if defined HAVE_KTYPE_STRUCT_INET_PROTOCOL && LINUX_VERSION_CODE < KERNEL_VERSION(2,6,24)
+		skb->nh.iph->protocol = 255;
+		skb->protocol = 255;
 #endif				/* HAVE_KTYPE_STRUCT_INET_PROTOCOL */
 }
 #endif
 
-#if defined HAVE_KTYPE_STRUCT_NET_PROTOCOL
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
+#define mynet_protocol net_protocol
+#elif defined HAVE_KTYPE_STRUCT_NET_PROTOCOL
 #define mynet_protocol net_protocol
 #endif				/* defined HAVE_KTYPE_STRUCT_NET_PROTOCOL */
-#if defined HAVE_KTYPE_STRUCT_INET_PROTOCOL
+#if defined HAVE_KTYPE_STRUCT_INET_PROTOCOL && LINUX_VERSION_CODE < KERNEL_VERSION(2,6,24)
 #define mynet_protocol inet_protocol
 #endif				/* defined HAVE_KTYPE_STRUCT_INET_PROTOCOL */
 
 struct ipnet_protocol {
 	struct mynet_protocol *proto;
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
+	const struct mynet_protocol *next;
+#else
 	struct mynet_protocol *next;
+#endif
 	struct module *kmod;
 };
 
@@ -11161,6 +11171,10 @@ t_conn_res(struct tp *tp, queue_t *q, mblk_t *mp)
 #ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
 	if (unlikely(tp->cred.cr_uid.val != 0 && ap->cred.cr_uid.val == 0))
 		goto acces;
+#elif LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
+	if (unlikely(!uid_eq(tp->cred.cr_uid, GLOBAL_ROOT_UID)
+		     && uid_eq(ap->cred.cr_uid, GLOBAL_ROOT_UID)))
+		goto acces;
 #else
 	if (unlikely(tp->cred.cr_uid != 0 && ap->cred.cr_uid == 0))
 		goto acces;
@@ -13180,7 +13194,7 @@ STATIC __unlikely int tp_udp_v4_err(struct sk_buff *skb, u32 info);
 STATIC __unlikely void tp_udp_v4_err(struct sk_buff *skb, u32 info);
 #endif
 
-#ifdef HAVE_KMEM_STRUCT_INET_PROTOCOL_PROTOCOL
+#if defined HAVE_KMEM_STRUCT_INET_PROTOCOL_PROTOCOL && LINUX_VERSION_CODE < KERNEL_VERSION(2,6,24)
 STATIC struct inet_protocol tp_tp4_protocol = {
 	.handler = tp_tp4_v4_rcv,	/* ISO-TP4 data handler */
 	.err_handler = tp_tp4_v4_err,	/* ISO-TP4 error control */
@@ -13203,7 +13217,7 @@ STATIC struct inet_protocol tp_udp_protocol = {
 };
 #endif				/* HAVE_KMEM_STRUCT_INET_PROTOCOL_PROTOCOL */
 
-#ifdef HAVE_KMEMB_STRUCT_INET_PROTOCOL_NO_POLICY
+#if defined HAVE_KMEMB_STRUCT_INET_PROTOCOL_NO_POLICY && LINUX_VERSION_CODE < KERNEL_VERSION(2,6,24)
 STATIC struct inet_protocol tp_tp4_protocol = {
 	.handler = tp_tp4_v4_rcv,	/* ISO-TP4 data handler */
 	.err_handler = tp_tp4_v4_err,	/* ISO-TP4 error control */
@@ -13223,7 +13237,7 @@ STATIC struct inet_protocol tp_udp_protocol = {
 };
 #endif				/* HAVE_KMEMB_STRUCT_INET_PROTOCOL_NO_POLICY */
 
-#ifdef HAVE_KMEMB_STRUCT_NET_PROTOCOL_NO_POLICY
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24) || defined HAVE_KMEMB_STRUCT_NET_PROTOCOL_NO_POLICY
 STATIC struct net_protocol tp_tp4_protocol = {
 	.handler = tp_tp4_v4_rcv,	/* ISO-TP4 data handler */
 	.err_handler = tp_tp4_v4_err,	/* ISO-TP4 error control */
@@ -13469,7 +13483,9 @@ tp_tp4_v4_err(struct sk_buff *skb, uint32_t info)
 	goto drop;
 #endif
       drop:
-#ifdef HAVE_KINC_LINUX_SNMP_H
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
+	ICMP_INC_STATS(dev_net(skb->dev), ICMP_MIB_INERRORS);
+#elif defined HAVE_KINC_LINUX_SNMP_H
 #ifndef ICMP_INC_STATS_BH
 	__ICMP_INC_STATS(dev_net(skb->dev), ICMP_MIB_INERRORS);
 #else
@@ -13655,7 +13671,9 @@ tp_iso_v4_err(struct sk_buff *skb, uint32_t info)
 	goto drop;
 #endif
       drop:
-#ifdef HAVE_KINC_LINUX_SNMP_H
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
+	ICMP_INC_STATS(dev_net(skb->dev), ICMP_MIB_INERRORS);
+#elif defined HAVE_KINC_LINUX_SNMP_H
 #ifndef ICMP_INC_STATS_BH
 	__ICMP_INC_STATS(dev_net(skb->dev), ICMP_MIB_INERRORS);
 #else
@@ -13895,7 +13913,9 @@ tp_udp_v4_err(struct sk_buff *skb, u32 info)
 	goto drop;
 #endif
       drop:
-#ifdef HAVE_KINC_LINUX_SNMP_H
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
+	ICMP_INC_STATS(dev_net(skb->dev), ICMP_MIB_INERRORS);
+#elif defined HAVE_KINC_LINUX_SNMP_H
 #ifndef ICMP_INC_STATS_BH
 	__ICMP_INC_STATS(dev_net(skb->dev), ICMP_MIB_INERRORS);
 #else
@@ -13929,7 +13949,7 @@ tp_udp_v4_err(struct sk_buff *skb, u32 info)
  * field) and is in fact the network portion.
  */
 STATIC __hot_in int
-#ifdef HAVE_KMEMB_STRUCT_PACKET_TYPE_FUNC_4_ARGS
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24) || defined HAVE_KMEMB_STRUCT_PACKET_TYPE_FUNC_4_ARGS
 tp_llc_rcv(struct sk_buff *skb, struct net_device *dev, struct packet_type *pt, struct net_device *orig_dev)
 #else
 tp_llc_rcv(struct sk_buff *skb, struct net_device *dev, struct packet_type *pt)
@@ -14040,7 +14060,7 @@ tp_notifier(struct notifier_block *self, unsigned long msg, void *data)
 #if ( defined HAVE_KFUNC_RCU_READ_LOCK || defined HAVE_KMACRO_RCU_READ_LOCK )
 	rcu_read_lock();
 #endif
-#ifdef HAVE_KFUNC___IN_DEV_GET_RCU
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24) || defined HAVE_KFUNC___IN_DEV_GET_RCU
 	if (!(in_dev = __in_dev_get_rcu(dev)))
 		goto done;
 #else

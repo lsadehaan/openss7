@@ -279,7 +279,10 @@ sad_put(queue_t *q, mblk_t *mp)
 		switch (ioc->iocblk.ioc_cmd) {
 		case SAD_SAP:
 			err = -EPERM;
-#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,5,0)
+			if (!uid_eq(ioc->iocblk.ioc_uid, GLOBAL_ROOT_UID))
+				goto nak;
+#elif defined(HAVE_KMEMB_STRUCT_CRED_UID_VAL)
 			if (ioc->iocblk.ioc_uid.val != 0)
 				goto nak;
 #else
@@ -589,7 +592,11 @@ sad_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	case DRVOPEN:
 		if (minor != 0 && minor != 1)
 			break;
-#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,5,0)
+		if (minor == 0 && !uid_eq(crp->cr_uid, GLOBAL_ROOT_UID)
+		    && !uid_eq(crp->cr_ruid, GLOBAL_ROOT_UID))
+			return (-EACCES);
+#elif defined(HAVE_KMEMB_STRUCT_CRED_UID_VAL)
 		if (minor == 0 && crp->cr_uid.val != 0 && crp->cr_ruid.val != 0)
 			return (-EACCES);
 #else

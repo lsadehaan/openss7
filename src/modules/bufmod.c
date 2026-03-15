@@ -724,7 +724,7 @@ bufmod_iocdata(queue_t *q, mblk_t *mp)
 STATIC noinline fastcall __hot_get void
 bufmod_gettimeval(const struct sb *sb, struct sb_hdr *sbh)
 {
-#if defined HAVE_KFUNC_KTIME_GET_REAL_TS64
+#if defined HAVE_KFUNC_KTIME_GET_REAL_TS64 || LINUX_VERSION_CODE >= KERNEL_VERSION(3,17,0)
 	struct timespec64 ts;
 
 	ktime_get_real_ts64(&ts);

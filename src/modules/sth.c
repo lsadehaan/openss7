@@ -69,13 +69,17 @@ static char const ident[] = "src/modules/sth.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #ifdef HAVE_KINC_LINUX_SCHED_SIGNAL_H
 #include <linux/sched/signal.h>
 #endif
+#include <linux/pid.h>
 #include <linux/spinlock.h>
 #include <linux/fs.h>		/* for file */
 #include <linux/file.h>		/* for fget() */
-#ifdef HAVE_KINC_LINUX_FDTABLE_H
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,38)
+#include <linux/fdtable.h>	/* for files_struct */
+#elif defined HAVE_KINC_LINUX_FDTABLE_H
 #include <linux/fdtable.h>	/* for files_struct */
 #endif
 #include <linux/poll.h>		/* for poll_wait */
+#include <linux/tty.h>
 #include <linux/highmem.h>	/* for kmap, kunmap */
 #include <linux/uio.h>		/* for iovec */
 
@@ -421,7 +425,9 @@ strinsert(struct inode *inode, struct stdata *sd)
 		list_add(&sd->sd_list, &cdev->d_stlist);
 		write_unlock(&cdevsw_lock);
 		assert(cdev->d_inode);
-#ifdef HAVE_KFUNC_SET_NLINK
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,38)
+		inc_nlink(cdev->d_inode);
+#elif defined HAVE_KFUNC_SET_NLINK
 		inode_inc_link_count(cdev->d_inode);
 #else
 		cdev->d_inode->i_nlink++;
@@ -465,7 +471,9 @@ strremove_locked(struct inode *inode, struct stdata *sd)
 		assert(cdev);
 		assert(cdev->d_inode);
 		write_lock(&cdevsw_lock);
-#ifdef HAVE_KFUNC_SET_NLINK
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,38)
+		drop_nlink(cdev->d_inode);
+#elif defined HAVE_KFUNC_SET_NLINK
 		inode_dec_link_count(cdev->d_inode);
 #else
 		cdev->d_inode->i_nlink--;
@@ -913,7 +921,9 @@ strcopyin(const void __user *from, void *to, size_t len)
 #endif
 
 /* How to find the current thread group pid: just use current_tgid(). */
-#ifdef HAVE_KFUNC_PID_NR
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,38)
+#define current_tgid() task_tgid(current)
+#elif defined HAVE_KFUNC_PID_NR
 #if defined HAVE_KFUNC_TASK_TGID
 #define current_tgid() task_tgid(current)
 #else
@@ -934,7 +944,9 @@ strcopyin(const void __user *from, void *to, size_t len)
 #endif
 
 /* How to find the current process pid: just use current_pid(). */
-#ifdef HAVE_KFUNC_PID_NR
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,38)
+#define current_pid() task_pid(current)
+#elif defined HAVE_KFUNC_PID_NR
 #if defined HAVE_KFUNC_TASK_PID
 #define current_pid() task_pid(current)
 #else
@@ -963,10 +975,10 @@ strcopyin(const void __user *from, void *to, size_t len)
 #endif
 
 /* How to find the session leader pid for the current task.  Just use current_sid(). */
-#ifdef HAVE_KFUNC_PID_NR
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,38)
 #define current_sid() task_session(current)
-#elif defined HAVE_KFUNC_TASK_SESSION
+#elif defined HAVE_KFUNC_PID_NR
+#if defined HAVE_KFUNC_TASK_SESSION
 #define current_sid() task_session(current)
 #else
 #error Need a way to get the session leader of the current task.
@@ -992,10 +1004,10 @@ strcopyin(const void __user *from, void *to, size_t len)
 #endif
 
 /* How to find the current process group pid: just use current_pgid(). */
-#ifdef HAVE_KFUNC_PID_NR
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,38)
 #define current_pgid() task_pgrp(current)
-#elif defined HAVE_KFUNC_TASK_PGRP
+#elif defined HAVE_KFUNC_PID_NR
+#if defined HAVE_KFUNC_TASK_PGRP
 #define current_pgid() task_pgrp(current)
 #else
 #error Need a way to get the process group of the current task.
@@ -1102,12 +1114,15 @@ is_ignored_(int sig)
 #else
 int is_ignored(int sig)
 {
-#if defined HAVE_KMEMB_STRUCT_TASK_STRUCT_SIG
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,38)
 	return (sigismember(&current->blocked, sig) ||
-			current->sig->action[sig-1].sa.sa_handler == SIG_IGN);
+		current->sighand->action[sig - 1].sa.sa_handler == SIG_IGN);
+#elif defined HAVE_KMEMB_STRUCT_TASK_STRUCT_SIG
+	return (sigismember(&current->blocked, sig) ||
+		current->sig->action[sig - 1].sa.sa_handler == SIG_IGN);
 #elif defined HAVE_KMEMB_STRUCT_TASK_STRUCT_SIGHAND
 	return (sigismember(&current->blocked, sig) ||
-			current->sighand->action[sig-1].sa.sa_handler == SIG_IGN);
+		current->sighand->action[sig - 1].sa.sa_handler == SIG_IGN);
 #else
 #error Need a way to check for an ignored signal.
 #endif
@@ -1152,12 +1167,18 @@ is_current_pgrp_orphaned_(void)
 }
 #define is_current_pgrp_orphaned() is_current_pgrp_orphaned_()
 #endif
+#elif LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,38)
+extern int is_current_pgrp_orphaned(void);
+#define is_current_pgrp_orphaned() is_current_pgrp_orphaned()
 #else
 #error Need a way to check if process group is orphaned.
 #endif
 
 /* How to send a signal to a process group: just use kill_pg(3) in the code. */
-#if defined HAVE_KILL_PGRP_SYMBOL
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,38)
+extern int kill_pgrp(struct pid *pid, int sig, int priv);
+#define kill_pg(_x_,_y_,_z_) kill_pgrp(_x_,_y_,_z_)
+#elif defined HAVE_KILL_PGRP_SYMBOL
 /* 2.6.32 kernel approach. */
 #if defined HAVE_KILL_PGRP_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 int kill_pgrp(struct pid *pid, int sig, int priv);
@@ -1196,7 +1217,10 @@ kill_pg_(pid_t pgrp, int sig, int priv)
 #endif
 
 /* How to send a signal to a session leader: just use kill_sl(3) in the code. */
-#if defined HAVE_KILL_SL_SYMBOL
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,38)
+extern int kill_pid(struct pid *pid, int sig, int priv);
+#define kill_sl(_x_,_y_,_z_) kill_pid(_x_,_y_,_z_)
+#elif defined HAVE_KILL_SL_SYMBOL
 /* 2.4.33 kernel approach. */
 #if defined HAVE_KILL_SL_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 int kill_sl(pid_t sess, int sig, int priv);
@@ -1250,7 +1274,10 @@ kill_proc_(pid_t sess, int sig, int priv)
 #endif
 
 /* How to send a signal with information to a process: just use kill_proc_info(7) in the code */
-#if defined HAVE_KILL_PID_INFO_SYMBOL
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,38)
+extern int kill_pid_info(int sig, struct kernel_siginfo *info, struct pid *pid);
+#define kill_proc_info(a,b,c,d,e,f,g) kill_pid_info(a,b,c)
+#elif defined HAVE_KILL_PID_INFO_SYMBOL
 /* 4.9 kernel approach: */
 #if   defined HAVE_KILL_PID_INFO_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 #if     defined HAVE_KTYPE_STRUCT_KERNEL_SIGINFO
@@ -1462,7 +1489,10 @@ int kill_proc_info_(int sig, struct siginfo *info, pid_t pid, uid_t uid, uid_t e
 #endif
 
 /* How to send a signal without information to a process. */
-#if   defined HAVE_KILL_PID_SYMBOL
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,38)
+extern int kill_pid(struct pid *pid, int sig, int priv);
+#define kill_pid(a,b,c) kill_pid(a,b,c)
+#elif   defined HAVE_KILL_PID_SYMBOL
 /* 2.6.32 kernel approach. */
 #if   defined HAVE_KILL_PID_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 extern int kill_pid(struct pid *pid, int sig, int priv);
@@ -1499,7 +1529,10 @@ kill_proc_(pid_t pid, int sig, int priv)
 #endif
 
 /* How to send a signal without information to a specific task (thread). */
-#if   defined HAVE_SEND_SIG_SYMBOL
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,38)
+extern int send_sig(int sig, struct task_struct *p, int priv);
+#define send_sig(a,b,c) send_sig(a,b,c)
+#elif   defined HAVE_SEND_SIG_SYMBOL
 #if   defined HAVE_SEND_SIG_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 extern int send_sig(int sig, struct task_struct *p, int priv);
 #define send_sig(a,b,c) send_sig(a,b,c)
@@ -1518,7 +1551,10 @@ int send_sig_(int sig, struct task_struct *p, int priv)
 #endif
 
 /* How to send a signal with information to a specific task (thread). */
-#if   defined HAVE_SEND_SIG_INFO_SYMBOL
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,38)
+extern int send_sig_info(int sig, struct kernel_siginfo *info, struct task_struct *p);
+#define send_sig_info(a,b,c) send_sig_info(a,b,c)
+#elif   defined HAVE_SEND_SIG_INFO_SYMBOL
 #if   defined HAVE_SEND_SIG_INFO_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 #if     defined HAVE_KTYPE_STRUCT_KERNEL_SIGINFO
 extern int send_sig_info(int sig, struct kernel_siginfo *info, struct task_struct *p);
@@ -1702,7 +1738,9 @@ straccess_slow(struct stdata *sd, const register int access, const register int 
 				if (sd->sd_eropt & WERRNONPERSIST)
 					clear_bit(STWRERR_BIT, &sd->sd_flag);
 				if (sd->sd_wropt & SNDPIPE)
-#if defined HAVE_KTYPE_STRUCT_KERNEL_SIGINFO
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,38)
+					send_sig_info(SIGPIPE, SEND_SIG_PRIV, current);
+#elif defined HAVE_KTYPE_STRUCT_KERNEL_SIGINFO
 					send_sig_info(SIGPIPE, (struct kernel_siginfo *) 1, current);
 #else
 					send_sig_info(SIGPIPE, (struct siginfo *) 1, current);
@@ -2039,7 +2077,17 @@ str_find_file_descriptor(const struct task_struct *procp, const struct file *fil
 	struct files_struct *files = procp->files;
 	int fd, max;
 
-#ifdef HAVE_KMEMB_STRUCT_FILES_STRUCT_MAX_FDSET
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,38)
+	const struct fdtable *fdt;
+
+	spin_lock(&files->file_lock);
+	fdt = files_fdtable(files);
+	max = fdt->max_fds;
+	for (fd = 0; fd < max && fdt->fd[fd] != file; fd++) ;
+	spin_unlock(&files->file_lock);
+	if (fd >= max)
+		fd = ~0;
+#elif defined HAVE_KMEMB_STRUCT_FILES_STRUCT_MAX_FDSET
 #ifdef WITH_KO_MODULES
 	spin_lock(&files->file_lock);
 #else
@@ -2203,7 +2251,9 @@ STATIC __unlikely void
 strsiglist(struct stdata *sd, const int events, unsigned char band, int code)
 {
 	struct strevent *se;
-#if defined HAVE_KTYPE_STRUCT_KERNEL_SIGINFO
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,38)
+	struct kernel_siginfo si;
+#elif defined HAVE_KTYPE_STRUCT_KERNEL_SIGINFO
 	struct kernel_siginfo si;
 #else
 	struct siginfo si;
@@ -4896,13 +4946,15 @@ strfasync(int fd, struct file *file, int on)
 	else if (likely((sd = stri_acquire(file)) != NULL)) {
 		if (likely((err = straccess_rlock(sd, FNDELAY)) == 0)) {
 			if ((err = fasync_helper(fd, file, on, &sd->sd_fasync)) >= 0 && on) {
-#ifdef HAVE_KMEMB_STRUCT_FOWN_STRUCT_PID_TYPE
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,38)
+				f_setown(file, -pid_nr(sd->sd_pgrp), 0);
+#elif defined HAVE_KMEMB_STRUCT_FOWN_STRUCT_PID_TYPE
 				f_setown(file, -pid_nr(sd->sd_pgrp), 0);
 #else				/* HAVE_KMEMB_STRUCT_FOWN_STRUCT_PID_TYPE */
 				if (file->f_owner.pid == 0) {
 					file->f_owner.pid = (-pid_nr(sd->sd_pgrp)) ? : current->pid;
-					file->f_owner.uid = current->uid;
-					file->f_owner.euid = current->euid;
+					file->f_owner.uid = current_uid();
+					file->f_owner.euid = current_euid();
 				}
 #endif				/* HAVE_KMEMB_STRUCT_FOWN_STRUCT_PID_TYPE */
 				srunlock(sd);
@@ -6606,7 +6658,7 @@ _strgetpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user 
 STATIC streams_fastcall __unlikely int
 strfattach(struct file *file, const char *path)
 {
-#if defined HAVE_KERNEL_FATTACH_SUPPORT && \
+#if defined HAVE_KERNEL_FATTACH_SUPPORT && LINUX_VERSION_CODE < KERNEL_VERSION(3,0,0) && \
     (!defined CONFIG_KERNEL_WEAK_MODULES || ( \
      ((!defined HAVE_NAMESPACE_SEM_SYMBOL && \
        (!defined HAVE_MOUNT_SEM_SYMBOL || defined HAVE_MOUNT_SEM_EXPORT) ) || \
@@ -6625,7 +6677,7 @@ strfattach(struct file *file, const char *path)
 STATIC streams_fastcall __unlikely int
 strfdetach(const char *path)
 {
-#if defined HAVE_KERNEL_FATTACH_SUPPORT && \
+#if defined HAVE_KERNEL_FATTACH_SUPPORT && LINUX_VERSION_CODE < KERNEL_VERSION(3,0,0) && \
     (!defined CONFIG_KERNEL_WEAK_MODULES || ( \
      ((!defined HAVE_NAMESPACE_SEM_SYMBOL && \
        (!defined HAVE_MOUNT_SEM_SYMBOL || defined HAVE_MOUNT_SEM_EXPORT) ) || \
@@ -6857,7 +6909,14 @@ file_fiogetown(struct file *file, struct stdata *sd, unsigned long arg)
 		if ((err = straccess_rlock(sd, (FREAD | FNDELAY))) == 0) {
 			pid_t owner;
 
-#ifdef HAVE_KMEMB_STRUCT_FOWN_STRUCT_PID_TYPE
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,38)
+			read_lock(&file->f_owner.lock);
+			if (file->f_owner.pid_type == PIDTYPE_PGID)
+				owner = pid_nr(file->f_owner.pid);
+			else
+				owner = 0;
+			read_unlock(&file->f_owner.lock);
+#elif defined HAVE_KMEMB_STRUCT_FOWN_STRUCT_PID_TYPE
 			read_lock(&file->f_owner.lock);
 			if (file->f_owner.pid_type == PIDTYPE_PGID)
 				owner = pid_nr(file->f_owner.pid);
@@ -6902,12 +6961,14 @@ file_fiosetown(struct file *file, struct stdata *sd, unsigned long arg)
 			put_pid(sd->sd_pgrp);
 			sd->sd_pgrp = get_pid(find_pid((owner < 0) ? -owner : 0));
 			swunlock(sd);
-#ifdef HAVE_KMEMB_STRUCT_FOWN_STRUCT_PID_TYPE
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,38)
+			f_setown(file, owner, 1);
+#elif defined HAVE_KMEMB_STRUCT_FOWN_STRUCT_PID_TYPE
 			f_setown(file, owner, 1);
 #else				/* HAVE_KMEMB_STRUCT_FOWN_STRUCT_PID_TYPE */
 			file->f_owner.pid = (-sd->sd_pgrp) ? : owner;
-			file->f_owner.uid = current->uid;
-			file->f_owner.euid = current->euid;
+			file->f_owner.uid = current_uid();
+			file->f_owner.euid = current_euid();
 #endif				/* HAVE_KMEMB_STRUCT_FOWN_STRUCT_PID_TYPE */
 		}
 		return (err);
@@ -8639,12 +8700,14 @@ str_i_pop(const struct file *file, struct stdata *sd, unsigned long arg)
 
 			/* TODO: should use capabilities instead of UID */
 			if (sd->sd_pushcnt >= sd->sd_nanchor ||
-#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
-					crp->cr_uid.val == 0
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,38)
+			    uid_eq(crp->cr_uid, GLOBAL_ROOT_UID)
+#elif defined HAVE_KMEMB_STRUCT_CRED_UID_VAL
+			    crp->cr_uid.val == 0
 #else
-					crp->cr_uid == 0
+			    crp->cr_uid == 0
 #endif
-					) {
+			    ) {
 				int oflag = make_oflag(file);
 
 				sd->sd_pushcnt--;
@@ -8787,7 +8850,7 @@ __str_i_recvfd(const struct file *file, struct stdata *sd, struct strrecvfd *sr)
 {
 	int fd, err;
 
-#ifdef HAVE_KFUNC_GET_UNUSED_FD_FLAGS
+#if defined(HAVE_KFUNC_GET_UNUSED_FD_FLAGS) || LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
 	err = fd = get_unused_fd_flags(0);
 #else
 	err = fd = get_unused_fd();
@@ -8809,7 +8872,9 @@ __str_i_recvfd(const struct file *file, struct stdata *sd, struct strrecvfd *sr)
 			/* we now have a M_PASSFP message in mp */
 			f2 = *(struct file **) mp->b_rptr;
 			sr->fd = fd;
-#if defined HAVE_KMEMB_STRUCT_FILE_F_UID
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,38)
+			sr->uid = __kuid_val(f2->f_cred->uid);
+#elif defined HAVE_KMEMB_STRUCT_FILE_F_UID
 			sr->uid = f2->f_uid;
 #elif defined HAVE_KMEMB_STRUCT_FILE_F_CRED
 #if defined HAVE_KMEMB_STRUCT_CRED_UID_VAL
@@ -8820,7 +8885,9 @@ __str_i_recvfd(const struct file *file, struct stdata *sd, struct strrecvfd *sr)
 #else
 #error Do not know how to get file uid.
 #endif
-#if defined HAVE_KMEMB_STRUCT_FILE_F_GID
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,38)
+			sr->gid = __kgid_val(f2->f_cred->gid);
+#elif defined HAVE_KMEMB_STRUCT_FILE_F_GID
 			sr->gid = f2->f_gid;
 #elif defined HAVE_KMEMB_STRUCT_FILE_F_CRED
 #if defined HAVE_KMEMB_STRUCT_CRED_GID_VAL
@@ -10678,7 +10745,7 @@ _strioctl_locked(struct inode *inode, struct file *file, unsigned int cmd, unsig
 #endif
 
 #if defined WITH_32BIT_CONVERSION
-#if defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_COMPAT_IOCTL
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,11) || defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_COMPAT_IOCTL
 
 /* Just about every 64-bit architecture has a 32-bit compatibility mode */
 STATIC __unlikely long
@@ -12066,7 +12133,9 @@ sthinit(void)
 		goto no_strmod;
 	if (sth_modid == 0 && result >= 0)
 		sth_modid = result;
-#if defined WITH_32BIT_CONVERSION && !defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_COMPAT_IOCTL
+#if defined WITH_32BIT_CONVERSION && \
+    !defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_COMPAT_IOCTL && \
+    LINUX_VERSION_CODE < KERNEL_VERSION(2,6,11)
 	streams_register_ioctl32_conversions();
 #endif
 	sthunlocked = 1;
@@ -12082,7 +12151,9 @@ void __exit
 #endif
 sthexit(void)
 {
-#if defined WITH_32BIT_CONVERSION && !defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_COMPAT_IOCTL
+#if defined WITH_32BIT_CONVERSION && \
+    !defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_COMPAT_IOCTL && \
+    LINUX_VERSION_CODE < KERNEL_VERSION(2,6,11)
 	streams_unregister_ioctl32_conversions();
 #endif
 	unregister_strmod(&sth_fmod);

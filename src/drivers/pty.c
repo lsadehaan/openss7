@@ -66,6 +66,20 @@ static char const ident[] = "src/drivers/pty.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #include <linux/interrupt.h>
 #include <linux/spinlock.h>
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,38)
+#define pty_uid_eq(_a, _b) uid_eq((_a), (_b))
+#define pty_uid_is_root(_u) uid_eq((_u), GLOBAL_ROOT_UID)
+#define pty_uid_is_tty_group(_u) (__kuid_val((_u)) == 5)
+#elif defined HAVE_KMEMB_STRUCT_CRED_UID_VAL
+#define pty_uid_eq(_a, _b) ((_a).val == (_b).val)
+#define pty_uid_is_root(_u) ((_u).val == 0)
+#define pty_uid_is_tty_group(_u) ((_u).val == 5)
+#else
+#define pty_uid_eq(_a, _b) ((_a) == (_b))
+#define pty_uid_is_root(_u) ((_u) == 0)
+#define pty_uid_is_tty_group(_u) ((_u) == 5)
+#endif
+
 #define PTY_DESCRIP	"SVR 4.2 Pseudo-Terminal (PTY) STREAMS Driver"
 #define PTY_EXTRA	"Part of UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PTY_COPYRIGHT	"Copyright (c) 2008-2020  Monavacon Limited.  All Rights Reserved."
@@ -946,21 +960,12 @@ pts_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 
 	if ((c = q->q_ptr) != NULL) {
 		/* already open, check permissions */
-#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
-		if (crp->cr_uid.val == 0)
+		if (pty_uid_is_root(crp->cr_uid))
 			goto access_ok;
-		if (crp->cr_uid.val == 5 && !(oflag & FREAD))
+		if (pty_uid_is_tty_group(crp->cr_uid) && !(oflag & FREAD))
 			goto access_ok;
-		if (crp->cr_uid.val == c->pts.creds.cr_uid.val)
+		if (pty_uid_eq(crp->cr_uid, c->pts.creds.cr_uid))
 			goto access_ok;
-#else
-		if (crp->cr_uid == 0)
-			goto access_ok;
-		if (crp->cr_uid == 5 && !(oflag & FREAD))
-			goto access_ok;
-		if (crp->cr_uid == c->pts.creds.cr_uid)
-			goto access_ok;
-#endif
 		return (EPERM);
 	}
 
@@ -1003,21 +1008,12 @@ pts_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 			}
 
 			/* its unlocked, but check your permissions */
-#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
-			if (crp->cr_uid.val == 0)
+			if (pty_uid_is_root(crp->cr_uid))
 				goto good_open;
-			if (crp->cr_uid.val == 5 && !(oflag & FREAD))
+			if (pty_uid_is_tty_group(crp->cr_uid) && !(oflag & FREAD))
 				goto good_open;
-			if (crp->cr_uid.val == c->pts.creds.cr_uid.val)
+			if (pty_uid_eq(crp->cr_uid, c->pts.creds.cr_uid))
 				goto good_open;
-#else
-			if (crp->cr_uid == 0)
-				goto good_open;
-			if (crp->cr_uid == 5 && !(oflag & FREAD))
-				goto good_open;
-			if (crp->cr_uid == c->pts.creds.cr_uid)
-				goto good_open;
-#endif
 		}
 		write_unlock_str(&c->lock, flags);
 	}

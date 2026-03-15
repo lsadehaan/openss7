@@ -79,10 +79,12 @@ static char const ident[] = "src/drivers/np_ip.c (" PACKAGE_ENVR ") " PACKAGE_DA
 #endif
 
 #include <linux/udp.h>
+#include <linux/netfilter.h>
 
 #include <net/ip.h>
 #include <net/icmp.h>
 #include <net/route.h>
+#include <net/protocol.h>
 #include <net/inet_ecn.h>
 #include <net/snmp.h>
 
@@ -218,7 +220,7 @@ MODULE_STATIC struct streamtab np_info = {
 	.st_wrinit = &np_winit,	/* Upper write queue */
 };
 
-#if !defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER
+#if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,22) && !defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER
 #if !defined HAVE_KFUNC_SKB_TRANSPORT_HEADER
 static inline unsigned char *
 skb_tail_pointer(const struct sk_buff *skb)
@@ -431,7 +433,10 @@ np_chashfn(unsigned char proto, unsigned short sport, unsigned short dport)
 	return ((np_chash_size - 1) & (proto + sport + dport));
 }
 
-#if defined HAVE_KTYPE_STRUCT_NET_PROTOCOL
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
+#define mynet_protocol net_protocol
+#define HAVE_MODERN_NET_PROTOCOL 1
+#elif defined HAVE_KTYPE_STRUCT_NET_PROTOCOL
 #define mynet_protocol net_protocol
 #endif				/* defined HAVE_KTYPE_STRUCT_NET_PROTOCOL */
 #if defined HAVE_KTYPE_STRUCT_INET_PROTOCOL
@@ -440,7 +445,11 @@ np_chashfn(unsigned char proto, unsigned short sport, unsigned short dport)
 
 struct ipnet_protocol {
 	struct mynet_protocol proto;
+#if defined HAVE_MODERN_NET_PROTOCOL
+	const struct net_protocol *next;
+#else
 	struct mynet_protocol *next;
+#endif
 	struct module *kmod;
 };
 
@@ -830,7 +839,7 @@ STATIC INLINE fastcall __hot_in int
 np_v4_rcv_next(struct sk_buff *skb)
 {
 	struct np_prot_bucket *pb;
-	struct mynet_protocol *pp;
+	const struct mynet_protocol *pp;
 	struct iphdr *iph;
 	unsigned char proto;
 
@@ -855,7 +864,7 @@ STATIC INLINE fastcall __hot_in void
 np_v4_err_next(struct sk_buff *skb, __u32 info)
 {
 	struct np_prot_bucket *pb;
-	struct mynet_protocol *pp;
+	const struct mynet_protocol *pp;
 	unsigned char proto;
 
 	proto = ((struct iphdr *) skb->data)->protocol;
@@ -883,8 +892,6 @@ np_init_nproto(unsigned char proto, unsigned int type)
 {
 	struct np_prot_bucket *pb;
 	struct ipnet_protocol *pp;
-	struct mynet_protocol **ppp;
-	int hash = proto & (MAX_INET_PROTOS - 1);
 
 	write_lock_bh(&np_prot_lock);
 	if ((pb = np_prots[proto]) != NULL) {
@@ -915,7 +922,7 @@ np_init_nproto(unsigned char proto, unsigned int type)
 			break;
 		}
 		pp = &pb->prot;
-#ifdef HAVE_KMEMB_STRUCT_INET_PROTOCOL_PROTOCOL
+#if !defined HAVE_MODERN_NET_PROTOCOL && defined HAVE_KMEMB_STRUCT_INET_PROTOCOL_PROTOCOL
 		pp->proto.protocol = proto;
 		pp->proto.name = "streams-np_ip";
 #endif
@@ -927,17 +934,45 @@ np_init_nproto(unsigned char proto, unsigned int type)
 #endif
 		pp->proto.handler = &np_v4_rcv;
 		pp->proto.err_handler = &np_v4_err;
-		ppp = &inet_protosp[hash];
-
+#if defined HAVE_MODERN_NET_PROTOCOL
+		pp->next = READ_ONCE(inet_protos[proto]);
+		if (pp->next != NULL) {
+			if ((pp->kmod = streams_module_address((ulong) pp->next))
+			    && pp->kmod != THIS_MODULE && !try_module_get(pp->kmod)) {
+				write_unlock_bh(&np_prot_lock);
+				kmem_cache_free(np_prot_cachep, pb);
+				return (NULL);
+			}
+			if (inet_del_protocol(pp->next, proto) != 0) {
+				if (pp->kmod != NULL && pp->kmod != THIS_MODULE)
+					module_put(pp->kmod);
+				write_unlock_bh(&np_prot_lock);
+				kmem_cache_free(np_prot_cachep, pb);
+				return (NULL);
+			}
+		}
+		if (inet_add_protocol(&pp->proto, proto) != 0) {
+			if (pp->next != NULL)
+				inet_add_protocol(pp->next, proto);
+			if (pp->kmod != NULL && pp->kmod != THIS_MODULE)
+				module_put(pp->kmod);
+			write_unlock_bh(&np_prot_lock);
+			kmem_cache_free(np_prot_cachep, pb);
+			return (NULL);
+		}
+#else
 		{
+			struct mynet_protocol **ppp;
+			int hash = proto & (MAX_INET_PROTOS - 1);
+
+			ppp = &inet_protosp[hash];
 			net_protocol_lock();
 #ifdef HAVE_OLD_STYLE_INET_PROTOCOL
 			while (*ppp && (*ppp)->protocol != proto)
 				ppp = &(*ppp)->next;
-#endif				/* HAVE_OLD_STYLE_INET_PROTOCOL */
+#endif
 			if (*ppp != NULL) {
 #ifdef HAVE_KMEMB_STRUCT_INET_PROTOCOL_COPY
-				/* can only override last entry */
 				if ((*ppp)->copy != 0) {
 					__ptrace(("Cannot override copy entry\n"));
 					net_protocol_unlock();
@@ -945,11 +980,10 @@ np_init_nproto(unsigned char proto, unsigned int type)
 					kmem_cache_free(np_prot_cachep, pb);
 					return (NULL);
 				}
-#endif				/* HAVE_KMEMB_STRUCT_INET_PROTOCOL_COPY */
+#endif
 				if ((pp->kmod = streams_module_address((ulong) *ppp))
 				    && pp->kmod != THIS_MODULE) {
 					if (!try_module_get(pp->kmod)) {
-						__ptrace(("Cannot acquire module\n"));
 						net_protocol_unlock();
 						write_unlock_bh(&np_prot_lock);
 						kmem_cache_free(np_prot_cachep, pb);
@@ -963,6 +997,7 @@ np_init_nproto(unsigned char proto, unsigned int type)
 			pp->next = xchg(ppp, &pp->proto);
 			net_protocol_unlock();
 		}
+#endif
 		/* link into hash slot */
 		np_prots[proto] = pb;
 	}
@@ -1004,22 +1039,28 @@ np_term_nproto(unsigned char proto, unsigned int type)
 		}
 		if (--pb->refs == 0) {
 			struct ipnet_protocol *pp = &pb->prot;
-			struct mynet_protocol **ppp;
-			int hash = proto & (MAX_INET_PROTOS - 1);
-
-			ppp = &inet_protosp[hash];
+#if defined HAVE_MODERN_NET_PROTOCOL
+			(void) inet_del_protocol(&pp->proto, proto);
+			if (pp->next != NULL)
+				(void) inet_add_protocol(pp->next, proto);
+#else
 			{
+				struct mynet_protocol **ppp;
+				int hash = proto & (MAX_INET_PROTOS - 1);
+
+				ppp = &inet_protosp[hash];
 				net_protocol_lock();
 #ifdef HAVE_OLD_STYLE_INET_PROTOCOL
 				while (*ppp && *ppp != &pp->proto)
 					ppp = &(*ppp)->next;
 				if (pp->next)
 					pp->next->next = pp->proto.next;
-#endif				/* HAVE_OLD_STYLE_INET_PROTOCOL */
+#endif
 				__assert(*ppp == &pp->proto);
 				*ppp = pp->next;
 				net_protocol_unlock();
 			}
+#endif
 			if (pp->next != NULL && pp->kmod != NULL && pp->kmod != THIS_MODULE)
 				module_put(pp->kmod);
 			/* unlink from hash slot */
@@ -1181,9 +1222,11 @@ np_bind(struct np *np, unsigned char *PROTOID_buffer, size_t PROTOID_length, str
 	return (0);
 }
 
-#if defined HAVE_KFUNC_DST_OUTPUT
+#if defined HAVE_KFUNC_DST_OUTPUT || LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
 STATIC INLINE __hot_out int
-#if defined HAVE_KFUNC_NF_HOOK_OKFN_2_ARG
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
+np_ip_queue_xmit(struct net *net, struct sock *sk, struct sk_buff *skb)
+#elif defined HAVE_KFUNC_NF_HOOK_OKFN_2_ARG
 np_ip_queue_xmit(struct sock *sk, struct sk_buff *skb)
 #elif defined HAVE_KFUNC_NF_HOOK_OKFN_3_ARG
 np_ip_queue_xmit(struct net *net, struct sock *sk, struct sk_buff *skb)
@@ -1195,7 +1238,9 @@ np_ip_queue_xmit(struct sk_buff *skb)
 	struct iphdr *iph = (typeof(iph)) skb_network_header(skb);
 
 #if defined NETIF_F_TSO
-#if defined HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS_SEGS || \
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
+	__ip_select_ident(iph, dst, 0);
+#elif defined HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS_SEGS || \
     defined HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS_SEGS
 	__ip_select_ident(iph, dst, 0);
 #elif defined HAVE_KFUNC_IP_SELECT_IDENT_MORE_SK_BUFF
@@ -1210,7 +1255,10 @@ np_ip_queue_xmit(struct sk_buff *skb)
 #ifndef NF_IP_LOCAL_OUT
 #define NF_IP_LOCAL_OUT NF_INET_LOCAL_OUT
 #endif
-#if defined HAVE_KFUNC_IP_DST_OUTPUT
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
+	return NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, net, sk, skb, NULL, dst->dev,
+		       dst_output);
+#elif defined HAVE_KFUNC_IP_DST_OUTPUT
 	return NF_HOOK_(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, dst->dev, ip_dst_output);
 #else
 	return NF_HOOK_(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, dst->dev, dst_output_);
@@ -1232,7 +1280,7 @@ np_ip_queue_xmit(struct sk_buff *skb)
 		return dst->output(skb);
 	}
 }
-#endif				/* defined HAVE_KFUNC_DST_OUTPUT */
+#endif				/* defined HAVE_KFUNC_DST_OUTPUT || modern kernels */
 
 /**
  * np_alloc_skb_slow - allocate a socket buffer from a message block
@@ -1445,7 +1493,7 @@ np_route_output_slow(struct np *np, const uint32_t daddr, struct rtable **rtp)
 		struct flowi4 fl4;
 		struct rtable *rt;
 
-#ifdef HAVE_KFUNC_FLOWI4_INIT_OUTPUT_12_ARGS
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
 		flowi4_init_output(&fl4, 0, 0, 0, RT_SCOPE_UNIVERSE, 0, 0, daddr, np->qos.saddr, 0, 0, (kuid_t){ 0 });
 #else
 		flowi4_init_output(&fl4, 0, 0, 0, RT_SCOPE_UNIVERSE, 0, 0, daddr, np->qos.saddr, 0, 0);
@@ -1536,7 +1584,8 @@ np_senddata(struct np *np, uint8_t protocol, uint32_t daddr, mblk_t *mp)
 			iph->protocol = protocol;
 			iph->tot_len = htons(tlen);
 
-#ifndef HAVE_KFUNC_DST_OUTPUT
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
+#elif !defined HAVE_KFUNC_DST_OUTPUT
 #ifdef HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS
 			__ip_select_ident(iph, rt_dst(rt));
 #elif defined HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS
@@ -1546,7 +1595,10 @@ np_senddata(struct np *np, uint8_t protocol, uint32_t daddr, mblk_t *mp)
 #endif
 #endif
 			_printd(("sending message %p\n", skb));
-#ifdef HAVE_KFUNC_DST_OUTPUT
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
+			NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, dev_net(dev), NULL, skb, NULL, dev,
+				np_ip_queue_xmit);
+#elif defined HAVE_KFUNC_DST_OUTPUT
 			NF_HOOK_(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, dev, np_ip_queue_xmit);
 #else
 			np_ip_queue_xmit(skb);
@@ -6064,7 +6116,7 @@ np_v4_err(struct sk_buff *skb, u32 info)
 #endif
 #endif
 #else
-	ICMP_INC_STATS_BH(IcmpInErrors);
+	ICMP_INC_STATS(dev_net(skb->dev), ICMP_MIB_INERRORS);
 #endif
 #if defined HAVE_NET_PROTOCOL_ERR_HANDLER_RETURNS_INT
 	return(0);  /* XXX */

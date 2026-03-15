@@ -359,6 +359,22 @@ proceed as follows:
 
 See ‘README-make’ for additional specialized make targets.
 
+Current Linux Build
+-------------------
+
+The current in-tree kernel build has been verified on Ubuntu 24.04 with
+the stock 6.8 kernel headers using the following configuration:
+
+     $> ./configure --disable-java --without-perl --without-tcl \
+             --disable-dependency-tracking --disable-32bit-libs
+     $> make -j1
+
+This configuration keeps the native user-space tools, libraries and
+kernel modules enabled while skipping optional Java, Perl, Tcl and 32-bit
+multilib components.  The ‘--disable-32bit-libs’ switch is currently
+recommended for local kernel-6.x builds because the remaining multilib
+subtree is optional and is not required for validating the kernel port.
+
 For custom applications, see the ‘INSTALL’ and ‘INSTALL-openss7’ files
 or the see *note Installation::, as listed below.  If you encounter
 troubles, see *note Troubleshooting::, before issuing a bug report.

@@ -145,7 +145,7 @@ typedef struct sctp_addr {
 #define sctp_addr_t sctp_addr_t
 #endif				/* sctp_addr_t */
 
-#include <os7/bufq.h>
+#include "bufq.h"
 
 #include "sctp.h"
 #include "sctp_defs.h"

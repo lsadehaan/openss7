@@ -50,6 +50,8 @@
 #ifndef __LOCAL_IP_HOOKS_H__
 #define __LOCAL_IP_HOOKS_H__
 
+#include <linux/version.h>
+
 /* This symbol should be defined by newer kernels, however, since the protocol
    value is always 132, we double check the definition for those kernels that
    haven't defined it yet.  */
@@ -66,7 +68,7 @@
 
 /* Define to 1 if the system has the type 'struct sockaddr_storage'. */
 #undef HAVE_KTYPE_STRUCT_SOCKADDR_STORAGE
-#ifndef HAVE_KTYPE_STRUCT_SOCKADDR_STORAGE
+#if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,0) && !defined HAVE_KTYPE_STRUCT_SOCKADDR_STORAGE
 #define _SS_MAXSIZE 128
 #define _SS_ALIGNSIZE (__alignof__ (struct sockaddr *))
 struct sockaddr_storage {
@@ -353,7 +355,9 @@ extern void __ip_rt_update_pmtu(struct rtable *rt, struct flowi4 *fl4, u32 mtu);
 #undef HAVE_KMEMB_STRUCT_RTABLE_U_DST
 #undef HAVE_KMEMB_STRUCT_RTABLE_DST
 
-#if   defined HAVE_KMEMB_STRUCT_RTABLE_U_DST
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
+#define rt_dst(__rt) (&(__rt)->dst)
+#elif   defined HAVE_KMEMB_STRUCT_RTABLE_U_DST
 #define rt_dst(__rt) (&(__rt)->u.dst)
 #elif defined HAVE_KMEMB_STRUCT_RTABLE_DST
 #define rt_dst(__rt) (&(__rt)->dst)
@@ -364,7 +368,17 @@ extern void __ip_rt_update_pmtu(struct rtable *rt, struct flowi4 *fl4, u32 mtu);
 /* Define to 1 if 'path' is member of 'struct dst_entry'. */
 #undef HAVE_KMEMB_STRUCT_DST_ENTRY_PATH
 #undef HAVE_KMEMB_STRUCT_DST_OPS_UPDATE_PMTU
-#if defined HAVE_KMEMB_STRUCT_DST_ENTRY_PATH || defined HAVE_KMEMB_STRUCT_DST_OPS_UPDATE_PMTU
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
+#ifndef dst_pmtu
+#define dst_pmtu dst_mtu
+#endif
+static __inline__ void
+dst_update_pmtu(struct dst_entry *dst, uint32_t mtu)
+{
+	if (dst && dst->ops->update_pmtu)
+		dst->ops->update_pmtu(dst, NULL, NULL, mtu, true);
+}
+#elif defined HAVE_KMEMB_STRUCT_DST_ENTRY_PATH || defined HAVE_KMEMB_STRUCT_DST_OPS_UPDATE_PMTU
 /* dst_pmtu should be already defined */
 /* Define if function ip_rt_update_pmtu takes 4 arguments. */
 #undef HAVE_KFUNC_IP_RT_UPDATE_PMTU_4_ARGS
@@ -479,7 +493,24 @@ ip_route_connect_(struct rtable **rp, __be32 dst, __be32 src, u32 tos, int oif,
 /* Define if function ip_route-output_key() returns a pointer to struct
    rtable. */
 #undef HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_RTABLE_RETURN
-#ifdef HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_RTABLE_RETURN
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
+#undef ip_route_output
+static __inline__ int
+ip_route_output_(struct rtable **rp, u32 daddr, u32 saddr, u32 tos, int oif)
+{
+	struct rtable *rt;
+
+	rt = ip_route_output(&init_net, daddr, saddr, tos, oif);
+	if (IS_ERR(rt)) {
+		return PTR_ERR(rt);
+	}
+	if (rp != NULL) {
+		*rp = rt;
+	}
+	return (0);
+}
+#define ip_route_output(rp,daddr,saddr,tos,oif) ip_route_output_(rp,daddr,saddr,tos,oif)
+#elif defined HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_RTABLE_RETURN
 #undef ip_route_output
 static __inline__ int
 ip_route_output_(struct rtable **rp, u32 daddr, u32 saddr, u32 tos, int oif)
@@ -714,7 +745,7 @@ typedef int socklen_t;
 
 /* Define to 1 if kernel function skb_dst() exists. */
 #undef HAVE_KFUNC_SKB_DST
-#ifndef HAVE_KFUNC_SKB_DST
+#if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,24) && !defined HAVE_KFUNC_SKB_DST
 static __inline__ struct dst_entry*
 skb_dst(struct sk_buff *skb)
 {
@@ -724,7 +755,7 @@ skb_dst(struct sk_buff *skb)
 
 /* Define to 1 if kernel function skb_dst_set() exists. */
 #undef HAVE_KFUNC_SKB_DST_SET
-#ifndef HAVE_KFUNC_SKB_DST_SET
+#if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,24) && !defined HAVE_KFUNC_SKB_DST_SET
 static __inline__ void
 skb_dst_set(struct sk_buff *skb, struct dst_entry *dst)
 {
@@ -734,7 +765,7 @@ skb_dst_set(struct sk_buff *skb, struct dst_entry *dst)
 
 /* Define to 1 if kernel function skb_rtable() exists. */
 #undef HAVE_KFUNC_SKB_RTABLE
-#ifndef HAVE_KFUNC_SKB_RTABLE
+#if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,24) && !defined HAVE_KFUNC_SKB_RTABLE
 static __inline__ struct rtable*
 skb_rtable(struct sk_buff *skb)
 {
@@ -753,7 +784,9 @@ skb_rtable(struct sk_buff *skb)
 
 /* Symbol __ip_select_ident is available. */
 #undef HAVE___IP_SELECT_IDENT_SYMBOL
-#ifdef HAVE___IP_SELECT_IDENT_SYMBOL
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,24)
+#define __ip_select_ident(a,b,c) __ip_select_ident(&init_net,a,c ? 16 : 1)
+#elif defined HAVE___IP_SELECT_IDENT_SYMBOL
 #if !defined HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS && \
     !defined HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS && \
     !defined HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS_SEGS && \

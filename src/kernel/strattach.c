@@ -107,7 +107,9 @@ int check_mnt(struct vfsmount *mnt);
 STATIC int
 check_mnt(struct vfsmount *mnt)
 {
-#if defined HAVE_KMEMB_STRUCT_VFSMOUNT_MNT_NS
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,38)
+	return mnt->mnt_ns == current->nsproxy->mnt_ns;
+#elif defined HAVE_KMEMB_STRUCT_VFSMOUNT_MNT_NS
 	return mnt->mnt_ns == current->nsproxy->mnt_ns;
 #elif defined HAVE_KMEMB_STRUCT_VFSMOUNT_MNT_NAMESPACE
 	return mnt->mnt_namespace == current->namespace;

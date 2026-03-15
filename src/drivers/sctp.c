@@ -130,7 +130,7 @@ struct sockaddr_storage {
 #include <sys/debug.h>
 #include <sys/ddi.h>
 
-#include <os7/bufq.h>
+#include "bufq.h"
 
 #include "sctp.h"
 #include "sctp_defs.h"

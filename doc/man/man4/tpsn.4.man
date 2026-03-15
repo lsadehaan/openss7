@@ -1,0 +1,48 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\"
+.\" @(#) doc/man/man4/tpsn.4.man
+.\"
+.TH TPSN 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.SH NAME
+.B tpsn
+\- Transport Provider for STREAMS Networking
+.SH SYNOPSIS
+.HP
+.BI "int " fd " = open(" \*(lq/dev/cots\*(rq ", " flags );
+.HP
+.BI "int " fd " = open(" \*(lq/dev/clts\*(rq ", " flags );
+.SH DESCRIPTION
+.PP
+The
+.B tpsn
+STREAMS driver provides TPI transport provider interfaces.  It presents
+various minor device nodes for connection-oriented and connectionless
+transport:
+.TP
+.B /dev/cots
+Connection-oriented transport service.
+.TP
+.B /dev/clts
+Connectionless transport service.
+.TP
+.B /dev/cotz
+Connection-oriented transport service with orderly release.
+.TP
+.B /dev/cltz
+Connectionless transport service with orderly release.
+.TP
+.B /dev/cots-ip
+Connection-oriented transport over IP.
+.TP
+.B /dev/clts-ip
+Connectionless transport over IP.
+.TP
+.B /dev/cots-udp
+Connection-oriented transport over UDP.
+.TP
+.B /dev/clts-udp
+Connectionless transport over UDP.
+.SH "SEE ALSO"
+.BR tpi (7),
+.BR timod (4).
