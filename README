@@ -366,14 +366,40 @@ The current in-tree kernel build has been verified on Ubuntu 24.04 with
 the stock 6.8 kernel headers using the following configuration:
 
      $> ./configure --disable-java --without-perl --without-tcl \
-             --disable-dependency-tracking --disable-32bit-libs
+             --disable-dependency-tracking
      $> make -j1
 
 This configuration keeps the native user-space tools, libraries and
-kernel modules enabled while skipping optional Java, Perl, Tcl and 32-bit
-multilib components.  The ‘--disable-32bit-libs’ switch is currently
-recommended for local kernel-6.x builds because the remaining multilib
-subtree is optional and is not required for validating the kernel port.
+kernel modules enabled while skipping optional Java, Perl and Tcl
+components.  The `lib32/` subtree was also rebuilt successfully on the
+same host, so `--disable-32bit-libs` is not required for the verified
+kernel-6.x build.
+
+Safe Kernel Test Procedure
+--------------------------
+
+For first validation on another machine, prefer a disposable VM or a
+host snapshot.  Containers are fine for user-space tools, but they do
+not isolate kernel module loading because they share the host kernel.
+
+Use the following sequence on a test machine running the target kernel:
+
+     $> ./configure --disable-java --without-perl --without-tcl \
+             --disable-dependency-tracking
+     $> make -j1
+     $> sudo make install
+     $> sudo depmod -a
+     $> sudo modprobe streams
+     $> dmesg | tail -100
+
+If you want to validate module insertion before installation, load the
+first module directly from the build tree and inspect the kernel log:
+
+     $> sudo insmod ./streams.ko
+     $> dmesg | tail -100
+
+If the test host provides snapshots, take one before `make install` or
+`modprobe` so you can revert quickly.
 
 For custom applications, see the ‘INSTALL’ and ‘INSTALL-openss7’ files
 or the see *note Installation::, as listed below.  If you encounter
