@@ -1076,6 +1076,15 @@ openss7_man_MANS = \
 	man4/tp4.4 \
 	man4/tpi_conv.4 \
 	man4/tpiperf.4 \
+	man4/tpsn.4 \
+	man4/cots.4 \
+	man4/clts.4 \
+	man4/cotz.4 \
+	man4/cltz.4 \
+	man4/cots-ip.4 \
+	man4/clts-ip.4 \
+	man4/cots-udp.4 \
+	man4/clts-udp.4 \
 	man4/tr-mod.4 \
 	man4/tr_mod.4 \
 	man4/tstdrv.4 \
@@ -2957,6 +2966,8 @@ openss7_man_MANS = \
 	man8/slmon.8 \
 	man8/sls.8 \
 	man8/sndcmap.8 \
+	man8/mxconfig.8 \
+	man8/soconf.8 \
 	man8/soconfig.8 \
 	man8/soip.8 \
 	man8/specfs.8 \
@@ -5486,6 +5497,15 @@ openss7_dist_noinst_MANS = \
 	man4/tp4.4.man \
 	man4/tpi_conv.4.man \
 	man4/tpiperf.4.man \
+	man4/tpsn.4.man \
+	man4/cots.4.man \
+	man4/clts.4.man \
+	man4/cotz.4.man \
+	man4/cltz.4.man \
+	man4/cots-ip.4.man \
+	man4/clts-ip.4.man \
+	man4/cots-udp.4.man \
+	man4/clts-udp.4.man \
 	man4/tr-mod.4.man \
 	man4/tr_mod.4.man \
 	man4/tstdrv.4.man \
@@ -7367,6 +7387,8 @@ openss7_dist_noinst_MANS = \
 	man8/slmon.8.man \
 	man8/sls.8.man \
 	man8/sndcmap.8.man \
+	man8/mxconfig.8.man \
+	man8/soconf.8.man \
 	man8/soconfig.8.man \
 	man8/soip.8.man \
 	man8/specfs.8.man \

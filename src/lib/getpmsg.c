@@ -134,7 +134,10 @@ __old_getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, 
 	args.band = bandp ? *bandp : 0;
 	args.flags = flagsp ? *flagsp : 0;
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-overflow"
 	if (likely((err = read(fd, &args, LFS_GETMSG_PUTMSG_ULEN)) >= 0)) {
+#pragma GCC diagnostic pop
 		if (ctlptr)
 			ctlptr->len = args.ctlbuf.len;
 		if (datptr)

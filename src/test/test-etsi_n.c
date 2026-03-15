@@ -527,7 +527,6 @@ timer_sethandler(void)
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGALRM);
 	sigprocmask(SIG_UNBLOCK, &mask, NULL);
-	siginterrupt(SIGALRM, 1);
 	return __RESULT_SUCCESS;
 }
 

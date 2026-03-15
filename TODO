@@ -1,6 +1,6 @@
-OpenSS7 -- things to do.  2020-03-03
+OpenSS7 -- things to do.  2026-03-14
 $Id: TODO,v 1.1.2.25 2011-05-10 13:45:30 brian Exp $
-Copyright (c) 2008-2020  Monavacon Limited. <http://www.monavacon.com/>
+Copyright (c) 2008-2026  Monavacon Limited. <http://www.monavacon.com/>
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2001  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -8,9 +8,9 @@ See the end for copying conditions (for this file).
 Current Plan
 ------------
 
-The 'OpenSS7' package is a mature collection of all of the OpenSS7
+The ‘OpenSS7’ package is a mature collection of all of the OpenSS7
 STREAMS and protocol modules that builds all components on a wide range
-of supported Linux distributions and kernels.  The 'OpenSS7' package is
+of supported Linux distributions and kernels.  The ‘OpenSS7’ package is
 a builds and validates all components against a given distribution.
 
 Therefore, the current plan for packaging is largely a maintenance plan.
@@ -122,8 +122,8 @@ CHAN Current Plan
 
 This component, which contains hard-switch or MG capabilities is not
 currently planned.  Of priority is the production deployment of
-soft-switch or MGC and Signalling Gateway components from the 'SIGTRAN',
-'SS7' and 'VOIP' components.  This component will only receive
+soft-switch or MGC and Signalling Gateway components from the ‘SIGTRAN’,
+‘SS7’ and ‘VOIP’ components.  This component will only receive
 maintenance releases until those priorities have been sufficiently met
 (over the course of Summer 2009).
 
@@ -173,8 +173,8 @@ Stream head socket library, module or driver implementation.  Also,
 performance testing of STREAMS INET drivers indicates that STREAMS-based
 networking components could exhibit far superior performance to that
 exhibited by legacy Linux sockets.  To accomplish this requires fully
-implementing 'socklib(3)' (*note (*manpages*)socklib(3)::), 'sockmod(4)'
-(*note (*manpages*)sockmod(4)::) module or 'socksys(4)' (*note
+implementing ‘socklib(3)’ (*note (*manpages*)socklib(3)::), ‘sockmod(4)’
+(*note (*manpages*)sockmod(4)::) module or ‘socksys(4)’ (*note
 (*manpages*)socksys(4)::) driver, creating validation test suites, and
 performance analysis and comparison with legacy Linux mechanisms.
 
@@ -211,7 +211,7 @@ X25 Current Plan
 This component was initially started to provide managment interfaces to
 platforms using the OpenSS7 protocol stacks (CMIP and CMOT interfaces)
 using SS7 GDMO and other GDMO. It was considered pulling some of the old
-'isode' package into this component to provide some GDMO facilities.
+‘isode’ package into this component to provide some GDMO facilities.
 
 Since then, it was discovered that these ISO protocols are still very
 important to a number of industries on Linux and Linux Fast-STREAMS.
@@ -232,7 +232,7 @@ ISO Current Plan
 This component was initially started to provide managment interfaces to
 platforms using the OpenSS7 protocol stacks (CMIP and CMOT interfaces)
 using SS7 GDMO and other GDMO. It was considered pulling some of the old
-'isode' package into this component to provide some GDMO facilities.
+‘isode’ package into this component to provide some GDMO facilities.
 
 Since then, it was discovered that these ISO protocols are still very
 important to a number of industries on Linux and Linux Fast-STREAMS.
@@ -251,8 +251,8 @@ ISDN Current Plan
 .................
 
 This component is lower down on the priority list.  Current focus is on
-pushing through the 'SIGTRAN', 'SS7' and 'VOIP' components instead.
-This components sits at about the same status as the 'CHAN' component.
+pushing through the ‘SIGTRAN’, ‘SS7’ and ‘VOIP’ components instead.
+This components sits at about the same status as the ‘CHAN’ component.
 there exists modules and drivers in this component that have not yet
 been publicly released and are only available to sponsors of the OpenSS7
 Project on the CVS archive.  When the project gets back to this
@@ -283,18 +283,18 @@ The current plan of the next several months (over the summer of 2009) is
 to actively move this component forward.  This consists of the
 following:
 
-   * Move SIGTRAN modules and drivers that have not yet been publicly
+   • Move SIGTRAN modules and drivers that have not yet been publicly
      released into the public release.
 
-   * Write test cases for complete AS-side implementations of all of the
+   • Write test cases for complete AS-side implementations of all of the
      UAs (including ISUA and TUA).
 
-   * Perform production testing of the UAs against Tekelec Eagle and
+   • Perform production testing of the UAs against Tekelec Eagle and
      Cisco ITP equipment.
 
-   * Rigorous lab and limited field testing of AS-side components.
+   • Rigorous lab and limited field testing of AS-side components.
 
-   * Production deployment in customer's network for 1Q2009.
+   • Production deployment in customer's network for 1Q2009.
 
 Note that M2PA is complete.  Aside from that, the order of testing and
 implementation will be M3UA followed by M2UA or SUA and then TUA, IUA
@@ -309,7 +309,7 @@ ATM Current Plan
 This component was initially started to provide managment interfaces to
 platforms using the OpenSS7 protocol stacks (CMIP and CMOT interfaces)
 using SS7 GDMO and other GDMO. It was considered pulling some of the old
-'isode' package into this component to provide some GDMO facilities.
+‘isode’ package into this component to provide some GDMO facilities.
 
 Since then, it was discovered that these ISO protocols are still very
 important to a number of industries on Linux and Linux Fast-STREAMS.
@@ -331,22 +331,22 @@ The current plan of the next several months (over the summer of 2009) is
 to actively move this component forward.  This consists of the
 following:
 
-   * Implementation and testing of MGCP (MGC-side) using the MGI and TCP
-     transport from the 'INET' component.
+   • Implementation and testing of MGCP (MGC-side) using the MGI and TCP
+     transport from the ‘INET’ component.
 
-   * Implementation and testing of MEGACO/H.248 (MGC-side, binary
-     format) using the MGI and SCTP transport from the 'SCTP' component.
+   • Implementation and testing of MEGACO/H.248 (MGC-side, binary
+     format) using the MGI and SCTP transport from the ‘SCTP’ component.
 
-   * Implementation of SIP-T and SIP call control using the CCI and TCP
-     transport from the 'INET' component and later SCTP transport from
-     the 'SCTP' component.
+   • Implementation of SIP-T and SIP call control using the CCI and TCP
+     transport from the ‘INET’ component and later SCTP transport from
+     the ‘SCTP’ component.
 
-   * Perform production testing of MEGACO/H.248 and MGCP against the
+   • Perform production testing of MEGACO/H.248 and MGCP against the
      Veraz iGATE, the Cisco 5400 and the Sonus Media Gateways.
 
-   * Rigorous lab and limited field testing of the MGC-side components.
+   • Rigorous lab and limited field testing of the MGC-side components.
 
-   * Production deployment in customer's network for 1Q2009.
+   • Production deployment in customer's network for 1Q2009.
 
 The order of testing will be MEGACO/H.248 and then SIP-T and SIP
 followed by MGCP. Production public releases of the MGC side of
@@ -355,13 +355,13 @@ MEGACO/H.248 and SIP-T acan be expected by the end of July 2009.
 Things to Do
 ------------
 
-   - Packaging.
+   − Packaging.
 
      Get master build package working better.  Currently the master
      build package does not build a master tarball or RPM distribution,
      which would be nice, only individual RPMs for subpackages.
 
-   - Cross-testing framework.
+   − Cross-testing framework.
 
      We have nice autotest test suites that are fine for native builds,
      but for cross-compile builds, it would also be nice to cross-test.
@@ -373,7 +373,7 @@ Things to Do
      Then we could cross-build the package and then execute the test
      scripts on the result on a remote board using DEJAGNU.
 
-   - Distributed testing framework.
+   − Distributed testing framework.
 
      Because these are mostly communications protocols implemented using
      STREAMS, it is important to be able to do consistent distributed
@@ -393,7 +393,7 @@ Things to Do
      DejaGNU that can execute test cases over a serial port if
      necessary).
 
-   - Dynamic configuration.
+   − Dynamic configuration.
 
      Automake files (Makefile.am) are too static.  The strbcm package
      needs the list of sources and objects to be rather dynamic.  It
@@ -402,20 +402,20 @@ Things to Do
      configuration time and then include them in a far more general main
      Makefile.am file.
 
-   - Merge sub-packages.
+   − Merge sub-packages.
 
      I really want to put all these packages back together, it is too
      time consuming maintaining the various administrative files for
      each of seven or so packages.
 
-          * streams-0.7a.5
-          * strcompat-0.9.2.4
-          * strutil-0.9.2.4
-          * strxns-0.9.2.4
-          * strxnet-0.9.2.9
-          * strinet-0.9.2.4
-          * strsctp-0.9.2.6
-          * netperf-2.3.2
+          • streams-0.7a.5
+          • strcompat-0.9.2.4
+          • strutil-0.9.2.4
+          • strxns-0.9.2.4
+          • strxnet-0.9.2.9
+          • strinet-0.9.2.4
+          • strsctp-0.9.2.6
+          • netperf-2.3.2
 
      The result will be just a streams-0.9.4 release.  The only two
      (STREAMS) packages left will be strbcm and strss7.
@@ -423,7 +423,7 @@ Things to Do
 STREAMS Things to Do
 ....................
 
-   - Support for RT kernels.  This is a little more than just having the
+   − Support for RT kernels.  This is a little more than just having the
      STREAMS scheduler run as a non-RT process kernel thread, which it
      does now, and which is trivial.  (The existing package should
      compile and run against these kernels with minor modification in
@@ -442,7 +442,7 @@ STREAMS Things to Do
      _TODO:_
           Provide support for RT kernels.
 
-   - Per cpu data:- I am still using the older approach of using cache
+   − Per cpu data:- I am still using the older approach of using cache
      line aligned arrays for per-cpu data.  This, of course, does not
      fully utilize NUMA architectures.  For NUMA architectures we need
      to use the per-cpu utilities provided by the 2.6, 3.x and 4.x
@@ -456,7 +456,7 @@ STREAMS Things to Do
           3.x and 4.x kernels.  Complete NUMA supporting STREAMS
           facilities.
 
-   - Provide support for assigning a processor affinity for queue pairs.
+   − Provide support for assigning a processor affinity for queue pairs.
      The current STREAMS scheduler will schedule a queue enabled as a
      result of, for example, a put() on the same processor that
      performed the action that caused the enable.  This has been
@@ -473,23 +473,23 @@ STREAMS Things to Do
      _TODO:_
           Add an optional processor affinity to the STREAMS scheduler.
 
-   - Split 'include/sys/streams/stropts.h' by architecture.  There is
+   − Split ‘include/sys/streams/stropts.h’ by architecture.  There is
      conflicting numbering on the standard STREAMS input-output
      controls:
 
-     'I_SWROPT(7)'    'I_GWROPT(7)'    'I_LIST(7)'
+     ‘I_SWROPT(7)’    ‘I_GWROPT(7)’    ‘I_LIST(7)’
      (*note (*manpages*)I_SWROPT(7)::)(*note (*manpages*)I_GWROPT(7)::)(*note (*manpages*)I_LIST(7)::)
-     'I_FLUSHBAND(7)' 'I_CKBAND(7)'    'I_GETBAND(7)'
+     ‘I_FLUSHBAND(7)’ ‘I_CKBAND(7)’    ‘I_GETBAND(7)’
      (*note (*manpages*)I_FLUSHBAND(7)::)(*note (*manpages*)I_CKBAND(7)::)(*note (*manpages*)I_GETBAND(7)::)
-     'I_ATMARK(7)'    'I_SETCLTIME(7)' 'I_GETCLTIME(7)'
+     ‘I_ATMARK(7)’    ‘I_SETCLTIME(7)’ ‘I_GETCLTIME(7)’
      (*note (*manpages*)I_ATMARK(7)::)(*note (*manpages*)I_SETCLTIME(7)::)(*note (*manpages*)I_GETCLTIME(7)::)
-     'I_CANPUT(7)'
+     ‘I_CANPUT(7)’
      (*note (*manpages*)I_CANPUT(7)::)
 
-     'System V Release 4' UNIX(R) vendors use one set and 'OSF' UNIX(R)
-     vendors use another.  Namely 'HP-UX', 'OSF/1.2', 'AIX', 'Mac
-     OpenTransport' use OSF numbering, whereas 'IRIX', 'Solaris',
-     'UnixWare' and others use SVR4 numbering.  So, for HPPA, Alpha,
+     ‘System V Release 4’ UNIX® vendors use one set and ‘OSF’ UNIX®
+     vendors use another.  Namely ‘HP-UX’, ‘OSF/1.2’, ‘AIX’, ‘Mac
+     OpenTransport’ use OSF numbering, whereas ‘IRIX’, ‘Solaris’,
+     ‘UnixWare’ and others use SVR4 numbering.  So, for HPPA, Alpha,
      PowerPC, we should use the OSF numbering.
 
      I know that it is a fall-back to the SVR4 way of separating
@@ -500,35 +500,35 @@ STREAMS Things to Do
      autoconf's config.guess.
 
      _TODO:_
-          Split 'include/sys/streams/stropts.h' by processor
+          Split ‘include/sys/streams/stropts.h’ by processor
           architecture.
 
-   - A similar numbering mismatch occurs for many of the message block
+   − A similar numbering mismatch occurs for many of the message block
      types.
 
      _TODO:_
-          Split 'include/sys/streams/streams.h' by processor
+          Split ‘include/sys/streams/streams.h’ by processor
           architecture.
 
-   - Implement 'I_EGETSIG(7)' (*note (*manpages*)I_EGETSIG(7)::) and
-     'I_ESETSIG(7)' (*note (*manpages*)I_ESETSIG(7)::).  These are
-     'Solaris' enhanced version of the 'I_GETSIG(7)' (*note
-     (*manpages*)I_GETSIG(7)::) and 'I_SETSIG(7)' (*note
+   − Implement ‘I_EGETSIG(7)’ (*note (*manpages*)I_EGETSIG(7)::) and
+     ‘I_ESETSIG(7)’ (*note (*manpages*)I_ESETSIG(7)::).  These are
+     ‘Solaris’ enhanced version of the ‘I_GETSIG(7)’ (*note
+     (*manpages*)I_GETSIG(7)::) and ‘I_SETSIG(7)’ (*note
      (*manpages*)I_SETSIG(7)::) STREAMS input-output controls.  The
      difficulty with their implementation is that the entire signal
      handling setup inside the Stream head code is geared toward the
      calling process and needs to be adjusted to be general enough for
-     any process or process group.  Until then, 'Linux' file
+     any process or process group.  Until then, ‘Linux’ file
      asynchronous I/O is supported.
 
      _PARTLY DONE:_
           Wrote the manual pages and added them to the build.  Placed
-          function skeletons that return '[EOPNOTSUPP]' for these
+          function skeletons that return ‘[EOPNOTSUPP]’ for these
           functions in the Stream head.
      _TODO:_
-          Implement 'I_EGETSIG(7)' and 'I_ESETSIG(7)'.
+          Implement ‘I_EGETSIG(7)’ and ‘I_ESETSIG(7)’.
 
-   - Socket buffer handling:
+   − Socket buffer handling:
 
        1. Rather than write offset and padding, why not provide a flag
           (e.g.  SO_SKBUFF) to indicate to the stream head to allocate
@@ -559,7 +559,7 @@ STREAMS Things to Do
           Item (1) is done and complete.  The 2nd generation UDP and RAW
           drivers are already using it.  Item (2) and (3) remain.
 
-   - Had another look at specfs, devfs and udev.  It looks like we can
+   − Had another look at specfs, devfs and udev.  It looks like we can
      create minor device nodes within /dev (not just /dev/streams) using
      devfs or udev.  Again, this doesn't do everything that specfs does.
      specfs will demand load when an attempt is made to open a
@@ -583,14 +583,14 @@ STREAMS Things to Do
      _TODO:_
           rationalize specfs to devfs and udev
 
-   - Have the STREAMS subsystem register a panic notifier on 2.6, 3.x
+   − Have the STREAMS subsystem register a panic notifier on 2.6, 3.x
      and 4.x kernels to be able to recover from panics caused by
      misbehaving STREAMS modules or drivers.
 
      _TODO:_
           Register panic notifier.
 
-   - Kernel objects are another thing.  For 2.6, 3.x or 4.x kernels, we
+   − Kernel objects are another thing.  For 2.6, 3.x or 4.x kernels, we
      need to hold our data structures in the kobject manner so that the
      /sys file system is usable.  This requires another adaptation layer
      because 2.4 kernels do this in a completely different way.  Much of
@@ -605,41 +605,41 @@ STREAMS Things to Do
 COMPAT Things to Do
 ...................
 
-   - Implement the AIX strtune() command.
+   − Implement the AIX strtune() command.
 
      _*todo*_
 
-   - I would really really like a set of rmallocmap(), rmalloc(),
+   − I would really really like a set of rmallocmap(), rmalloc(),
      rmalloc_wait(), rmfree(), rmfreemap() functions so that drivers
      could stop using the kmem_cache functions but could acheive similar
      effect.
 
      _*todo*_
 
-   - Work in MUTEX_ALLOC(), MUTEX_DESTROY(), MUTEX_LOCK(), MUTEX_MINE(),
+   − Work in MUTEX_ALLOC(), MUTEX_DESTROY(), MUTEX_LOCK(), MUTEX_MINE(),
      MUTEX_OWNED(), MUTEX_TRYLOCK(), MUTEX_UNLOCK() from IRIX into
      irixcompat.c.
 
      _*todo*_
 
-   - Work in streams_interrupt() and STREAMS_TIMEOUT() from IRIX into
+   − Work in streams_interrupt() and STREAMS_TIMEOUT() from IRIX into
      irixcompat.c.
 
      _*todo*_
 
-   - Hey, here's an idea for testing Solaris compatibility: take an
+   − Hey, here's an idea for testing Solaris compatibility: take an
      OpenSolaris source file for a STREAMS driver and compile and test
      it under Linux with no (or minimal) source code modifications!
 
      _*todo*_
 
-   - Write test programs and test suites.  There are really not any test
+   − Write test programs and test suites.  There are really not any test
      programs or test suites available for the OpenSS7 STREAMS
      Compatibility Modules package as of strcompat-0.9.2.2.
 
      _*todo*_
 
-   - Not all compatibility functionality is implemented.  There are a
+   − Not all compatibility functionality is implemented.  There are a
      large number of Sun DDI functions applicable to STREAMS that have
      not been fully implemented.  Also, the Sun configuration management
      mechanism is not yet fully implemented and neither is that for AIX.
@@ -650,9 +650,9 @@ COMPAT Things to Do
 
      _*moved*_
           (Note that the ability to link binary modules has been moved
-          to is own 'strbcm' package.)
+          to is own ‘strbcm’ package.)
 
-   - Linking of binary modules is not yet supported.  This is the place
+   − Linking of binary modules is not yet supported.  This is the place
      (strcompat) where binary modules should be permitted to be loaded
      against Linux Fast-STREAMS, because the binary compatibility
      interface modules are defined here.  There is the beginnings of an
@@ -662,9 +662,9 @@ COMPAT Things to Do
 
      _*moved*_
           (Note that the ability to link binary modules has been moved
-          to is own 'strbcm' package.)
+          to is own ‘strbcm’ package.)
 
-   - Documentation.  The documentation is trailing a bit.  I have
+   − Documentation.  The documentation is trailing a bit.  I have
      thousands of manual pages written, however, some are sparse or
      incomplete.  Also, the manual and the STREAMS Porting Guide needs a
      bunch of work.
@@ -676,11 +676,11 @@ COMPAT Things to Do
 BCM Things to Do
 ................
 
-   - Testing.  This package is completely untested.  One way to test
+   − Testing.  This package is completely untested.  One way to test
      compatibility is to take a set of frozen binary modules and drivers
      from the release and place them in a test directory.
 
-   - The strbcm package is currently incomplete.  The purpose of the
+   − The strbcm package is currently incomplete.  The purpose of the
      package was to move STREAMS binary compatibility module
      capabilities outside of the STREAMS release package.  As Linux
      Fast-STREAMS has become production grade in terms of both
@@ -695,50 +695,50 @@ BCM Things to Do
 TTY Things to Do
 ................
 
-   - Testing.  This package is completely untested.
+   − Testing.  This package is completely untested.
 
      _*todo*_
 
-   - Create a library 'libtty(3)' (*note (*manpages*)libtty(3)::) to
+   − Create a library ‘libtty(3)’ (*note (*manpages*)libtty(3)::) to
      hold the library functions for use with this package:
 
-          'openpt(3)'
+          ‘openpt(3)’
           (*note (*manpages*)openpt(3)::)
-          'grantpt(3)'
+          ‘grantpt(3)’
           (*note (*manpages*)grantpt(3)::)
-          'ptsname(3)'
+          ‘ptsname(3)’
           (*note (*manpages*)ptsname(3)::)
-          'unlockpt(3)'
+          ‘unlockpt(3)’
           (*note (*manpages*)unlockpt(3)::)
 
      _*todo*_
 
-   - Create an 'ldterm(4)' (*note (*manpages*)ldterm(4)::) 'Line
-     Discipline for Terminals' STREAMS module.  This item remains to be
+   − Create an ‘ldterm(4)’ (*note (*manpages*)ldterm(4)::) ‘Line
+     Discipline for Terminals’ STREAMS module.  This item remains to be
      done.  Al that is in place right now is a skeleton module.
 
      _*todo*_
 
-The 'openss7' package is currently incomplete.
+The ‘openss7’ package is currently incomplete.
 
 The purpose of the package was to provide STREAMS terminal capabilities
-for 'Linux Fast-STREAMS'. The package will only build and install with
-'Linux Fast-STREAMS'
+for ‘Linux Fast-STREAMS’. The package will only build and install with
+‘Linux Fast-STREAMS’
 
 If someone is interested in this package, a contribution of a working
-'ldterm(4)' (*note (*manpages*)ldterm(4)::) module would be good.  Also,
+‘ldterm(4)’ (*note (*manpages*)ldterm(4)::) module would be good.  Also,
 testing could be performed.
 
 CHAN Things to Do
 .................
 
-   - Testing.  This package is completely untested.
+   − Testing.  This package is completely untested.
 
      This remains to be done.
 
-   - Actually implement all of the package.
+   − Actually implement all of the package.
 
-   - Copy all of the channel drivers, multiplexers and switching drivers
+   − Copy all of the channel drivers, multiplexers and switching drivers
      as well as media gateway drivers from the strss7 package and place
      it here.
 
@@ -751,7 +751,7 @@ CHAN Things to Do
 XNS Things to Do
 ................
 
-   - I want to write a NetFilter pseudo-device driver that will install
+   − I want to write a NetFilter pseudo-device driver that will install
      and control netfilter hooks for performance testing.  It will do
      things like packet drops, checksum errors, packet duplication,
      packet delay, and combinations, for a specified range of addresses
@@ -763,24 +763,24 @@ XNS Things to Do
      special network conditions on SCTP (for example), and will also
      allow for comparison tests.
 
-   * The strxns package contains several GPL'd modules and drivers
+   • The strxns package contains several GPL'd modules and drivers
      originally included in the STREAMS releases that were removed to
      this package so that they could be used with Linux Fast-STREAMS.
 
-   - Test.  Almost none of the modules or drivers in this package have
+   − Test.  Almost none of the modules or drivers in this package have
      been tested thoroughly against Linux Fast-STREAMS. One of the
      primary reasons for this is that The OpenSS7 Project does not
      really use any of these modules or drivers.
 
-   - This might be a useful place to drop all of the DLPI drivers from
+   − This might be a useful place to drop all of the DLPI drivers from
      the strss7 package, particularly those for X.25, Frame Relay, and
      ISDN LAPD and LAPB.
 
 XNET Things to Do
 .................
 
-   * The texinfo manual, 'libxnet.texi', is incomplete.  For the time
-     being, the manual pages, starting with 'libxnet(3)' (*note
+   • The texinfo manual, ‘libxnet.texi’, is incomplete.  For the time
+     being, the manual pages, starting with ‘libxnet(3)’ (*note
      (*manpages*)libxnet(3)::), are the definitive documentation.  It
      would be nice to also provide these library manual pages as a
      printable manual, however, the project has not yet found the time
@@ -788,7 +788,7 @@ XNET Things to Do
 
      _*todo*_
 
-   * There is an XTITRACE option the was associated wtih the XTI library
+   • There is an XTITRACE option the was associated wtih the XTI library
      that provided the abilty to record trace information to a temporary
      file and then display or print it with an xtitrace user program.
      This capability is not yet implemented in this XTI library and
@@ -796,15 +796,15 @@ XNET Things to Do
 
      _*todo*_
 
-   * Need to remove the following functions: 't_sndopt(3)' (*note
-     (*manpages*)t_sndopt(3)::), 't_sndvopt(3)' (*note
-     (*manpages*)t_sndvopt(3)::), 't_rcvopt(3)' (*note
-     (*manpages*)t_rcvopt(3)::) and 't_rcvvopt(3)' (*note
+   • Need to remove the following functions: ‘t_sndopt(3)’ (*note
+     (*manpages*)t_sndopt(3)::), ‘t_sndvopt(3)’ (*note
+     (*manpages*)t_sndvopt(3)::), ‘t_rcvopt(3)’ (*note
+     (*manpages*)t_rcvopt(3)::) and ‘t_rcvvopt(3)’ (*note
      (*manpages*)t_rcvvopt(3)::); as they are non-standard and
-     non-portable.  Instead use the following functions: 't_sndudata(3)'
-     (*note (*manpages*)t_sndudata(3)::), 't_sndvudata(3)' (*note
-     (*manpages*)t_sndvudata(3)::), 't_rcvudata(3)' (*note
-     (*manpages*)t_rcvudata(3)::) and 't_rcvvudata(3)' (*note
+     non-portable.  Instead use the following functions: ‘t_sndudata(3)’
+     (*note (*manpages*)t_sndudata(3)::), ‘t_sndvudata(3)’ (*note
+     (*manpages*)t_sndvudata(3)::), ‘t_rcvudata(3)’ (*note
+     (*manpages*)t_rcvudata(3)::) and ‘t_rcvvudata(3)’ (*note
      (*manpages*)t_rcvvudata(3)::); because they have precisely the same
      argument templates as the other.  These functions are described in
      the OpenGroup documentation as inapplicable to connection-oriented
@@ -818,10 +818,10 @@ XNET Things to Do
      They may have already been removed.  Verify this.  They certainly
      have to be implemented this way yet.
 
-   * The XTI/TLI library is now largely in maintenance mode.  Not much
+   • The XTI/TLI library is now largely in maintenance mode.  Not much
      special development is planned.
 
-   - Full ATM Support.  This is an item where the XTI implementation is
+   − Full ATM Support.  This is an item where the XTI implementation is
      lacking.  When we provide full TPI ATM support under the strss7
      package, then this item will be investigated.
 
@@ -830,7 +830,7 @@ XNET Things to Do
 NSL Things to Do
 ................
 
-   * Fedora 7 has a libtirpc library that uses the /etc/netconfig files.
+   • Fedora 7 has a libtirpc library that uses the /etc/netconfig files.
      To avoid conflicts, the installation scripts now avoid overwriting
      this file.  An interesting thing is that the libtirpc
      implementation is taken from TI-RPC 2.3 when there is a TI-RPC 2.8
@@ -840,11 +840,11 @@ NSL Things to Do
 
      _*todo*_
 
-   * The package still needs to be internationalized.
+   • The package still needs to be internationalized.
 
      _*todo*_
 
-   * This implementation of the Network Selection facility and
+   • This implementation of the Network Selection facility and
      Name-to-Address mapping allows direct use of TI-RPC for Linux.  The
      primary benefit of this is the ability to use TI-RPC code directly
      without significant and thus support upper level services such as
@@ -856,8 +856,8 @@ NSL Things to Do
 
      _*todo*_
 
-   * The texinfo manual, 'libxnsl.texi', is incomplete.  For the time
-     being, the manual pages, starting with 'libxnsl(3)' (*note
+   • The texinfo manual, ‘libxnsl.texi’, is incomplete.  For the time
+     being, the manual pages, starting with ‘libxnsl(3)’ (*note
      (*manpages*)libxnsl(3)::), are the definitive documentation.  It
      would be nice to also provide these library manual pages as a
      printable manual, however, the project has not yet found the time
@@ -865,7 +865,7 @@ NSL Things to Do
 
      _*todo*_
 
-   * This package is largely untested.  A conformance test suite and
+   • This package is largely untested.  A conformance test suite and
      some test cases need to be written.
 
      _*todo*_
@@ -873,53 +873,53 @@ NSL Things to Do
 SOCK Things to Do
 .................
 
-   - Testing.  This package is completely untested.
+   − Testing.  This package is completely untested.
 
      _*todo*_
 
-   - Create a 'socksys(4)' (*note (*manpages*)socksys(4)::) 'Socket
-     System' STREAMS driver.
+   − Create a ‘socksys(4)’ (*note (*manpages*)socksys(4)::) ‘Socket
+     System’ STREAMS driver.
 
      _*todo*_
 
-   - It would be interesting to perform some 'Netperf' and 'Iperf'
+   − It would be interesting to perform some ‘Netperf’ and ‘Iperf’
      performance tests against STREAMS-based network drivers supporting
-     'Transport Provider Interface (TPI)' and "Sockets" using this
-     socket system.  Without 'sockmod(4)' and 'libsocket' it was only
-     possible to use 'Netperf' for performance testing, and then only
+     ‘Transport Provider Interface (TPI)’ and “Sockets” using this
+     socket system.  Without ‘sockmod(4)’ and ‘libsocket’ it was only
+     possible to use ‘Netperf’ for performance testing, and then only
      using the XTI tests.
 
      _*todo*_
 
-   - Create the 'socket(3)' (*note (*manpages*)socket(3)::) 'libsocket'
+   − Create the ‘socket(3)’ (*note (*manpages*)socket(3)::) ‘libsocket’
      shared library.
 
      _*todo*_
 
-   - Create a 'sockmod(4)' (*note (*manpages*)sockmod(4)::) 'Socket
-     Module' STREAMS module.
+   − Create a ‘sockmod(4)’ (*note (*manpages*)sockmod(4)::) ‘Socket
+     Module’ STREAMS module.
 
      _*todo*_
 
-   - Move already written code from the 'stacks' or 'strss7' directories
-     into the 'src' directory.
+   − Move already written code from the ‘stacks’ or ‘strss7’ directories
+     into the ‘src’ directory.
 
      _*todo*_
 
-The 'openss7' package is currently incomplete.
+The ‘openss7’ package is currently incomplete.
 
 The purpose of the package was to move STREAMS socket capabilities
-outside of the STREAMS release package.  As 'Linux Fast-STREAMS' has
+outside of the STREAMS release package.  As ‘Linux Fast-STREAMS’ has
 already shown production grade in terms of both performance and
 conformance, it is no longer necessary to keep these packages separate
-and they can be combined once again (or still) with 'Linux
-Fast-STREAMS'.
+and they can be combined once again (or still) with ‘Linux
+Fast-STREAMS’.
 
 INET Things to Do
 .................
 
-   - Loop back devices (ticlts, ticots, ticotsord) are currently
-     implemented in the 'inet(4)' driver using UNIX domain sockets and
+   − Loop back devices (ticlts, ticots, ticotsord) are currently
+     implemented in the ‘inet(4)’ driver using UNIX domain sockets and
      the XTI over sockets approach.  It should be straightforward to
      implement these loopback devices directly in STREAMS without
      involving sockets.  These second generation loopback drivers need
@@ -927,7 +927,7 @@ INET Things to Do
 
      _*todo*_
 
-   - Implement pseudo-connection oriented modes in INET(4) driver as
+   − Implement pseudo-connection oriented modes in INET(4) driver as
      well as udp2(4) and rawip2(4) drivers.  Document use of
      pseudo-connection oriented modes for UDP and RAWIP.
      Pseudo-connection oriented modes permit a connectionless (T_CLTS)
@@ -940,14 +940,14 @@ INET Things to Do
 
      _*todo*_
 
-   - It might be worth retrying the netperf(1) performance test on the
+   − It might be worth retrying the netperf(1) performance test on the
      second generation UDP driver with this pseudo-connection oriented
      mode in place.  You see, the netperf tests for UDP sockets performs
      a connect(3).
 
      _*todo*_
 
-   - Implement pseudo-connectionless modes in INET(4) driver as well as
+   − Implement pseudo-connectionless modes in INET(4) driver as well as
      sctp(4) drivers.  Document use of pseudo-connectionless modes for
      SCTP (not really applicable to TCP). Pseudo-connectionless modes
      permit a connection-oriented (T_COTS) provider such as sctp to
@@ -965,14 +965,14 @@ INET Things to Do
 
      _*todo*_
 
-   - Convert inet driver to use os7 common functions.  In fact, it might
+   − Convert inet driver to use os7 common functions.  In fact, it might
      be a better idea to convert the driver to use MPS common functions
      instead as we are now trying to move away from os7 common
      functions.
 
      _*todo*_
 
-   - Connectionless testing using netperf competes well with
+   − Connectionless testing using netperf competes well with
      connection-oriented sockets.  Need to still modify netperf to use
      (pseudo-)connection-oriented UDP for better comparison.
 
@@ -981,18 +981,18 @@ INET Things to Do
 SCTP Things to Do
 .................
 
-   - The strsctp package is quite stable and mature as of
+   − The strsctp package is quite stable and mature as of
      strsctp-0.9.2.2 and most of the things that remain to be done are
      rigorous conformance and performance testing.
 
      _*todo*_
 
-   - Move the tpiperf(4) module to the strxnet package and rename it
+   − Move the tpiperf(4) module to the strxnet package and rename it
      tiperf(4).
 
      _*todo*_
 
-   - Implement pseudo-connectionless modes in sctp(4) driver.  Document
+   − Implement pseudo-connectionless modes in sctp(4) driver.  Document
      use of pseudo-connectionless modes for SCTP. Pseudo-connectionless
      modes permit a connection-oriented (T_COTS) provider such as
      sctp_t(4) to provide the appearance of connectionless service.
@@ -1014,18 +1014,18 @@ SCTP Things to Do
 
      _*todo*_
 
-   - Work recent SCTP I-G changes into the code.  Many of the I-G
+   − Work recent SCTP I-G changes into the code.  Many of the I-G
      changes over the years have been implemented in the code, however,
      some of the more recent changes that made it into RFC 4460 have not
      yet been added.  This is an ongoing process.
 
      _*todo*_
 
-   - Writing new IP-packet-level conformance test suites.
+   − Writing new IP-packet-level conformance test suites.
 
      _*todo*_
 
-   - It would also be an idea to make the STREAMS SCTP Driver able to be
+   − It would also be an idea to make the STREAMS SCTP Driver able to be
      pushed as a module over a STREAMS-based pipe end so that Ferry-Clip
      conformance testing could be performed.  In fact, Ferry-Clip
      testing might be better and more flexible than IP-packet-level
@@ -1040,14 +1040,14 @@ SCTP Things to Do
 X25 Things to Do
 ................
 
-   - Important drivers and modules for the financial industry (POS, ATM,
+   − Important drivers and modules for the financial industry (POS, ATM,
      EFT) in support of POS to data center communications and data
      center to branch communications is as follows:
 
      X.25
-     'xot(4)'
+     ‘xot(4)’
 
-   - Important drivers and modules for the aviation industry (ATN) in
+   − Important drivers and modules for the aviation industry (ATN) in
      support of air-ground ground stations and Boundary Intermediate
      System and Intermediate System ground-ground stations are as
      follows:
@@ -1056,54 +1056,54 @@ X25 Things to Do
      ISO 8802 SNDCF
      Mobile 8208 SNDCF
      CIDIN SNDCF
-     'clnp(4)'
+     ‘clnp(4)’
           With security adaptations for the ATN network.
-     'esis(4)'
+     ‘esis(4)’
           With subset for the ATN network.
-     'isis(4)'
+     ‘isis(4)’
           With subset for the ATN network.
-     'idrp(4)'
+     ‘idrp(4)’
           With subset for the ATN network.
 
      Additional drivers and modules in support of ground-to-ground
      Intermediate systems and End Systems:
 
-     'isot(4)'
+     ‘isot(4)’
           RFC 1006, ISO Transport over TCP.
-     'itot(4)'
+     ‘itot(4)’
           RFC 2126, ISO Transport over TCP.
-     'xot(4)'
+     ‘xot(4)’
           RFC 1613, Cisco X.25 over TCP.
 
      Additional drivers and modules in support of ground end systems:
 
-     'tp(4)'
+     ‘tp(4)’
 
-   - Testing.  This package is completely untested.
+   − Testing.  This package is completely untested.
 
      _*todo*_
 
-   - Create 'isot(4)', 'itot(4)', 'lpp(4)' and 'cmot(4)' STREAMS modules
+   − Create ‘isot(4)’, ‘itot(4)’, ‘lpp(4)’ and ‘cmot(4)’ STREAMS modules
      and drivers.
 
      _*todo*_
 
 The purpose of the package was to move STREAMS ISO networking
-capabilities outside of the 'strss7' release package.  The 'openss7'
+capabilities outside of the ‘strss7’ release package.  The ‘openss7’
 package is currently incomplete.  If you are interested in the
 completion of this add-on package, contact <info@openss7.com>.
 
 ISO Things to Do
 ................
 
-   - Important drivers and modules for the financial industry (POS, ATM,
+   − Important drivers and modules for the financial industry (POS, ATM,
      EFT) in support of POS to data center communications and data
      center to branch communications is as follows:
 
      X.25
-     'xot(4)'
+     ‘xot(4)’
 
-   - Important drivers and modules for the aviation industry (ATN) in
+   − Important drivers and modules for the aviation industry (ATN) in
      support of air-ground ground stations and Boundary Intermediate
      System and Intermediate System ground-ground stations are as
      follows:
@@ -1112,51 +1112,51 @@ ISO Things to Do
      ISO 8802 SNDCF
      Mobile 8208 SNDCF
      CIDIN SNDCF
-     'clnp(4)'
+     ‘clnp(4)’
           With security adaptations for the ATN network.
-     'esis(4)'
+     ‘esis(4)’
           With subset for the ATN network.
-     'isis(4)'
+     ‘isis(4)’
           With subset for the ATN network.
-     'idrp(4)'
+     ‘idrp(4)’
           With subset for the ATN network.
 
      Additional drivers and modules in support of ground-to-ground
      Intermediate systems and End Systems:
 
-     'isot(4)'
+     ‘isot(4)’
           RFC 1006, ISO Transport over TCP.
-     'itot(4)'
+     ‘itot(4)’
           RFC 2126, ISO Transport over TCP.
-     'xot(4)'
+     ‘xot(4)’
           RFC 1613, Cisco X.25 over TCP.
 
      Additional drivers and modules in support of ground end systems:
 
-     'tp(4)'
+     ‘tp(4)’
 
-   - Testing.  This package is completely untested.
+   − Testing.  This package is completely untested.
 
      _*todo*_
 
-   - Create 'isot(4)', 'itot(4)', 'lpp(4)' and 'cmot(4)' STREAMS modules
+   − Create ‘isot(4)’, ‘itot(4)’, ‘lpp(4)’ and ‘cmot(4)’ STREAMS modules
      and drivers.
 
      _*todo*_
 
 The purpose of the package was to move STREAMS ISO networking
-capabilities outside of the 'strss7' release package.  The 'openss7'
+capabilities outside of the ‘strss7’ release package.  The ‘openss7’
 package is currently incomplete.  If you are interested in the
 completion of this add-on package, contact <info@openss7.com>.
 
 ISDN Things to Do
 .................
 
-   - Testing.  This package is completely untested.
+   − Testing.  This package is completely untested.
 
      This remains to be done.
 
-   - Actually implement all of the package.
+   − Actually implement all of the package.
 
 SS7 Things to Do
 ................
@@ -1164,49 +1164,49 @@ SS7 Things to Do
 There is a great long list of these, but here is a crack at the first
 ones:
 
-   - Compile entire (private) package against Linux Fast-STREAMS.
+   − Compile entire (private) package against Linux Fast-STREAMS.
 
-   - Convert test programs into conformance test suites under GNU
+   − Convert test programs into conformance test suites under GNU
      autotest.  This should be straight forward matter.
 
-   - Start retesting SIGTRAN components against SCTP and Linux
+   − Start retesting SIGTRAN components against SCTP and Linux
      Fast-STREAMS starting with M2PA.
 
-   - Start retesting SS7 Device Drivers under Linux Fast-STREAMS
+   − Start retesting SS7 Device Drivers under Linux Fast-STREAMS
      starting with X400P.
 
-   - Start retesting SS7 Stack components (MTP2, MTP3, SCCP, ISUP, TCAP)
+   − Start retesting SS7 Stack components (MTP2, MTP3, SCCP, ISUP, TCAP)
      under Linux Fast-STREAMS.
 
-   - Package a public release.  It has been way too long since a public
+   − Package a public release.  It has been way too long since a public
      release of this package.  The package has almost a million lines of
      code in it, most of which the public has never seen!
 
-   - Complete the SL-MUX driver and utility programs.
+   − Complete the SL-MUX driver and utility programs.
 
-   - Complete the libslpcap library ('pcap(3)') for live capture of SS7
-     link SDUs using 'ethereal(1)' or 'wireshark(1)'.
+   − Complete the libslpcap library (‘pcap(3)’) for live capture of SS7
+     link SDUs using ‘ethereal(1)’ or ‘wireshark(1)’.
 
 SIGTRAN Things to Do
 ....................
 
-   - Testing.  This package is completely untested.
+   − Testing.  This package is completely untested.
 
      This remains to be done.
 
-   - Actually implement all of the package.
+   − Actually implement all of the package.
 
 ATM Things to Do
 ................
 
-   - Important drivers and modules for the financial industry (POS, ATM,
+   − Important drivers and modules for the financial industry (POS, ATM,
      EFT) in support of POS to data center communications and data
      center to branch communications is as follows:
 
      X.25
-     'xot(4)'
+     ‘xot(4)’
 
-   - Important drivers and modules for the aviation industry (ATN) in
+   − Important drivers and modules for the aviation industry (ATN) in
      support of air-ground ground stations and Boundary Intermediate
      System and Intermediate System ground-ground stations are as
      follows:
@@ -1215,56 +1215,56 @@ ATM Things to Do
      ISO 8802 SNDCF
      Mobile 8208 SNDCF
      CIDIN SNDCF
-     'clnp(4)'
+     ‘clnp(4)’
           With security adaptations for the ATN network.
-     'esis(4)'
+     ‘esis(4)’
           With subset for the ATN network.
-     'isis(4)'
+     ‘isis(4)’
           With subset for the ATN network.
-     'idrp(4)'
+     ‘idrp(4)’
           With subset for the ATN network.
 
      Additional drivers and modules in support of ground-to-ground
      Intermediate systems and End Systems:
 
-     'isot(4)'
+     ‘isot(4)’
           RFC 1006, ISO Transport over TCP.
-     'itot(4)'
+     ‘itot(4)’
           RFC 2126, ISO Transport over TCP.
-     'xot(4)'
+     ‘xot(4)’
           RFC 1613, Cisco X.25 over TCP.
 
      Additional drivers and modules in support of ground end systems:
 
-     'tp(4)'
+     ‘tp(4)’
 
-   - Testing.  This package is completely untested.
+   − Testing.  This package is completely untested.
 
      _*todo*_
 
-   - Create 'isot(4)', 'itot(4)', 'lpp(4)' and 'cmot(4)' STREAMS modules
+   − Create ‘isot(4)’, ‘itot(4)’, ‘lpp(4)’ and ‘cmot(4)’ STREAMS modules
      and drivers.
 
      _*todo*_
 
 The purpose of the package was to move STREAMS ISO networking
-capabilities outside of the 'strss7' release package.  The 'openss7'
+capabilities outside of the ‘strss7’ release package.  The ‘openss7’
 package is currently incomplete.  If you are interested in the
 completion of this add-on package, contact <info@openss7.com>.
 
 VOIP Things to Do
 .................
 
-   - Testing.  This package is completely untested.  This remains to be
+   − Testing.  This package is completely untested.  This remains to be
      done.
 
      _*todo*_
 
-   - Actually implement all of the package.
+   − Actually implement all of the package.
 
      _*todo*_
 
-   - Copy all of the VoIP drivers, multiplexers and modules as well as
+   − Copy all of the VoIP drivers, multiplexers and modules as well as
      the test programs from the strss7 package and place them here.
 
      Note that this package should load after strss7 (i.e, last).

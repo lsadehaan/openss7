@@ -158,7 +158,11 @@ do_fattach(const struct file *file, const char *file_name)
 #endif
 
 	err = -EINVAL;
+#ifdef HAVE_KMEMB_STRUCT_FILE_F_VFSMNT
 	if (file->f_dentry->d_sb->s_magic != SPECFS_MAGIC)
+#else
+	if (file->f_path.dentry->d_sb->s_magic != SPECFS_MAGIC)
+#endif
 		goto out;	/* not a STREAM */
 	err = -ENOENT;
 	if (!file_name || !*file_name)
@@ -174,11 +178,19 @@ do_fattach(const struct file *file, const char *file_name)
 
 	err = -EPERM;
 	/* the owner of the file is permitted to fattach */
+#ifdef HAVE_KMEMB_STRUCT_FILE_F_VFSMNT
 	if (!capable(CAP_SYS_ADMIN) && current_creds->cr_uid != file->f_dentry->d_inode->i_uid)
+#else
+	if (!capable(CAP_SYS_ADMIN) && current_creds->cr_uid != file->f_path.dentry->d_inode->i_uid)
+#endif
 		goto release;
 
 	err = -ENOMEM;
+#ifdef HAVE_KMEMB_STRUCT_FILE_F_VFSMNT
 	mnt = clone_mnt(file->f_vfsmnt, file->f_dentry);
+#else
+	mnt = clone_mnt(file->f_path.mnt, file->f_path.dentry);
+#endif
 	if (!mnt)
 		goto release;
 

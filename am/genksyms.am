@@ -208,6 +208,7 @@ stamp-verobjs: stamp-verfiles $(KERNEL_OBJECTS) $(PKG_LDS) $(PKG_ABI)
 		test :$$obj != :$(PKG_LDS) || continue ; \
 		test :$$obj != :$(PKG_ABI) || continue ; \
 		test :$$obj != :stamp-verfiles || continue ; \
+		case "$$obj" in *.lds|*.VERSION) continue ;; esac ; \
 		if $(OBJDUMP) -h $$obj | grep -q __ksymtab; then \
 			a=`echo "$$obj" | sed 's,^lib.*_a-,$(kpre),'` ; \
 			v=`echo "$$obj" | sed 's,^lib.*_a-,,;s,\.o$$,,'` ; \
@@ -397,6 +398,7 @@ stamp-verobjs: $(KERNEL_OBJECTS) $(PKG_LDS) $(PKG_ABI)
 	list="$?" ; for obj in $$list ; do \
 		test :$$obj != :$(PKG_LDS) || continue ; \
 		test :$$obj != :$(PKG_ABI) || continue ; \
+		case "$$obj" in *.lds|*.VERSION) continue ;; esac ; \
 		a=`echo "$$obj" | sed 's,^lib.*_a-,$(kpre),'` ; \
 		$(ECHO_Q) "  LD    " $$a ; \
 		$(ECHO_V) "$(LD) -r $$pkg_lds $$pkg_abi -o a.$$$$.out $$obj && $(am__mv) -- a.$$$$.out $$a" ; \

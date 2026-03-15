@@ -1109,7 +1109,7 @@ bzero(void *data, size_t len)
 	memset(data, 0, len);
 }
 
-#ifndef HAVE_KFUNC_BCMP
+#if !defined(__KERNEL__) && !defined(HAVE_KFUNC_BCMP)
 static __inline__ int
 bcmp(const void *s1, const void *s2, size_t len)
 {

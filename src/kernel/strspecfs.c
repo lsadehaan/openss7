@@ -311,7 +311,7 @@ spec_snode(dev_t dev, struct cdevsw *cdev)
 		if (snode->i_state & I_NEW) {
 			/* just a way to pass another argument to read_inode() */
 			snode->i_private = cdev;
-#if defined HAVE_KMEMB_STRUCT_SUPER_OPERATIONS_READ_INODE
+#if defined HAVE_KMEMB_STRUCT_SUPER_OPERATIONS_READ_INODE && LINUX_VERSION_CODE < KERNEL_VERSION(3,0,0)
 			sb->s_op->read_inode(snode);
 #else
 			spec_read_inode(snode);
@@ -460,7 +460,7 @@ spec_reparent(struct file *file, struct cdevsw *cdev, dev_t dev)
 #if 0
 		i_readcount_dec(file->f_path.dentry->d_inode);
 #else
-		atomic_dec(&file->f_dentry->d_inode->i_readcount);
+		atomic_dec(&file->f_path.dentry->d_inode->i_readcount);
 #endif
 #endif
 #endif
@@ -661,7 +661,7 @@ STATIC struct inode_operations spec_dir_i_ops = {
  *  -------------------------------------------------------------------------
  */
 
-#if defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_READDIR
+#if defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_READDIR && LINUX_VERSION_CODE < KERNEL_VERSION(3,11,0)
 /**
  *  spec_dir_readdir:	- read a driver/module subdirectory
  *  @file:		user file pointer
@@ -675,7 +675,11 @@ STATIC struct inode_operations spec_dir_i_ops = {
 STATIC int
 spec_dir_readdir(struct file *file, void *dirent, filldir_t filldir)
 {
+#ifdef HAVE_KMEMB_STRUCT_FILE_F_VFSMNT
 	struct dentry *dentry = file->f_dentry;
+#else
+	struct dentry *dentry = file->f_path.dentry;
+#endif
 	int nr = file->f_pos;
 
 	switch (nr) {
@@ -759,7 +763,7 @@ spec_dir_readdir(struct file *file, void *dirent, filldir_t filldir)
 	return (0);
 }
 
-#elif defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_ITERATE
+#else
 /**
  *  spec_dir_iterate:	- read a driver/module subdirectory
  *  @file:		user file pointer
@@ -827,19 +831,19 @@ spec_dir_iterate(struct file *file, struct dir_context *ctx)
 	return (0);
 }
 
-#else
-#error Need a way to read a directory.
 #endif
 
 STATIC struct file_operations spec_dir_f_ops = {
 	.owner = THIS_MODULE,
 	.read = generic_read_dir,
-#if defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_READDIR
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,11,0)
+	.iterate_shared = spec_dir_iterate,
+#elif defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_READDIR
 	.readdir = spec_dir_readdir,
+#elif defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_ITERATE_SHARED
+	.iterate_shared = spec_dir_iterate,
 #elif defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_ITERATE
 	.iterate = spec_dir_iterate,
-#else
-#error Need a way to read a directory.
 #endif
 };
 
@@ -922,7 +926,7 @@ STATIC struct inode_operations spec_root_i_ops = {
  *  -------------------------------------------------------------------------
  */
 
-#if defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_READDIR
+#if defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_READDIR && LINUX_VERSION_CODE < KERNEL_VERSION(3,11,0)
 /**
  *  spec_root_readdir:	- read the root directory
  *  @file:		user file pointer
@@ -936,7 +940,11 @@ STATIC struct inode_operations spec_root_i_ops = {
 STATIC int
 spec_root_readdir(struct file *file, void *dirent, filldir_t filldir)
 {
+#ifdef HAVE_KMEMB_STRUCT_FILE_F_VFSMNT
 	struct dentry *dentry = file->f_dentry;
+#else
+	struct dentry *dentry = file->f_path.dentry;
+#endif
 	int nr = file->f_pos;
 
 	switch (nr) {
@@ -981,7 +989,7 @@ spec_root_readdir(struct file *file, void *dirent, filldir_t filldir)
 	}
 	return 0;
 }
-#elif defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_ITERATE
+#else
 /**
  *  spec_root_iterate:	- read the root directory
  *  @file:		user file pointer
@@ -1020,15 +1028,17 @@ spec_root_iterate(struct file *file, struct dir_context *ctx)
 	read_unlock(&cdevsw_lock);
 	return (0);
 }
-#else
-#error Need a way to read a directory.
 #endif
 
 STATIC struct file_operations spec_root_f_ops = {
 	.owner = THIS_MODULE,
 	.read = generic_read_dir,
-#if defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_READDIR
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,11,0)
+	.iterate_shared = spec_root_iterate,
+#elif defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_READDIR
 	.readdir = spec_root_readdir,
+#elif defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_ITERATE_SHARED
+	.iterate_shared = spec_root_iterate,
 #elif defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_ITERATE
 	.iterate = spec_root_iterate,
 #else
@@ -1057,16 +1067,31 @@ specfs_dname(struct dentry *dentry, char *buffer, int buflen)
 		struct devnode *cmin;
 
 		if ((cmin = cmin_get(cdev, getminor(dentry->d_inode->i_ino)))) {
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6,6,0)
+			retn = dynamic_dname(buffer, buflen, "STR %s/%s", cdev->d_name, cmin->n_name);
+#else
 			retn = dynamic_dname(dentry, buffer, buflen, "STR %s/%s", cdev->d_name, cmin->n_name);
+#endif
 		} else {
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6,6,0)
+			retn = dynamic_dname(buffer, buflen, "STR %s/%lu", cdev->d_name,
+					     (unsigned long) getminor(dentry->d_inode->i_ino));
+#else
 			retn = dynamic_dname(dentry, buffer, buflen, "STR %s/%lu", cdev->d_name,
 					     (unsigned long) getminor(dentry->d_inode->i_ino));
+#endif
 		}
 		cdrv_put(cdev);
 	} else {
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6,6,0)
+		retn = dynamic_dname(buffer, buflen, "STR %lu/%lu",
+				     (unsigned long) getmajor(dentry->d_inode->i_ino),
+				     (unsigned long) getminor(dentry->d_inode->i_ino));
+#else
 		retn = dynamic_dname(dentry, buffer, buflen, "STR %lu/%lu",
 				     (unsigned long) getmajor(dentry->d_inode->i_ino),
 				     (unsigned long) getminor(dentry->d_inode->i_ino));
+#endif
 	}
 	return (retn);
 }
@@ -1102,7 +1127,9 @@ static const struct dentry_operations spec_root_d_ops = {
  *  -------------------------------------------------------------------------
  */
 
-#if defined HAVE_KMEMB_STRUCT_SUPER_BLOCK_S_FS_INFO
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,37)
+#define SPECFS_SB(s) s->s_fs_info
+#elif defined HAVE_KMEMB_STRUCT_SUPER_BLOCK_S_FS_INFO
 #define SPECFS_SB(s) s->s_fs_info
 #elif defined HAVE_KMEMB_STRUCT_SUPER_BLOCK_U_GENERIC_SBP
 #define SPECFS_SB(s) s->u.generic_sbp
@@ -1310,14 +1337,18 @@ spec_read_inode(struct inode *inode)
 		inode->i_nlink = 2;
 #endif
 	}
-#if defined HAVE_KFUNC_KTIME_GET_REAL_TS64
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6,6,0)
+	simple_inode_init_ts(inode);
+#elif defined HAVE_KFUNC_KTIME_GET_REAL_TS64
 	ktime_get_real_ts64(&inode->i_mtime);
+	inode->i_atime = inode->i_ctime = inode->i_mtime;
 #elif defined HAVE_KFUNC_KTIME_GET_REAL_TS
 	ktime_get_real_ts(&inode->i_mtime);
+	inode->i_atime = inode->i_ctime = inode->i_mtime;
 #else
 	inode->i_mtime = CURRENT_TIME;
-#endif
 	inode->i_atime = inode->i_ctime = inode->i_mtime;
+#endif
 	inode->i_private = NULL;	/* done with it */
 	return;
       bad_inode:
@@ -1326,7 +1357,7 @@ spec_read_inode(struct inode *inode)
 	return;
 }
 
-#if defined HAVE_KMEMB_STRUCT_SUPER_OPERATIONS_READ_INODE2
+#if defined HAVE_KMEMB_STRUCT_SUPER_OPERATIONS_READ_INODE2 && LINUX_VERSION_CODE < KERNEL_VERSION(3,0,0)
 /**
  *  spec_read_inode2: - read a inode from the filesystem
  *  @inode:	initialized inode to read
@@ -1354,7 +1385,7 @@ spec_read_inode2(struct inode *inode, void *opaque)
 }
 #endif
 
-#if defined HAVE_KMEMB_STRUCT_SUPER_OPERATIONS_PUT_INODE
+#if defined HAVE_KMEMB_STRUCT_SUPER_OPERATIONS_PUT_INODE && LINUX_VERSION_CODE < KERNEL_VERSION(3,0,0)
 /**
  *  spec_put_inode: - put an inode to the filesystem
  *  @inode:	inode to put
@@ -1381,7 +1412,11 @@ spec_put_inode(struct inode *inode)
 		if (atomic_read(&inode->i_count) == 1) {
 			_printd(("%s: final put of inode %p no %lu\n", __FUNCTION__, inode,
 				 inode->i_ino));
+#if defined HAVE_KFUNC_SET_NLINK
+			set_nlink(inode, 0);
+#else
 			inode->i_nlink = 0;
+#endif
 		}
 #endif
 	}
@@ -1505,13 +1540,13 @@ spec_destroy_inode(struct inode *inode)
 STATIC struct super_operations spec_s_ops ____cacheline_aligned = {
 	.alloc_inode = spec_alloc_inode,
 	.destroy_inode = spec_destroy_inode,
-#if defined HAVE_KMEMB_STRUCT_SUPER_OPERATIONS_READ_INODE
+#if defined HAVE_KMEMB_STRUCT_SUPER_OPERATIONS_READ_INODE && LINUX_VERSION_CODE < KERNEL_VERSION(3,0,0)
 	.read_inode = spec_read_inode,
 #endif
-#if defined HAVE_KMEMB_STRUCT_SUPER_OPERATIONS_READ_INODE2
+#if defined HAVE_KMEMB_STRUCT_SUPER_OPERATIONS_READ_INODE2 && LINUX_VERSION_CODE < KERNEL_VERSION(3,0,0)
 	.read_inode2 = spec_read_inode2,
 #endif				/* defined HAVE_KMEMB_STRUCT_SUPER_OPERATIONS_READ_INODE2 */
-#if defined HAVE_KMEMB_STRUCT_SUPER_OPERATIONS_PUT_INODE
+#if defined HAVE_KMEMB_STRUCT_SUPER_OPERATIONS_PUT_INODE && LINUX_VERSION_CODE < KERNEL_VERSION(3,0,0)
 	.put_inode = spec_put_inode,
 #endif				/* defined HAVE_KMEMB_STRUCT_SUPER_OPERATIONS_PUT_INODE */
 	.put_super = spec_put_super,
@@ -1560,16 +1595,20 @@ specfs_fill_super(struct super_block *sb, void *data, int silent)
 	if (!(inode = new_inode(sb)))
 		goto free_error;
 	inode->i_ino = -1UL;	/* unused (non-zero) inode number */
-#if defined HAVE_KFUNC_KTIME_GET_REAL_TS64
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6,6,0)
+	simple_inode_init_ts(inode);
+#elif defined HAVE_KFUNC_KTIME_GET_REAL_TS64
 	ktime_get_real_ts64(&inode->i_mtime);
+	inode->i_atime = inode->i_ctime = inode->i_mtime;
 #elif defined HAVE_KFUNC_KTIME_GET_REAL_TS
 	ktime_get_real_ts(&inode->i_mtime);
+	inode->i_atime = inode->i_ctime = inode->i_mtime;
 #else
 	inode->i_mtime = CURRENT_TIME;
-#endif
 	inode->i_atime = inode->i_ctime = inode->i_mtime;
+#endif
 	inode->i_blocks = 0;
-#ifdef HAVE_KMEMB_STRUCT_INODE_I_BLKSIZE
+#if defined(HAVE_KMEMB_STRUCT_INODE_I_BLKSIZE) && LINUX_VERSION_CODE < KERNEL_VERSION(4,0,0)
 	inode->i_blksize = 1024;
 #endif
 #ifndef HAVE_KMEMB_STRUCT_INODE_I_UID_VAL
@@ -1613,7 +1652,7 @@ specfs_fill_super(struct super_block *sb, void *data, int silent)
 	return (err);
 }
 
-#ifdef HAVE_KMEMB_STRUCT_FILE_SYSTEM_TYPE_MOUNT
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,39)
 STATIC struct dentry *
 specfs_fst_mount(struct file_system_type *fs_type, int flags, const char *dev_name, void *data)
 {
@@ -1707,7 +1746,11 @@ STATIC DECLARE_FSTYPE(spec_fs_type, "specfs", specfs_read_super, FS_SINGLE);
 #if    defined DECLARE_MUTEX
 STATIC DECLARE_MUTEX(specfs_sem);
 #elif  defined DEFINE_SEMAPHORE
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6,4,0)
+STATIC DEFINE_SEMAPHORE(specfs_sem, 1);
+#else
 STATIC DEFINE_SEMAPHORE(specfs_sem);
+#endif
 #else
 #error Need some way to declare a semaphore.
 #endif

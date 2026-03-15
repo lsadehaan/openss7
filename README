@@ -1,6 +1,6 @@
-OpenSS7 -- read me first file.  2020-03-03
+OpenSS7 -- read me first file.  2026-03-14
 $Id: README,v 1.1.2.25 2011-05-10 13:45:30 brian Exp $
-Copyright (c) 2008-2020  Monavacon Limited. <http://www.monavacon.com/>
+Copyright (c) 2008-2026  Monavacon Limited. <http://www.monavacon.com/>
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2001  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -8,89 +8,89 @@ See the end for copying conditions (for this file).
 OpenSS7
 =======
 
-Package openss7-1.1.8.20200303 was released under AGPLv3 2020-03-03.
+Package openss7-1.1.8.20200323 was released under AGPLv3 2026-03-14.
 
-This is the 'OpenSS7' package.  It contains all of the OpenSS7 Project
+This is the ‘OpenSS7’ package.  It contains all of the OpenSS7 Project
 release code.  This is the only package released by the OpenSS7 Project.
 
 The package contains all of the former subpackages of the OpenSS7 Master
 Package, including:
 
-     * Linux Fast-STREAMS
-     * STREAMS Compatibility Modules
-     * STREAMS Utilities
-     * STREAMS Terminals
-     * STREAMS X/Open Networking Services
-     * STREAMS X/Open Networking XTI/TLI Library
-     * STREAMS Sockets
-     * STREAMS Internet Protocol Drivers
-     * STREAMS SCTP
-     * STREAMS Channels and Multiplexing
-     * STREAMS X.25 and Frame Relay Stack
-     * STREAMS Open Systems Interconnect (OSI) Stack
-     * STREAMS ISDN Stack
-     * STREAMS ATM Stack
-     * STREAMS SS7 Stack
-     * STREAMS SIGTRAN Stack
-     * STREAMS VoiP Stack
+     • Linux Fast-STREAMS
+     • STREAMS Compatibility Modules
+     • STREAMS Utilities
+     • STREAMS Terminals
+     • STREAMS X/Open Networking Services
+     • STREAMS X/Open Networking XTI/TLI Library
+     • STREAMS Sockets
+     • STREAMS Internet Protocol Drivers
+     • STREAMS SCTP
+     • STREAMS Channels and Multiplexing
+     • STREAMS X.25 and Frame Relay Stack
+     • STREAMS Open Systems Interconnect (OSI) Stack
+     • STREAMS ISDN Stack
+     • STREAMS ATM Stack
+     • STREAMS SS7 Stack
+     • STREAMS SIGTRAN Stack
+     • STREAMS VoiP Stack
 
 Fully deprecated by this release and no longer released by the OpenSS7
 Project are the following former subpackages of the OpenSS7 Master
 Package:(1)
 
-     * Linux Native Sockets SCTP
-     * Internet Performance (the OpenSS7 iperf fork)
-     * Network Performance (the OpenSS7 netperf fork)
-     * Dialogic Open System Release 6.1
+     • Linux Native Sockets SCTP
+     • Internet Performance (the OpenSS7 iperf fork)
+     • Network Performance (the OpenSS7 netperf fork)
+     • Dialogic Open System Release 6.1
 
-This distribution is applicable to 'Linux' 2.4, 2.6, 3.x and 4.x kernels
-and was targeted at 'ix86', 'x86_64', 'ppc' and 'ppc64' architectures,
+This distribution is applicable to ‘Linux’ 2.4, 2.6, 3.x and 4.x kernels
+and was targeted at ‘ix86’, ‘x86_64’, ‘ppc’ and ‘ppc64’ architectures,
 but should build and install for other architectures as well.
 
 Release
 -------
 
-This is the 'openss7-1.1.8.20200303' package, released 2020-03-03.  This
-'1.1.8.20200303' release, and the latest version, can be obtained from
+This is the ‘openss7-1.1.8.20200323’ package, released 2026-03-14.  This
+‘1.1.8.20200323’ release, and the latest version, can be obtained from
 the download area (http://www.openss7.org/download.html) of The OpenSS7
 Project website using a command such as:
 
-     $> wget http://www.openss7.org/tarballs/openss7-1.1.8.20200303.tar.xz
+     $> wget http://www.openss7.org/tarballs/openss7-1.1.8.20200323.tar.xz
 
-The release is available as an 'autoconf(1)' tarball, 'src.rpm' or
-'dsc', as a set of binary 'rpm's or 'deb's, or as a 'yum(8)',
-'zypper(8)' or 'apt(8)' repository.  See the download page
-(http://www.openss7.org/download.html) for the 'autoconf(1)' tarballs,
-'src.rpm's, 'dsc's, or repository access instructions.  See the
-'openss7' package page (http://www.openss7.org/openss7_pkg.html) for
+The release is available as an ‘autoconf(1)’ tarball, ‘src.rpm’ or
+‘dsc’, as a set of binary ‘rpm’s or ‘deb’s, or as a ‘yum(8)’,
+‘zypper(8)’ or ‘apt(8)’ repository.  See the download page
+(http://www.openss7.org/download.html) for the ‘autoconf(1)’ tarballs,
+‘src.rpm’s, ‘dsc’s, or repository access instructions.  See the
+‘openss7’ package page (http://www.openss7.org/openss7_pkg.html) for
 tarballs, source and binary packages.
 
-Please see the 'NEWS' file for release notes and history of user visible
-changes for the current version, and the 'ChangeLog' file for a more
-detailed history of implementation changes.  The 'TODO' file lists
+Please see the ‘NEWS’ file for release notes and history of user visible
+changes for the current version, and the ‘ChangeLog’ file for a more
+detailed history of implementation changes.  The ‘TODO’ file lists
 features not yet implemented and other outstanding items.
 
-Please see the 'INSTALL', 'INSTALL-openss7' and 'README-make', files (or
+Please see the ‘INSTALL’, ‘INSTALL-openss7’ and ‘README-make’, files (or
 *note Installation::) for installation instructions.
 
-When working from 'cvs(1)' or 'git(1)', please see the 'README-cvs',
+When working from ‘cvs(1)’ or ‘git(1)’, please see the ‘README-cvs’,
 file (or *note Downloading from CVS::).  An abbreviated installation
 procedure that works for most applications appears below.
 
 This release of the package is published strictly under Version 3 of the
-'Affero GNU Public License' which can be found in the file 'COPYING'.
+‘Affero GNU Public License’ which can be found in the file ‘COPYING’.
 Package specific licensing terms (if any) can be found in the file
-'LICENSES'.  Please respect these licensing arrangements.  If you are
+‘LICENSES’.  Please respect these licensing arrangements.  If you are
 interested in different licensing terms, please contact the copyright
 holder, or OpenSS7 Corporation <sales@openss7.com>.
 
-See 'README-alpha' (if it exists) for alpha release information.
+See ‘README-alpha’ (if it exists) for alpha release information.
 
 Repository Installation
 -----------------------
 
-The simplest way of installing the package is to use the 'OpenSS7'
-'repomd' or 'apt' repositories instead of attempting to build from
+The simplest way of installing the package is to use the ‘OpenSS7’
+‘repomd’ or ‘apt’ repositories instead of attempting to build from
 tarball.  When you already have a the repository set up, the package can
 be udpated simply with (one of):
 
@@ -105,7 +105,7 @@ be udpated simply with (one of):
      Ubuntu:   $> sudo aptitude install openss7
      Debian:   $> sudo aptitude install openss7
 
-If you have not yet set up an installation source for the 'OpenSS7'
+If you have not yet set up an installation source for the ‘OpenSS7’
 repositories, one of the following commands will establish repository
 access for RPM-based systems:
 
@@ -129,37 +129,37 @@ establish repository access for DPKG-based systems:
                $> wget $REPO/$SUBDIR/openss7-repo_all.deb
                $> dpkg -i -D010077 openss7-repo_all.deb
 
-For 'zypper(8)' based systems it may be first necessary to perform:
+For ‘zypper(8)’ based systems it may be first necessary to perform:
 
      OpenSUSE: $> sudo rpm --import https://www.openss7.org/pubkey.asc
      SLES:     $> sudo rpm --import https://www.openss7.org/pubkey.asc
 
-For 'apt(8)' based systems it may be first necessary to perform:
+For ‘apt(8)’ based systems it may be first necessary to perform:
 
                $> wget https://www.openss7.org/pubkey.asc
      Debian:   $> sudo apt-key add pubkey.asc
      Ubuntu:   $> sudo apt-key add pubkey.asc
 
-For 'yum(8)' based systems, caches should be refreshed with:
+For ‘yum(8)’ based systems, caches should be refreshed with:
 
      Fedora:   $> sudo yum makecache
      CentOS:   $> sudo yum makecache
      RHEL:     $> sudo yum makecache
 
-For 'zypper(8)' based systems, caches should be refreshed with:
+For ‘zypper(8)’ based systems, caches should be refreshed with:
 
      OpenSUSE: $> sudo zypper refresh-services
      OpenSUSE: $> sudo zypper refresh
      SLES:     $> sudo zypper refresh-services
      SLES:     $> sudo zypper refresh
 
-For 'urpmi(8)' based systems, caches should be refreshed with:
+For ‘urpmi(8)’ based systems, caches should be refreshed with:
 
      Mageia:   $> sudo urpmi.update
      Mandriva: $> sudo urpmi.update
      MES:      $> sudo urpmi.update
 
-For 'apt(8)' base systems, caches should be refreshed with:(2)
+For ‘apt(8)’ base systems, caches should be refreshed with:(2)
 
      Debian:   $> sudo aptitude update
      Ubuntu:   $> sudo aptitude update
@@ -197,31 +197,31 @@ Build Prerequisites
 When building from source RPM or DSC, the prerequisites for building
 must be met.  Most RPM or DEB build prerequisites are automatic;
 however, some prerequisites must still be met manually.  When building
-from tarball, most prerequisites must be met manually.  The 'configure'
+from tarball, most prerequisites must be met manually.  The ‘configure’
 script will inform you of most missing prerequisites and the actions
 that must be performed to meet those prerequisites.
 
 Prerequisites for building OpenSS7 package are as follows:
 
-  1. 'Linux' distribution, somewhat 'Linux Standards Base' compliant,
+  1. ‘Linux’ distribution, somewhat ‘Linux Standards Base’ compliant,
      with a 2.4, 2.6 or 3.x kernel and the appropriate tool chain for
-     compiling out-of-tree kernel modules.  Most recent 'Linux'
+     compiling out-of-tree kernel modules.  Most recent ‘Linux’
      distributions are usable out of the box, but some development
      packages must be installed.  For more information, see *note
      Compatibility::.
 
-          - A fairly LSB compliant GNU/Linux distribution.(3)
-          - Linux 2.4 kernel (2.4.10 - 2.4.27),
-          - Linux 2.6 kernel (2.6.3 - 2.6.39), or
-          - Linux 3.x kernel (3.0 - 3.16);
-          - Linux 4.x kernel (4.0 - 4.10);
-          - glibc2 or better.
-          - GNU groff (for man pages).(4)
-          - GNU texinfo (for info files).
-          - GNU bison and flex (for config programs).
-          - net-snmp (for SNMP agents).(5)
-          - GNU gcj and classpath (for Java modules).
-          - swig (for Java, Tcl, Perl and Ruby interfaces).
+          − A fairly LSB compliant GNU/Linux distribution.(3)
+          − Linux 2.4 kernel (2.4.10 - 2.4.27),
+          − Linux 2.6 kernel (2.6.3 - 2.6.39), or
+          − Linux 3.x kernel (3.0 - 3.16);
+          − Linux 4.x kernel (4.0 - 4.10);
+          − glibc2 or better.
+          − GNU groff (for man pages).(4)
+          − GNU texinfo (for info files).
+          − GNU bison and flex (for config programs).
+          − net-snmp (for SNMP agents).(5)
+          − GNU gcj and classpath (for Java modules).
+          − swig (for Java, Tcl, Perl and Ruby interfaces).
 
 The following will meet most additional prerequisites for a CentOS/RHEL
 5.5 build host:
@@ -285,11 +285,11 @@ commands:
      Fedora:  $> yum install kernel-devel
      CentOS:  $> yum install kernel-devel
 
-You also need the same version of 'gcc(1)' compiler with which the
-kernel was built.  If it is not the default, add 'CC=kgcc' on the line
-after './configure', for example:
+You also need the same version of ‘gcc(1)’ compiler with which the
+kernel was built.  If it is not the default, add ‘CC=kgcc’ on the line
+after ‘./configure’, for example:
 
-     $> ../openss7-1.1.8.20200303/configure CC='gcc-3.4'
+     $> ../openss7-1.1.8.20200323/configure CC='gcc-3.4'
 
 The package builds and installs SNMP agents.  When configuring and
 building the package, it is necessary to have the net-snmp development
@@ -321,11 +321,11 @@ Installation
 The following commands will download, configure, build, check, install,
 validate, uninstall and remove the package:
 
-     $> wget http://www.openss7.org/tarballs/openss7-1.1.8.20200303.tar.xz
-     $> tar -xJvf openss7-1.1.8.20200303.tar.xz
+     $> wget http://www.openss7.org/tarballs/openss7-1.1.8.20200323.tar.xz
+     $> tar -xJvf openss7-1.1.8.20200323.tar.xz
      $> mkdir build
      $> pushd build
-     $> ../openss7-1.1.8.20200303/configure --enable-autotest --enable-silent-rules
+     $> ../openss7-1.1.8.20200323/configure --enable-autotest --enable-silent-rules
      $> make V=0
      $> make check
      $> sudo make install
@@ -333,8 +333,8 @@ validate, uninstall and remove the package:
      $> sudo make uninstall
      $> popd
      $> sudo rm -rf build
-     $> rm -rf openss7-1.1.8.20200303
-     $> rm -f openss7-1.1.8.20200303.tar.xz
+     $> rm -rf openss7-1.1.8.20200323
+     $> rm -f openss7-1.1.8.20200323.tar.xz
 
 If you have problems, try building with the logging targets instead.  If
 the make of a logging target fails, an automatic problem report will be
@@ -342,11 +342,11 @@ generated that can be mailed to The OpenSS7 Project
 <bugs@openss7.org>.(6)  Installation steps using the logging targets
 proceed as follows:
 
-     $> wget http://www.openss7.org/tarballs/openss7-1.1.8.20200303.tar.xz
-     $> tar -xJvf openss7-1.1.8.20200303.tar.xz
+     $> wget http://www.openss7.org/tarballs/openss7-1.1.8.20200323.tar.xz
+     $> tar -xJvf openss7-1.1.8.20200323.tar.xz
      $> mkdir build
      $> pushd build
-     $> ../openss7-1.1.8.20200303/configure --enable-autotest --enable-silent-rules
+     $> ../openss7-1.1.8.20200323/configure --enable-autotest --enable-silent-rules
      $> make V=1 compile.log
      $> make check.log
      $> sudo make install.log
@@ -354,12 +354,12 @@ proceed as follows:
      $> sudo make uninstall.log
      $> popd
      $> sudo rm -rf build
-     $> rm -rf openss7-1.1.8.20200303
-     $> rm -f openss7-1.1.8.20200303.tar.xz
+     $> rm -rf openss7-1.1.8.20200323
+     $> rm -f openss7-1.1.8.20200323.tar.xz
 
-See 'README-make' for additional specialized make targets.
+See ‘README-make’ for additional specialized make targets.
 
-For custom applications, see the 'INSTALL' and 'INSTALL-openss7' files
+For custom applications, see the ‘INSTALL’ and ‘INSTALL-openss7’ files
 or the see *note Installation::, as listed below.  If you encounter
 troubles, see *note Troubleshooting::, before issuing a bug report.
 
@@ -370,56 +370,56 @@ The OpenSS7 package is available from the downloads area of The OpenSS7
 Project website (http://www.openss7.org/download.html) using a command
 such as:
 
-     $> wget http://www.openss7.org/tarballs/openss7-1.1.8.20200303.tar.xz
+     $> wget http://www.openss7.org/tarballs/openss7-1.1.8.20200323.tar.xz
 
 Unpack the tarball using a command such as:
 
-     $> tar -xJvf openss7-1.1.8.20200303.tar.xz
+     $> tar -xJvf openss7-1.1.8.20200323.tar.xz
 
 The tarball will unpack into the relative subdirectory named after the
-package name: openss7-1.1.8.20200303.
+package name: openss7-1.1.8.20200323.
 
-The package builds using the GNU 'autoconf' utilities and the
-'configure' script.  To build the package, we recommend using a separate
-'build' directory as follows:
+The package builds using the GNU ‘autoconf’ utilities and the
+‘configure’ script.  To build the package, we recommend using a separate
+‘build’ directory as follows:
 
      $> mkdir build
      $> cd build
-     $> ../openss7-1.1.8.20200303/configure
+     $> ../openss7-1.1.8.20200323/configure
 
 In general, the package configures and builds without adding any special
-options to the 'configure' script.  For general options to the
-'configure' script, see the GNU 'INSTALL' file in the distribution:
+options to the ‘configure’ script.  For general options to the
+‘configure’ script, see the GNU ‘INSTALL’ file in the distribution:
 
-     $> less ../openss7-1.1.8.20200303/INSTALL
+     $> less ../openss7-1.1.8.20200323/INSTALL
 
-For specific options to the 'configure' script, see the
-'INSTALL-openss7' file in the distribution, or simply execute the
-configure script with the '--help' option like so:
+For specific options to the ‘configure’ script, see the
+‘INSTALL-openss7’ file in the distribution, or simply execute the
+configure script with the ‘--help’ option like so:
 
-     $> ../openss7-1.1.8.20200303/configure --help
+     $> ../openss7-1.1.8.20200323/configure --help
 
 After configuring the package, the package can be compiled simply by
-issuing the 'make' command:
+issuing the ‘make’ command:
 
      $> make V=0
 
-Some specialized makefile targets exists, see the 'README-make' file in
-the distribution or simply invoke the 'help' target like so:
+Some specialized makefile targets exists, see the ‘README-make’ file in
+the distribution or simply invoke the ‘help’ target like so:
 
      $> make help | less
 
 After successfully building the package, the package can be checked by
-invoking the 'check' make target like so:
+invoking the ‘check’ make target like so:
 
      $> make check
 
 After successfully checking the package, the package can be installed by
-invoking the 'install' make target (as root) like so:
+invoking the ‘install’ make target (as root) like so:
 
      $> sudo make install
 
-The 'info' documentation is automatically installed; however, the text,
+The ‘info’ documentation is automatically installed; however, the text,
 html and pdf documentation must be installed separately like so:
 
      $> sudo make install-txt
@@ -427,16 +427,16 @@ html and pdf documentation must be installed separately like so:
      $> sudo make install-pdf
 
 The test suites that ship with the package can be invoked after the
-package has been installed by invoking the 'installcheck' target.  This
+package has been installed by invoking the ‘installcheck’ target.  This
 target can either be invoked as root, or as a normal user, like so:
 
      $> make installcheck
 
-(Note: you must add the '--enable-autotest' flag to 'configure', above
-for the test suites to be invoked with 'make installcheck'.)
+(Note: you must add the ‘--enable-autotest’ flag to ‘configure’, above
+for the test suites to be invoked with ‘make installcheck’.)
 
 The package can be cleanly removed (including installed documentation)
-by invoking the 'uninstall' target (as root):
+by invoking the ‘uninstall’ target (as root):
 
      $> sudo make uninstall
 
@@ -444,27 +444,27 @@ Then the build directory and tarball can be simply removed:
 
      $> cd ..
      $> rm -rf build
-     $> rm -rf openss7-1.1.8.20200303
-     $> rm -f openss7-1.1.8.20200303.tar.xz
+     $> rm -rf openss7-1.1.8.20200323
+     $> rm -f openss7-1.1.8.20200323.tar.xz
 
 Detailed Installation Instructions
 ----------------------------------
 
 More detailed installation instructions can be found in the *note
-Installation::, contained in the distribution in 'text', 'info', 'html'
-and 'pdf' formats:
+Installation::, contained in the distribution in ‘text’, ‘info’, ‘html’
+and ‘pdf’ formats:
 
-     $> cd ../openss7-1.1.8.20200303
+     $> cd ../openss7-1.1.8.20200323
      $> less doc/manual/openss7.txt
      $> lynx doc/manual/openss7.html
      $> info doc/manual/openss7.info
      $> xpdf doc/manual/openss7.pdf
 
-The 'text' version of the manual is always available in the 'MANUAL'
+The ‘text’ version of the manual is always available in the ‘MANUAL’
 file in the release.
 
-The current manual is also always available online from 'The OpenSS7
-Project' website at:
+The current manual is also always available online from ‘The OpenSS7
+Project’ website at:
 
      $> lynx http://www.openss7.org/openss7_manual.html
 
@@ -474,22 +474,22 @@ Project' website at:
 can be obtained from the projects or companies that originated them.
 
    (2) Note that the apt-transport-https package must be installed for
-the openss7 repositories to function correctly.  Try 'sudo aptitude
-install apt-transport-https'.
+the openss7 repositories to function correctly.  Try ‘sudo aptitude
+install apt-transport-https’.
 
    (3) See *note GNU/Linux Distributions::, for more information.
 
    (4) If you are using a Debian release, please make sure to install
-the groff extension package ('groff_ext'), as it contains the 'refer' or
-'grefer' commands necessary for including references in the manual
+the groff extension package (‘groff_ext’), as it contains the ‘refer’ or
+‘grefer’ commands necessary for including references in the manual
 pages.
 
    (5) A wide range of net-snmp releases are supported, from UCD-SNMP
 4.2.5 through net-snmp 5.8.
 
-   (6) Please see *note Problem Reports::, or the file 'PROBLEMS' in the
-release directory for more information on filing a proper "Problem
-Report".
+   (6) Please see *note Problem Reports::, or the file ‘PROBLEMS’ in the
+release directory for more information on filing a proper “Problem
+Report”.
 
 -----
 

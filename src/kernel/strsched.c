@@ -5973,7 +5973,7 @@ kstreamd_unpark(unsigned int cpu)
 {
 }
 
-#ifdef HAVE_KMEMB_STRUCT_SMP_HOTPLUG_THREAD_PRE_UNPARK
+#if defined(HAVE_KMEMB_STRUCT_SMP_HOTPLUG_THREAD_PRE_UNPARK) && LINUX_VERSION_CODE < KERNEL_VERSION(6,0,0)
 /* called from outside the kthread before it is unparked */
 STATIC void
 kstreamd_pre_unpark(unsigned int cpu)
@@ -5990,7 +5990,7 @@ STATIC struct smp_hotplug_thread streams_threads = {
 	.cleanup = kstreamd_cleanup,
 	.park = kstreamd_park,
 	.unpark = kstreamd_unpark,
-#ifdef HAVE_KMEMB_STRUCT_SMP_HOTPLUG_THREAD_PRE_UNPARK
+#if defined(HAVE_KMEMB_STRUCT_SMP_HOTPLUG_THREAD_PRE_UNPARK) && LINUX_VERSION_CODE < KERNEL_VERSION(6,0,0)
 	.pre_unpark = kstreamd_pre_unpark,
 #endif
 	.selfparking = 0,
@@ -6070,7 +6070,11 @@ kstreamd(void *__bind_cpu)
 		   runs queues in process context. */
 		if (likely(((volatile unsigned long) t->flags & (QRUNFLAGS)) == 0)) {
 		      reschedule:
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,1,0)
+			preempt_enable();
+#else
 			preempt_enable_no_resched();
+#endif
 			schedule();
 			prefetchw(t);
 			if (unlikely(kthread_should_stop()))
@@ -6087,7 +6091,11 @@ kstreamd(void *__bind_cpu)
 
 		if (cpu_is_offline((long) __bind_cpu))
 			goto wait_to_die;
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,1,0)
+		preempt_enable();
+#else
 		preempt_enable_no_resched();
+#endif
 		__runqueues();
 
 #if !defined(CONFIG_PREEMPT) && !defined(CONFIG_PREEMPTION)
@@ -6179,6 +6187,90 @@ takeover_strsched(unsigned int cpu)
 	streams_local_restore(flags);
 }
 #endif				/* defined CONFIG_HOTPLUG_CPU */
+
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,10,0)
+/* Kernel 4.10+ uses cpuhp_setup_state/cpuhp_remove_state instead of
+ * register_cpu_notifier/unregister_cpu_notifier */
+
+STATIC int str_cpuhp_state = -1;
+
+STATIC int
+str_cpu_online(unsigned int cpu)
+{
+	struct strthread *t = &strthreads[cpu];
+	struct task_struct *p;
+	void *hcpu = (void *) (long) cpu;
+
+	if (IS_ERR(p = kthread_create(kstreamd, hcpu, "kstreamd/%d", cpu))) {
+		printd(("kstreamd for cpu %d failed\n", cpu));
+		return PTR_ERR(p);
+	}
+	t->proc = p;
+#ifdef PF_NOFREEZE
+	p->flags |= PF_NOFREEZE;
+#endif
+	kthread_bind(p, cpu);
+#if defined CONFIG_STREAMS_RT_KTHREADS
+#if defined HAVE_SCHED_SETSCHEDULER_EXPORT
+	{
+		struct sched_param sp = { MAX_USER_RT_PRIO - 1 };
+
+		sched_setscheduler(p, SCHED_FIFO, &sp);
+	}
+#endif				/* defined HAVE_SCHED_SETSCHEDULER_EXPORT */
+#endif				/* defined CONFIG_STREAMS_RT_KTHREADS */
+	wake_up_process(p);
+	return 0;
+}
+
+#if defined CONFIG_HOTPLUG_CPU
+STATIC int
+str_cpu_offline(unsigned int cpu)
+{
+	struct strthread *t = &strthreads[cpu];
+	struct task_struct *p = t->proc;
+
+	if (p) {
+		kthread_stop(p);
+		takeover_strsched(cpu);
+		t->proc = NULL;
+	}
+	return 0;
+}
+#endif				/* defined CONFIG_HOTPLUG_CPU */
+
+/* some older kernels (SLES) do not define cpu_present */
+#ifndef cpu_present
+#define cpu_present(__cpu) 1
+#endif
+
+STATIC __unlikely int
+spawn_kstreamd(void)
+{
+	int ret;
+
+#if defined CONFIG_HOTPLUG_CPU
+	ret = cpuhp_setup_state(CPUHP_AP_ONLINE_DYN, "streams/kstreamd:online",
+				str_cpu_online, str_cpu_offline);
+#else
+	ret = cpuhp_setup_state(CPUHP_AP_ONLINE_DYN, "streams/kstreamd:online",
+				str_cpu_online, NULL);
+#endif
+	if (ret < 0)
+		return ret;
+	str_cpuhp_state = ret;
+	return 0;
+}
+
+STATIC __unlikely void
+kill_kstreamd(void)
+{
+	if (str_cpuhp_state >= 0)
+		cpuhp_remove_state(str_cpuhp_state);
+}
+
+#else				/* LINUX_VERSION_CODE >= KERNEL_VERSION(4,10,0) */
+
 #ifndef __cpuinit
 #ifdef __devinit
 #define __cpuinit __devinit
@@ -6307,6 +6399,7 @@ kill_kstreamd(void)
 	unregister_cpu_notifier(&str_cpu_nfb);
 	return;
 }
+#endif				/* LINUX_VERSION_CODE >= KERNEL_VERSION(4,10,0) */
 #else				/* defined HAVE_KINC_LINUX_KTHREAD_H */
 #if !defined HAVE_KFUNC_SET_USER_NICE
 #define set_user_nice(__p, __val) (__p)->nice = (__val)

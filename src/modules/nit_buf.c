@@ -62,6 +62,14 @@ static char const ident[] = "src/modules/nit_buf.c (" PACKAGE_ENVR ") " PACKAGE_
 #include <linux/init.h>
 #include <linux/sched.h>
 
+/* Compat: struct timeval removed from kernel headers in 5.6+ */
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,6,0)
+struct timeval {
+	long tv_sec;
+	long tv_usec;
+};
+#endif
+
 #define _SVR4_SOURCE
 #define _MPS_SOURCE
 #define _SUN_SOURCE

@@ -5227,6 +5227,13 @@ my_dst_negative_advice(struct dst_entry **dst_p)
 {
 	struct dst_entry *dst = *dst_p;
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6,6,0)
+	/* negative_advice callback was removed in 6.6; just drop the cached dst */
+	if (dst) {
+		dst_release(dst);
+		*dst_p = NULL;
+	}
+#else
 	if (dst && dst->ops->negative_advice) {
 		*dst_p = dst->ops->negative_advice(dst);
 
@@ -5234,6 +5241,7 @@ my_dst_negative_advice(struct dst_entry **dst_p)
 			/* FIXME: reset the transmit queue */
 		}
 	}
+#endif
 }
 
 #ifdef HAVE_KFUNC_DST_MTU
@@ -5315,7 +5323,7 @@ sctp_update_routes(struct sctp *sp, int force_reselect)
 					goto done;
 				}
 				ip_rt_put(rt2);
-				flowi4_update_output(&fl4, 0, RT_CONN_FLAGS(sp), fl4.daddr, fl4.saddr);
+				flowi4_update_output(&fl4, 0, fl4.daddr, fl4.saddr);
 				rt2 = __ip_route_output_key(&init_net, &fl4);
 				if (IS_ERR(rt2)) {
 					err = PTR_ERR(rt2);
@@ -5328,6 +5336,37 @@ sctp_update_routes(struct sctp *sp, int force_reselect)
 			}
 		      done:
 #endif				/* defined HAVE_KMEMB_STRUCT_RTABLE_RT_SRC */
+#elif LINUX_VERSION_CODE >= KERNEL_VERSION(5,0,0)
+			{
+				struct flowi4 fl4;
+				struct rtable *rt2;
+
+#ifdef HAVE_KFUNC_FLOWI4_INIT_OUTPUT_12_ARGS
+				flowi4_init_output(&fl4, 0, 0, RT_CONN_FLAGS(sp), RT_SCOPE_UNIVERSE,
+						   IPPROTO_SCTP, 0, sd->daddr, 0, sp->dport, sp->sport,
+						   (kuid_t){ 0 });
+#else
+				flowi4_init_output(&fl4, 0, 0, RT_CONN_FLAGS(sp), RT_SCOPE_UNIVERSE,
+						   IPPROTO_SCTP, 0, sd->daddr, 0, sp->dport, sp->sport);
+#endif
+				rt2 = __ip_route_output_key(&init_net, &fl4);
+				if (IS_ERR(rt2)) {
+					err = PTR_ERR(rt2);
+					goto done2;
+				}
+				ip_rt_put(rt2);
+				flowi4_update_output(&fl4, 0, fl4.daddr, fl4.saddr);
+				rt2 = __ip_route_output_key(&init_net, &fl4);
+				if (IS_ERR(rt2)) {
+					err = PTR_ERR(rt2);
+					goto done2;
+				}
+				rt = rt2;
+				sd->daddr = fl4.daddr;
+				sd->saddr = fl4.saddr;
+				sd->dif = fl4.flowi4_oif;
+			}
+		      done2:
 #else
 #error Need a usable ip_route_connect() prototype.
 #endif
@@ -5423,6 +5462,23 @@ sctp_update_routes(struct sctp *sp, int force_reselect)
 			if (!ip_route_connect
 			    (&rt2, sd->daddr, 0, RT_CONN_FLAGS(sp), sd->dif, IPPROTO_SCTP, sp->sport,
 			     sp->dport, NULL, 0))
+#elif LINUX_VERSION_CODE >= KERNEL_VERSION(5,0,0)
+			{
+				struct flowi4 fl4;
+
+#ifdef HAVE_KFUNC_FLOWI4_INIT_OUTPUT_12_ARGS
+				flowi4_init_output(&fl4, sd->dif, 0, RT_CONN_FLAGS(sp), RT_SCOPE_UNIVERSE,
+						   IPPROTO_SCTP, 0, sd->daddr, 0, sp->dport, sp->sport,
+						   (kuid_t){ 0 });
+#else
+				flowi4_init_output(&fl4, sd->dif, 0, RT_CONN_FLAGS(sp), RT_SCOPE_UNIVERSE,
+						   IPPROTO_SCTP, 0, sd->daddr, 0, sp->dport, sp->sport);
+#endif
+				rt2 = __ip_route_output_key(&init_net, &fl4);
+				if (IS_ERR(rt2))
+					rt2 = NULL;
+			}
+			if (rt2)
 #else
 #error Need a usable ip_route_connect() prototype.
 #endif
@@ -14183,7 +14239,10 @@ sctp_bind_conflict(struct sctp *sp, struct sctp_bind_bucket *sb)
 	return (sp2 != NULL);
 }
 
-#if   defined HAVE_KFUNC_INET_GET_LOCAL_PORT_RANGE_3_ARGS
+#if   LINUX_VERSION_CODE >= KERNEL_VERSION(5,0,0)
+#undef inet_get_local_port_range
+#define inet_get_local_port_range(l,h) inet_get_local_port_range(&init_net,l,h)
+#elif defined HAVE_KFUNC_INET_GET_LOCAL_PORT_RANGE_3_ARGS
 #undef inet_get_local_port_range
 #define inet_get_local_port_range(l,h) inet_get_local_port_range(&init_net,l,h)
 #elif defined HAVE_KFUNC_INET_GET_LOCAL_PORT_RANGE

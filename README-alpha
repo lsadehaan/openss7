@@ -1,6 +1,6 @@
-OpenSS7 -- beta release introduction.  2020-03-03
+OpenSS7 -- beta release introduction.  2026-03-14
 $Id: README-alpha,v 1.1.2.25 2011-05-10 13:45:30 brian Exp $
-Copyright (c) 2008-2020  Monavacon Limited. <http://www.monavacon.com/>
+Copyright (c) 2008-2026  Monavacon Limited. <http://www.monavacon.com/>
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2001  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -8,7 +8,7 @@ See the end for copying conditions (for this file).
 OpenSS7
 =======
 
-Package openss7-1.1.8.20200303 Released 2020-03-03.
+Package openss7-1.1.8.20200323 Released 2026-03-14.
 
 This is beta release software.
 
@@ -20,11 +20,11 @@ The following is an extract from the Installation and Reference Manual:
 6.5.1 Defect Notices
 --------------------
 
-"OpenSS7" could contain unknown defects.  This is a "beta" release.
+“OpenSS7” could contain unknown defects.  This is a “beta” release.
 Some defects could be harmful.  Validation testing has been performed by
-the 'OpenSS7 Project' on this software for only a restricted set of
+the ‘OpenSS7 Project’ on this software for only a restricted set of
 systems.  The software might fail to configure or compile on other
-systems.  The 'OpenSS7 Project' recommends that you do not use this
+systems.  The ‘OpenSS7 Project’ recommends that you do not use this
 software for purposes other than validation testing and evaluation, and
 then only with care.  Use at your own risk.  Remember that there is NO
 WARRANTY.(1)
@@ -47,9 +47,9 @@ under *note GNU Affero General Public License::.
 6.5.2 Known Defects
 -------------------
 
-With the exception of packages not originally created by the 'OpenSS7
-Project', the 'OpenSS7 Project' software does not ship with known bugs
-in any release stage except "pre-alpha".  "OpenSS7" had no known bugs at
+With the exception of packages not originally created by the ‘OpenSS7
+Project’, the ‘OpenSS7 Project’ software does not ship with known bugs
+in any release stage except “pre-alpha”.  “OpenSS7” had no known bugs at
 the time of release.
 
 6.5.3 Defect History
@@ -64,7 +64,7 @@ development and their resolutions.  This list serves two purposes:
      problem.
 
   2. It provides a low overhead bug list between releases for developers
-     to use as a 'TODO' list.
+     to use as a ‘TODO’ list.
 
 Bugs
 ....
@@ -74,31 +74,31 @@ bugs for those portions are still being designed and will not be
 available until a later date.  Most of the package is complete and for
 the most part bugs are currently available.
 
-'openss7 009. 2010-12-14T07:29:58+0000'
+‘openss7 009. 2010-12-14T07:29:58+0000’
      Found a bug in msgpullup(9) that caused it to always fail.  Strange
      enough, msgpullup(9) only attempted after pullupmsg(9) failed in
      all OpenSS7 drivers and modules.
 
-     _*fixed*_ in 'openss7-1.1.1.20110111'
+     _*fixed*_ in ‘openss7-1.1.1.20110111’
 
-'openss7 008. 2010-08-09T17:41:46+0000'
-     The 't_alloc(3)' function was incorrectly returning a TLOOK error
+‘openss7 008. 2010-08-09T17:41:46+0000’
+     The ‘t_alloc(3)’ function was incorrectly returning a TLOOK error
      when called when an outstanding event was pending.  Thanks to John
      Hodgkinson at Boldon James for reporting this bug.  A similar bug
-     was found by inspection for 't_bind(3)', 't_getinfo(3)',
-     't_getprotaddr(3)'.
+     was found by inspection for ‘t_bind(3)’, ‘t_getinfo(3)’,
+     ‘t_getprotaddr(3)’.
 
-     _*fixed*_ in 'openss7-1.1.1.20110111'
+     _*fixed*_ in ‘openss7-1.1.1.20110111’
 
-'openss7 007. 2010-06-09T12:13:41+0000'
-     The 't_rcv(3)' function was not reseting data when the amount of
+‘openss7 007. 2010-06-09T12:13:41+0000’
+     The ‘t_rcv(3)’ function was not reseting data when the amount of
      data to be read was exactly the amount of data available.  Thanks
      to John Hodgkinson at Boldon James for reporting this bug.
 
-     _*fixed*_ in 'openss7-1.1.1.20111011'
+     _*fixed*_ in ‘openss7-1.1.1.20111011’
 
-'openss7 006. 2009-08-31T04:04:52+0000'
-     A number of functions in 'strlookup.c' were moving the found item
+‘openss7 006. 2009-08-31T04:04:52+0000’
+     A number of functions in ‘strlookup.c’ were moving the found item
      in the hash collision list to the head of the list; however, a
      number of these functions were being called with a read lock
      instead of a write lock on the corresponding hash table.  This
@@ -109,42 +109,42 @@ the most part bugs are currently available.
      practice has been removed (actually suppressed).  Thanks to Tony
      Abo at HiTech for the report leading to this bug.
 
-     _*fixed*_ in 'openss7-1.1.1.20090908'
+     _*fixed*_ in ‘openss7-1.1.1.20090908’
 
-'openss7 005. 2009-06-13T03:47:32+0000'
-     There was an 'qput(9)'/'qget(9)' reference counting imbalance in
-     the 'enter_syncq_writer(9)', 'enter_inner_syncq_func(9)' and
-     'enter_inner_syncq_putp(9)' functions.  The most symptomatic of
-     these was the 'enter_inner_syncq_putp(9)' function that affected
-     regular 'put(9s)' (*note (*manpages*)put(9s)::) and 'putnext(9)'
+‘openss7 005. 2009-06-13T03:47:32+0000’
+     There was an ‘qput(9)’/‘qget(9)’ reference counting imbalance in
+     the ‘enter_syncq_writer(9)’, ‘enter_inner_syncq_func(9)’ and
+     ‘enter_inner_syncq_putp(9)’ functions.  The most symptomatic of
+     these was the ‘enter_inner_syncq_putp(9)’ function that affected
+     regular ‘put(9s)’ (*note (*manpages*)put(9s)::) and ‘putnext(9)’
      (*note (*manpages*)putnext(9)::) functions on synchronized modules
      and drivers having an inner perimeter.  The reference imbalance
      resulted in leaking the module queue pair, stream head and stream
      head queue pair on driver close.
 
-     _*fixed*_ in 'openss7-1.1.1.20090908'
+     _*fixed*_ in ‘openss7-1.1.1.20090908’
 
-'openss7 004. 2009-06-12T08:16:08+0000'
-     'qattach(9)' (*note (*manpages*)qattach(9)::) was taking a
+‘openss7 004. 2009-06-12T08:16:08+0000’
+     ‘qattach(9)’ (*note (*manpages*)qattach(9)::) was taking a
      reference on a synchronization queue without the reference being
-     released in 'qdelete(9)' (*note (*manpages*)qdelete(9)::).
-     'qdelete(9)' (*note (*manpages*)qdelete(9)::) was fixed to release
-     the reference taken by 'setsq(9)' (*note (*manpages*)setsq(9)::) in
-     'qattach(9)' (*note (*manpages*)qattach(9)::).  Thanks to Tony Abo
+     released in ‘qdelete(9)’ (*note (*manpages*)qdelete(9)::).
+     ‘qdelete(9)’ (*note (*manpages*)qdelete(9)::) was fixed to release
+     the reference taken by ‘setsq(9)’ (*note (*manpages*)setsq(9)::) in
+     ‘qattach(9)’ (*note (*manpages*)qattach(9)::).  Thanks to Tony Abo
      at HiTech for identifying and reporting this bug.
 
-     _*fixed*_ in 'openss7-1.1.1.20090908'
+     _*fixed*_ in ‘openss7-1.1.1.20090908’
 
-'openss7 003. 2009-04-17T11:56:06+0000'
+‘openss7 003. 2009-04-17T11:56:06+0000’
 
      The strace, strerr daemons and the pstrlog call in the streams
-     library were not initializing ltime before the call to 'ctime_r(3)'
+     library were not initializing ltime before the call to ‘ctime_r(3)’
      resulting in an epoch timestamp (Jan 1, 1970).  Thanks to Pierre
      Crepieux for identifying and reporting this bug.
 
-     _*fixed*_ in 'openss7-1.1.1.20090908'
+     _*fixed*_ in ‘openss7-1.1.1.20090908’
 
-'openss7 002. 2009-03-26T07:56:40+0000'
+‘openss7 002. 2009-03-26T07:56:40+0000’
 
      Untimeout and unbufcall did not wait until the callback returned
      before returning when there was a collision between a cancellation
@@ -159,83 +159,83 @@ the most part bugs are currently available.
      (irq suppression) potentially resulting in list corruption or queue
      reference counting problem.
 
-     _*fixed*_ in 'openss7-1.1.1.20090908'
+     _*fixed*_ in ‘openss7-1.1.1.20090908’
 
-'openss7 001. 2008-12-16T08:17:47+0000'
+‘openss7 001. 2008-12-16T08:17:47+0000’
 
-     Somewhere about Linux kernel '2.6.17', and during the
-     'openss7-0.9.2.D.rc2' master package release, it was discovered
+     Somewhere about Linux kernel ‘2.6.17’, and during the
+     ‘openss7-0.9.2.D.rc2’ master package release, it was discovered
      that SLABs no longer supported the SLAB_NO_REAP flag.
-     Unfortunately, the 'seinfo_ctor(9)' function was assuming that the
+     Unfortunately, the ‘seinfo_ctor(9)’ function was assuming that the
      SLAB_NO_REAP flag was being recognized.  This means that over the
      span of some several days on system heavily using timers that a
      slab corruption would eventually occur resulting in a kernel crash,
-     particularly on x86_64 kernels.  The 'seinfo' slab functions have
+     particularly on x86_64 kernels.  The ‘seinfo’ slab functions have
      been rewritten to not expect the SLAB_NO_REAP feature.  There was
      also a minor possibility of a strevent structure identifier overlap
      after an extremely long period of intensive operation, and that has
      been fixed as well.  Thanks to Angel Diaz for reporting this bug.
 
-     _*fixed*_ in 'openss7-1.1.1.20090908'
+     _*fixed*_ in ‘openss7-1.1.1.20090908’
 
-'strinet 004. 2008-10-24T08:04:16+0000'
+‘strinet 004. 2008-10-24T08:04:16+0000’
      UDP and RAWIP drivers cannot receive zero-length messages in
      accordances with UNIX '98 and XNS 5.2.  Use the UDP2 and RAWIP2
      drivers instead if this is important to you as they exhibit full
      UNIX '98 XNS 5.2 conformance.
 
-     _*fixed*_ in 'strinet-0.9.2.7'
+     _*fixed*_ in ‘strinet-0.9.2.7’
 
-'strcompat 008. 2008-10-19T19:57:41+0000'
+‘strcompat 008. 2008-10-19T19:57:41+0000’
 
-     'mi_open_link(9)' (*note (*manpages*)mi_open_link(9)::) was not
+     ‘mi_open_link(9)’ (*note (*manpages*)mi_open_link(9)::) was not
      walking device lists correctly.
 
-     _*fixed*_ in 'strcompat-0.9.2.7'.
+     _*fixed*_ in ‘strcompat-0.9.2.7’.
 
-'strcompat 007. 2008-10-19T10:39:26+0000'
+‘strcompat 007. 2008-10-19T10:39:26+0000’
 
-     'mi_open_link(9)' (*note (*manpages*)mi_open_link(9)::) was not
+     ‘mi_open_link(9)’ (*note (*manpages*)mi_open_link(9)::) was not
      returning the assigned device number in devp when sflag was
      CLONEOPEN.
 
-     _*fixed*_ in 'strcompat-0.9.2.7'.
+     _*fixed*_ in ‘strcompat-0.9.2.7’.
 
-'streams 025. 2008-10-17T05:57:29+0000'
+‘streams 025. 2008-10-17T05:57:29+0000’
 
-     'putnext(q, mp)' was checking whether procedures had been turned
-     off on queue 'q'.  This was not correct as it is only the
-     'q->q_next' put procedure that would be executed.  It should only
-     check procedures on 'q->q_next'.
+     ‘putnext(q, mp)’ was checking whether procedures had been turned
+     off on queue ‘q’.  This was not correct as it is only the
+     ‘q->q_next’ put procedure that would be executed.  It should only
+     check procedures on ‘q->q_next’.
 
-     _*fixed*_ in 'streams-0.9.2.4'
+     _*fixed*_ in ‘streams-0.9.2.4’
 
-'streams 024. 2008-10-11T19:36:41+0000'
+‘streams 024. 2008-10-11T19:36:41+0000’
 
      A list delete corruption bug in the STREAMS driver and module
-     lookup functions (e.g.  '__cdrv_lookup') was discovered by the list
-     debugging in the 'FC9' kernel.
+     lookup functions (e.g.  ‘__cdrv_lookup’) was discovered by the list
+     debugging in the ‘FC9’ kernel.
 
-     _*fixed*_ in 'streams-0.9.2.4'
+     _*fixed*_ in ‘streams-0.9.2.4’
 
-'streams 023. 2008-10-11T19:36:23+0000'
+‘streams 023. 2008-10-11T19:36:23+0000’
 
      Not really a bug, but newer (2.6.25) kernels no longer permit
      registration of binary identifiers for sysctls (i.e.  CTL_NAME).
      The proc filesystem entries (i.e.  PROCNAME) are still permitted
      and CTL_NAME should be set to zero for these kernels.  Added a
-     check for the existence of symbol 'sysctl_check_table(9)' to
+     check for the existence of symbol ‘sysctl_check_table(9)’ to
      identify when binary registration is forbidden.  Another related
      problem is that when binary registration of system controls is not
-     possible, 'sysctl(2)' (*note (*manpages*)sysctl(2)::) becomes
+     possible, ‘sysctl(2)’ (*note (*manpages*)sysctl(2)::) becomes
      worthless.  Unfortunately, the STREAMS MIB agent was written to use
-     'sysctl(2)' (*note (*manpages*)sysctl(2)::) and needs to be
-     rewritten to use the '/proc/sys' filesystem instead ala 'sysctl(8)'
+     ‘sysctl(2)’ (*note (*manpages*)sysctl(2)::) and needs to be
+     rewritten to use the ‘/proc/sys’ filesystem instead ala ‘sysctl(8)’
      (*note (*manpages*)sysctl(8)::).
 
-     _*fixed*_ in 'streams-0.9.2.4'
+     _*fixed*_ in ‘streams-0.9.2.4’
 
-'streams 022. 2008-10-07T18:40:25+0000'
+‘streams 022. 2008-10-07T18:40:25+0000’
 
      When overriding 32-bit compatability on input-output controls
      conflicting from the CDROM block device with STREAMS input-output
@@ -244,18 +244,18 @@ the most part bugs are currently available.
      loop.  This bug affected pre-2.6.11 kernels, likely manifesting
      itself in a non-function CDROM device while STREAMS was loaded.
      Bug reported and one-line fix provided by Sylvain Chouleur for
-     'DGAC'.
+     ‘DGAC’.
 
-     _*fixed*_ in 'streams-0.9.2.4'
+     _*fixed*_ in ‘streams-0.9.2.4’
 
-'strxns 003. 2008-09-03T06:10:28+0000'
+‘strxns 003. 2008-09-03T06:10:28+0000’
 
-     Over-restricted settable range of tos in 'np_ip' driver.  Thanks to
+     Over-restricted settable range of tos in ‘np_ip’ driver.  Thanks to
      Christophe Nolibos for reporting this bug.
 
-     _*fixed*_ in 'strxns-0.9.2.7'
+     _*fixed*_ in ‘strxns-0.9.2.7’
 
-'strnsl 004. 2008-08-20T06:02:09+0000'
+‘strnsl 004. 2008-08-20T06:02:09+0000’
 
      To permit the xnsl library to be used on systems with the broken
      libtirpc package, we now place the file in /etc/netconfig.xnsl
@@ -264,49 +264,49 @@ the most part bugs are currently available.
      library has been adjusted to first look for /etc/netconfig.xnsl
      before looking for /etc/netconfig.
 
-     _*fixed*_ in 'strnsl-0.9.2.4'.
+     _*fixed*_ in ‘strnsl-0.9.2.4’.
 
-'strss7 006. 2008-08-17T03:42:23+0000'
+‘strss7 006. 2008-08-17T03:42:23+0000’
 
      The xnet library was discovered to contain a thread-safety bug
-     caused by newer behaviour of 'pthread_once(3)' (*note
+     caused by newer behaviour of ‘pthread_once(3)’ (*note
      (*manpages*)pthread_once(3)::) causing the library to core dump
      when used on recent implementations of pthreads (nptl).
 
      The xnet library is no longer normally compiled as part of the
-     'strss7' package.
+     ‘strss7’ package.
 
-     _*fixed*_ in 'strss7-0.9a.8'.
+     _*fixed*_ in ‘strss7-0.9a.8’.
 
-'strsock 001. 2008-08-17T03:42:23+0000'
+‘strsock 001. 2008-08-17T03:42:23+0000’
 
      The socket, socklib and sockpath libraries were discovered to
      contain a thread-safety bug caused by newer behaviour of
-     'pthread_once(3)' (*note (*manpages*)pthread_once(3)::) causing the
+     ‘pthread_once(3)’ (*note (*manpages*)pthread_once(3)::) causing the
      libraries to core dump when used on recent implementations of
      pthreads (nptl).
 
-     _*fixed*_ in 'strsock-0.9.2.4'.
+     _*fixed*_ in ‘strsock-0.9.2.4’.
 
-'strnsl 003. 2008-08-17T03:42:23+0000'
+‘strnsl 003. 2008-08-17T03:42:23+0000’
 
      The xnsl library was discovered to contain a thread-safety bug
-     caused by newer behaviour of 'pthread_once(9)' (*note
+     caused by newer behaviour of ‘pthread_once(9)’ (*note
      (*manpages*)pthread_once(9)::) causing the library to core dump
      when used on recent implementations of pthreads (nptl).
 
-     _*fixed*_ in 'strnsl-0.9.2.4'.
+     _*fixed*_ in ‘strnsl-0.9.2.4’.
 
-'strxnet 001. 2008-08-17T03:42:23+0000'
+‘strxnet 001. 2008-08-17T03:42:23+0000’
 
      The xnet and xnsl libraries were discovered to contain a
-     thread-safety bug caused by newer behaviour of 'pthread_once(3)'
+     thread-safety bug caused by newer behaviour of ‘pthread_once(3)’
      (*note (*manpages*)pthread_once(3)::) causing the libraries to core
      dump when used on recent implementations of pthreads (nptl).
 
-     _*fixed*_ in 'strxnet-0.9.2.12'.
+     _*fixed*_ in ‘strxnet-0.9.2.12’.
 
-'strinet 003. 2008-08-02T02:58:49+0000'
+‘strinet 003. 2008-08-02T02:58:49+0000’
 
      Some test cases are failing for the TCP driver when SELinux is set
      for Enforcing.  Either the STREAMS kernel threads kstream/0, etc.
@@ -314,83 +314,83 @@ the most part bugs are currently available.
      Disabled.  Conditions were added to the testsuite to expect
      failures on 30 specific tests when SELinux is set to Enforcing.
 
-     _*addressed*_ in 'strinet-0.9.2.7'
+     _*addressed*_ in ‘strinet-0.9.2.7’
 
-'streams 021. 2008-08-01T22:32:08+0000'
+‘streams 021. 2008-08-01T22:32:08+0000’
 
      When flushing queues the backenable bits were not being initialized
-     to zero in '__flushq(9)', resulting in back-enabling of bands (or
+     to zero in ‘__flushq(9)’, resulting in back-enabling of bands (or
      the normal queue) was being performed depending on the
      uninitialized values in the backenable bit array.  This only
-     affected 'I_SETSIG' signals for 'SWRNORM' and 'SWBAND', and the
+     affected ‘I_SETSIG’ signals for ‘SWRNORM’ and ‘SWBAND’, and the
      only when flushing queues.  Fix properly initializes the backenable
      array.
 
-     _*fixed*_ in 'streams-0.9.2.4'
+     _*fixed*_ in ‘streams-0.9.2.4’
 
-'streams 020. 2008-07-31T04:59:41+0000'
+‘streams 020. 2008-07-31T04:59:41+0000’
 
-     Not really a bug (for STREAMS), but when the 'streams.ko' kernel
-     module is loaded, the 'crash(8)' (*note (*manpages*)crash(8)::)
+     Not really a bug (for STREAMS), but when the ‘streams.ko’ kernel
+     module is loaded, the ‘crash(8)’ (*note (*manpages*)crash(8)::)
      debugger will not debug a running kernel because it finds the
-     'runqueues(9)' exported function in the 'streams.ko' module instead
+     ‘runqueues(9)’ exported function in the ‘streams.ko’ module instead
      of the the static one from the kernel.  This has been temporarily
-     renamed by macro to 'srunqueues(9)' (notice the leading 's') until
-     'crash(8)' (*note (*manpages*)crash(8)::) learns to do the right
+     renamed by macro to ‘srunqueues(9)’ (notice the leading ‘s’) until
+     ‘crash(8)’ (*note (*manpages*)crash(8)::) learns to do the right
      thing and check that the symbol it looks up comes from the kernel
      instead of a kernel module.
 
-     _*workaround*_ in 'streams-0.9.2.4'
+     _*workaround*_ in ‘streams-0.9.2.4’
 
-'streams 019. 2008-07-25T22:41:47+0000'
+‘streams 019. 2008-07-25T22:41:47+0000’
 
-     When 'M_READ' was being issued by the Stream Head downstream an
-     'srlock(0)' imbalance in 'strsendmread(9)' was causing soft-lockups
-     on close for recent read-write lock implementations on 'CentOS 5.2'
-     for 'x86_64'.
+     When ‘M_READ’ was being issued by the Stream Head downstream an
+     ‘srlock(0)’ imbalance in ‘strsendmread(9)’ was causing soft-lockups
+     on close for recent read-write lock implementations on ‘CentOS 5.2’
+     for ‘x86_64’.
 
-     _*fixed*_ in 'streams-0.9.2.4'
+     _*fixed*_ in ‘streams-0.9.2.4’
 
-'streams 018. 2008-07-25T01:15:26+0000'
+‘streams 018. 2008-07-25T01:15:26+0000’
 
-     Previous fix didn't work too good: returning '[EAGAIN]' when
-     hung-up on 'getmsg(2s)' (*note (*manpages*)getmsg(2s)::),
-     'getpmsg(2s)' (*note (*manpages*)getpmsg(2s)::), 'read(2s)' (*note
-     (*manpages*)read(2s)::), 'readv(2s)' (*note
+     Previous fix didn't work too good: returning ‘[EAGAIN]’ when
+     hung-up on ‘getmsg(2s)’ (*note (*manpages*)getmsg(2s)::),
+     ‘getpmsg(2s)’ (*note (*manpages*)getpmsg(2s)::), ‘read(2s)’ (*note
+     (*manpages*)read(2s)::), ‘readv(2s)’ (*note
      (*manpages*)readv(2s)::) instead of 0 and terminal end of file.
      This caused a regression on four or five other test cases.
 
-     _*fixed*_ in 'streams-0.9.2.4'
+     _*fixed*_ in ‘streams-0.9.2.4’
 
-'strcompat 006. 2008-07-11T13:52:04+0000'
+‘strcompat 006. 2008-07-11T13:52:04+0000’
 
      lis_alloc_sem() was not setting the supplied count against the
      created semaphore, but was alway setting the semaphore to 1
      (unlocked).
 
-     _*fixed*_ in 'strcompat-0.9.2.7'.
+     _*fixed*_ in ‘strcompat-0.9.2.7’.
 
-'strcompat 005. 2008-05-26T14:06:22+0000'
+‘strcompat 005. 2008-05-26T14:06:22+0000’
 
      lis_register_strdev() was failing whenever nminor was greater than
      zero or not an even multiple of 256.  This was due to an error in
      the logic checking for multiple majors.  (Thanks to Omer Tunali for
      reporting this bug.)
 
-     _*fixed*_ in 'strcompat-0.9.2.7'.
+     _*fixed*_ in ‘strcompat-0.9.2.7’.
 
-'streams 017. 2008-04-10T15:17:30+0000'
+‘streams 017. 2008-04-10T15:17:30+0000’
 
-     When 'M_DATA' is sent upstream followed by 'M_HANGUP', 'read(2s)'
+     When ‘M_DATA’ is sent upstream followed by ‘M_HANGUP’, ‘read(2s)’
      (*note (*manpages*)read(2s)::) is returning zero (0) and not
-     permitting the data associated with the 'M_DATA' to be read.  This
-     is a bug per documentation.  'read(2s)' (*note
+     permitting the data associated with the ‘M_DATA’ to be read.  This
+     is a bug per documentation.  ‘read(2s)’ (*note
      (*manpages*)read(2s)::) should operate as normal following a hangup
      until all data is read and then return zero (0).
 
      The difficulty is that when waking up from a read sleep or when
      entering read the hangup condition was generating an internal
-     '[ESTRPIPE]' error.  This was altered so that '[ESTRPIPE]' is only
+     ‘[ESTRPIPE]’ error.  This was altered so that ‘[ESTRPIPE]’ is only
      returned during the hangup condition after the read queue has been
      tested and the caller is about to sleep on read.
 
@@ -398,50 +398,50 @@ the most part bugs are currently available.
      executable were altered to validate the fix for this case and
      curtail regressions.
 
-     _*fixed*_ in 'streams-0.9.2.4'
+     _*fixed*_ in ‘streams-0.9.2.4’
 
-'streams 016. 2007-11-14T17:23:57+0000'
+‘streams 016. 2007-11-14T17:23:57+0000’
 
-     Read is blocking when data has been read, 'O_NONBLOCK' and
-     'O_NDELAY' unset, 'RFILL' unset, in non-SVR4 mode.  This violates
+     Read is blocking when data has been read, ‘O_NONBLOCK’ and
+     ‘O_NDELAY’ unset, ‘RFILL’ unset, in non-SVR4 mode.  This violates
      POSIX specifications.
 
      Test case 3.1.11.4 in the test-streams test suite executable was
      generated to validate the fix for this case and to curtail
      regressions.
 
-     _*fixed*_ in 'streams-0.9.2.4'
+     _*fixed*_ in ‘streams-0.9.2.4’
 
-'streams 015. 2007-11-14T17:19:01+0000'
+‘streams 015. 2007-11-14T17:19:01+0000’
 
      Dynamic allocation of major device numbers is not working on recent
      2.6 kernels.  Someone slipped some code in the kernel to have
-     'register_chrdev(9)' (*note (*manpages*)register_chrdev(9)::)
+     ‘register_chrdev(9)’ (*note (*manpages*)register_chrdev(9)::)
      allocate from major 255 down (again).  Changed code to allocate
      modid according to our own rules and then request the same for a
      major device number.  This also ensures that module ID and major
      are the same.
 
-     _*fixed*_ in 'streams-0.9.2.4'
+     _*fixed*_ in ‘streams-0.9.2.4’
 
-'strchan 001. 2007-10-15T16:17:08+0000'
+‘strchan 001. 2007-10-15T16:17:08+0000’
 
-     Removing definition of 'freezestr(9)' (*note
-     (*manpages*)freezestr(9)::) and 'unfreezestr(9)' (*note
+     Removing definition of ‘freezestr(9)’ (*note
+     (*manpages*)freezestr(9)::) and ‘unfreezestr(9)’ (*note
      (*manpages*)unfreezestr(9)::) in ch_pmod.c and mx_pmod.c was
      causing loss of version information on old 2.4 kernels.  Workaround
      is to use the _SUN versions as is until it can be fixed in streams
      or strcompat.
 
-     _*fixed*_ in 'strchan-0.9.2.4'
+     _*fixed*_ in ‘strchan-0.9.2.4’
 
-'strsctp 007. 2007-07-21T21:06:48-0600'
+‘strsctp 007. 2007-07-21T21:06:48-0600’
 
      It was discovered that many network devices were claiming to have
      hardware checksum capability by setting the NETIF_HW_CSUM flag, but
      did not support SCTP checksum offload.
 
-     _*workaround*_ in 'strsctp-0.9.2.8'
+     _*workaround*_ in ‘strsctp-0.9.2.8’
 
      The workaround is to ignore the flag for now.  Either Linux network
      drivers need to start supporting SCTP checksum when they set the
@@ -449,45 +449,45 @@ the most part bugs are currently available.
      SCTP. The workaround is to not believe that the driver does SCTP
      checksum offload when NETIF_HW_CSUM is set.
 
-'strsctp 006. 2007-07-21T21:05:10-0600'
+‘strsctp 006. 2007-07-21T21:05:10-0600’
 
      It was detected that the XTI_SNDBUF and XTI_RCVBUF options were not
      being set correctly (in fact, not being set at all).
 
-     _*fixed*_ in 'strsctp-0.9.2.8'
+     _*fixed*_ in ‘strsctp-0.9.2.8’
 
      XTI_SNDBUF now limits the maximum available send window.
      XTI_RCVBUF now alters the advertized receive window.
 
-'openss7 002. 2007-07-21T17:26:01-0600'
+‘openss7 002. 2007-07-21T17:26:01-0600’
 
      It was reported that validation test suites for XEN kernels are
      failing.  XEN kernels are, therefore, not supported.  (Thanks to
      Bryan Shupe at Flying J for reporting this bug.)
 
-     _*noted*_ in 'openss7-0.9.2.G'
+     _*noted*_ in ‘openss7-0.9.2.G’
 
-'strcompat 004. 2007-07-21T17:26:01-0600'
+‘strcompat 004. 2007-07-21T17:26:01-0600’
 
      It was reported that, even with the fix below, validation test
      suites for XEN kernels are failing.  XEN kernels are, therefore,
      not supported.  (Thanks to Bryan Shupe at Flying J for reporting
      this bug.)
 
-     _*noted*_ in 'strcompat-0.9a.7.rc1'.
+     _*noted*_ in ‘strcompat-0.9a.7.rc1’.
 
-'strcompat 003. 2007-07-21T17:22:10-0600'
+‘strcompat 003. 2007-07-21T17:22:10-0600’
 
      It was reported that paddr_t is already defined in recent XEN
      kernels, causing compile to fail for these kernels.  (Thanks to
      Bryan Shupe at Flying J for reporting this bug.)
 
-     _*fixed*_ in 'strcompat-0.9a.7.rc1'.
+     _*fixed*_ in ‘strcompat-0.9a.7.rc1’.
 
      A check was added to the configure script to check for the
      existence of paddr_t.
 
-'strss7 005. 2007-07-21T17:15:02-0600'
+‘strss7 005. 2007-07-21T17:15:02-0600’
 
      It was discovered that recent kernel on RHAS4 are defining
      irq_handler_t but have the old 3 argument function template for irq
@@ -496,12 +496,12 @@ the most part bugs are currently available.
      handlers were in effect.  This caused builds to fail on these RHAS4
      kernels.
 
-     _*fixed*_ in 'strss7-0.9a.8.rc1'.
+     _*fixed*_ in ‘strss7-0.9a.8.rc1’.
 
      A check was added to the configure script to test whether the
      irq_handler_t has the newer 2 argument template.
 
-'strcompat 002. 2007-07-21T17:15:02-0600'
+‘strcompat 002. 2007-07-21T17:15:02-0600’
 
      It was discovered that recent kernel on RHAS4 are defining
      irq_handler_t but have the old 3 argument function template for irq
@@ -510,26 +510,26 @@ the most part bugs are currently available.
      handlers were in effect.  This caused builds to fail on these RHAS4
      kernels.
 
-     _*fixed*_ in 'strcompat-0.9a.7.rc1'.
+     _*fixed*_ in ‘strcompat-0.9a.7.rc1’.
 
      A check was added to the configure script to test whether the
      irq_handler_t has the newer 2 argument template.
 
-'openss7 001. 2007-06-27T08:53:51+0000'
+‘openss7 001. 2007-06-27T08:53:51+0000’
 
      A report was made by Chris from Sandia that the build process
      choked on building 32-bit libraries and applications on an x86_64
      system under Ubuntu Fiesty (7.04).  While most other distributions
-     include the 'gcc' 32-bit compatibility libraries for 64-bit
+     include the ‘gcc’ 32-bit compatibility libraries for 64-bit
      architectures with a 32-bit emulation mode, Ubuntu (and maybe
      Debian too) does not.  The Ubuntu 7.04 package that is missing is
-     the 'lib32gcc1' package.  There are two workarounds to this
-     difficulty: add the 'lib32gcc1' package (with apt), or add the
-     '--disable-32bit-libs' flag to 'configure'.
+     the ‘lib32gcc1’ package.  There are two workarounds to this
+     difficulty: add the ‘lib32gcc1’ package (with apt), or add the
+     ‘--disable-32bit-libs’ flag to ‘configure’.
 
-     _*noted*_ in 'openss7-0.9.2.G'
+     _*noted*_ in ‘openss7-0.9.2.G’
 
-'strnsl 002. 2007-06-20T15:22:19-0600'
+‘strnsl 002. 2007-06-20T15:22:19-0600’
 
      The libtirpc package for current releases of GNU/Linux including
      NFS4 has usurped a broken /etc/netconfig file for use by its broken
@@ -545,49 +545,49 @@ the most part bugs are currently available.
      subdirectory entries when an /etc/netconfig file exists that we
      have not generated.
 
-'strsctp 005. 2007-05-18T07:06:33+0000'
+‘strsctp 005. 2007-05-18T07:06:33+0000’
 
      Found the most obnoxious of bugs.  When testing on loopback, more
-     than 255 calls were being made to 'dupb(9)' (*note
+     than 255 calls were being made to ‘dupb(9)’ (*note
      (*manpages*)dupb(9)::) causing the DB_REF field of the data block
      to wrap to zero, causing an incorrect reference count.
 
-     _*fixed*_ in 'strsctp-0.9.2.7'
+     _*fixed*_ in ‘strsctp-0.9.2.7’
 
-'streams 014. 2007-05-17T21:48:24+0000'
+‘streams 014. 2007-05-17T21:48:24+0000’
 
-     The 'dupb(9)' (*note (*manpages*)dupb(9)::) utility had an
+     The ‘dupb(9)’ (*note (*manpages*)dupb(9)::) utility had an
      obnoxious bug where it permitted the DB_REF count to wrap to zero,
      causing buffer allocation and freeing problems.  This was very
-     difficult to debug.  'dupb(9)' (*note (*manpages*)dupb(9)::) now
-     fails if the reference count has reached 255.  When 'dupb(9)'
+     difficult to debug.  ‘dupb(9)’ (*note (*manpages*)dupb(9)::) now
+     fails if the reference count has reached 255.  When ‘dupb(9)’
      (*note (*manpages*)dupb(9)::) fails, the user should check if the
      reference count has reached 255, and if it has, attempt a deep
-     'copyb(9)' (*note (*manpages*)copyb(9)::) instead.  At some point
+     ‘copyb(9)’ (*note (*manpages*)copyb(9)::) instead.  At some point
      it might be useful to have STREAMS do the deep copy automatically.
-     This was discovered in 'strsctp' loopback tests where message
+     This was discovered in ‘strsctp’ loopback tests where message
      blocks are rapidly duplicated for retransmission.
 
-     _*fixed*_ in 'streams-0.9.2.3'
+     _*fixed*_ in ‘streams-0.9.2.3’
 
-'streams 013. 2007-05-17T21:48:06+0000'
+‘streams 013. 2007-05-17T21:48:06+0000’
 
      The log driver, strace, strerr and strclean utilities had some
-     bugs.  The 'strsctp' driver now makes extensive use of 'strlog(9)'
+     bugs.  The ‘strsctp’ driver now makes extensive use of ‘strlog(9)’
      (*note (*manpages*)strlog(9)::) trace and error logging and the log
      driver and utilities have been corrected.  These facilities are now
      production grade.
 
-     _*fixed*_ in 'streams-0.9.2.3'
+     _*fixed*_ in ‘streams-0.9.2.3’
 
-'streams 012. 2007-04-13T01:47:30+0000'
+‘streams 012. 2007-04-13T01:47:30+0000’
 
-     It appears that 'Ubuntu 6.10' has a rather broken implementation of
-     the LSB 'install_init' that has been inherited from Debian (a
+     It appears that ‘Ubuntu 6.10’ has a rather broken implementation of
+     the LSB ‘install_init’ that has been inherited from Debian (a
      python script, none the less).  This implementation refuses to
      properly install a disabled service (one with an empty or missing
      Default-Start: tag), but, rather invokes updated-rc.d in such a way
-     that the init script is started at runlevels '2 3 4 5' instead.
+     that the init script is started at runlevels ‘2 3 4 5’ instead.
      This was causing problems with the strace and strerr services which
      are normally installed disabled.
 
@@ -595,9 +595,9 @@ the most part bugs are currently available.
      working anyway.  The scripts have been fixed and the strace and
      strerr utilities now default to enabled.
 
-     _*fixed*_ in 'streams-0.9.2.3'
+     _*fixed*_ in ‘streams-0.9.2.3’
 
-'streams 011. 2007-04-10T10:56:42+0000'
+‘streams 011. 2007-04-10T10:56:42+0000’
 
      The strbcflag flag was never being cleared, causing infinite
      looping of the scheduler once the maximum number of buffers was
@@ -605,25 +605,25 @@ the most part bugs are currently available.
      unncecessarily (when strbcwait was set, instead of only when
      strbcflag was set).
 
-     _*fixed*_ in 'streams-0.9.2.3'
+     _*fixed*_ in ‘streams-0.9.2.3’
 
-'streams 010. 2007-04-10T10:55:29+0000'
+‘streams 010. 2007-04-10T10:55:29+0000’
 
      The stream event sequence number was wrapping and becoming larger
      than the event mask resulting in inability to cancel buffer
      callbacks and timeouts.
 
-     _*fixed*_ in 'streams-0.9.2.3'
+     _*fixed*_ in ‘streams-0.9.2.3’
 
-'strxns 002. 2007-04-02T13:04:36+0000'
+‘strxns 002. 2007-04-02T13:04:36+0000’
 
-     Option handling bug in 'ldltest'.
+     Option handling bug in ‘ldltest’.
 
-     _*fixed*_ in 'strxns-0.9.2.6'
+     _*fixed*_ in ‘strxns-0.9.2.6’
 
-'streams 009. 2007-04-02T11:57:35+0000'
+‘streams 009. 2007-04-02T11:57:35+0000’
 
-     'ldl' was using an incorrect MKDEV command, but when the Stream
+     ‘ldl’ was using an incorrect MKDEV command, but when the Stream
      head attempted to redirect the open to the new (mangled) major
      device number, it properly returned ENXIO, but did not release a
      reference to the module.  Need to check code paths for this to see
@@ -631,71 +631,71 @@ the most part bugs are currently available.
 
      _*known bug*_
 
-'strxns 001. 2007-04-02T11:52:59+0000'
+‘strxns 001. 2007-04-02T11:52:59+0000’
 
-     'ldl' was not demand loading for 2.6 kernels due to missing
-     MODULE_ALIAS declarations.  Also, 'ldl' had an incorrect SVR 3
-     style 'MKDEV(MAJOR(*devp), i)' construct in it that was using Linux
+     ‘ldl’ was not demand loading for 2.6 kernels due to missing
+     MODULE_ALIAS declarations.  Also, ‘ldl’ had an incorrect SVR 3
+     style ‘MKDEV(MAJOR(*devp), i)’ construct in it that was using Linux
      utilities instead of Linux Fast-STREAMS utilities, causing the
      Stream head to attempt to redirect the major device.
      Unfortunalely, this was failing.  Changed to the correct SVR 4
-     style 'makedevice(getmajor(*devp), i)'.  (There must still be a bad
+     style ‘makedevice(getmajor(*devp), i)’.  (There must still be a bad
      major redirection path in the Stream head.)
 
-     _*fixed*_ in 'strxns-0.9.2.6'
+     _*fixed*_ in ‘strxns-0.9.2.6’
 
-'streams 008. 2007-03-31T05:33:29-0600'
+‘streams 008. 2007-03-31T05:33:29-0600’
 
      When loosening SMP locking, found a bug in the QWANTR handling in
-     'getq(9)' (*note (*manpages*)getq(9)::) and back-enabling in
-     'flushq(9)' (*note (*manpages*)flushq(9)::) and 'flushband(9)'
+     ‘getq(9)’ (*note (*manpages*)getq(9)::) and back-enabling in
+     ‘flushq(9)’ (*note (*manpages*)flushq(9)::) and ‘flushband(9)’
      (*note (*manpages*)flushband(9)::).  Both of these were generating
-     false back-enables.  The 'getq(9)' (*note (*manpages*)getq(9)::)
-     was generating a _lot_ of false back-enables.  Whenever 'getq(9)'
+     false back-enables.  The ‘getq(9)’ (*note (*manpages*)getq(9)::)
+     was generating a _lot_ of false back-enables.  Whenever ‘getq(9)’
      (*note (*manpages*)getq(9)::) found an empty queue it was not only
      setting QWANTR, but it was back-enabling the queue.  The result is
      that if service procedures are used exclusively (that is,
-     'qi_put(9)' always does a 'putq(9)' (*note (*manpages*)putq(9)::)),
-     'getq(9)' (*note (*manpages*)getq(9)::) would generate a false
+     ‘qi_put(9)’ always does a ‘putq(9)’ (*note (*manpages*)putq(9)::)),
+     ‘getq(9)’ (*note (*manpages*)getq(9)::) would generate a false
      back-enable for each message.  Also, the enabled queue would
      generate another false back-enable.  Significant performance gains
      should be noticed.
 
-     _*fixed*_ in 'streams-0.9.2.3'
+     _*fixed*_ in ‘streams-0.9.2.3’
 
-'streams 007. 2007-03-16T17:33:20-0600'
+‘streams 007. 2007-03-16T17:33:20-0600’
 
-     J�r�my Compostella pointed out an error in 'strallocpmsg(9)' where
-     it was always assigining M_PCPROTO to messages created with
+     Jrmy Compostella pointed out an error in ‘strallocpmsg(9)’ where it
+     was always assigining M_PCPROTO to messages created with
      I_FDINSERT.
 
-     _*fixed*_ in 'streams-0.9.2.3'
+     _*fixed*_ in ‘streams-0.9.2.3’
 
-'streams 006. 2007-03-14T23:48:26-0600'
+‘streams 006. 2007-03-14T23:48:26-0600’
 
      There appears to be an inode lock imbalance that occurred for
      several clone error paths in stropen.  If the returned major device
      number does not correspond to a driver, or an snode cannot be
      acquired for the new entry and the stream head reparented.
 
-     _*fixed*_ in 'streams-0.9.2.2'
+     _*fixed*_ in ‘streams-0.9.2.2’
 
-'strsctp 004. 2007-03-14T17:36:31-0600'
+‘strsctp 004. 2007-03-14T17:36:31-0600’
 
-     Another bug found, a double buffer free in 'sctp_recv_msg(9)' when
-     calling 'sctp_rcv_ootb(9)'.  This bug was discovered during
+     Another bug found, a double buffer free in ‘sctp_recv_msg(9)’ when
+     calling ‘sctp_rcv_ootb(9)’.  This bug was discovered during
      verification testing on a high speed SMP machine.
 
-     _*fixed*_ in 'strsctp-0.9.2.7'
+     _*fixed*_ in ‘strsctp-0.9.2.7’
 
-'strss7 004. 2007-03-13T23:36:37-0600 (x400p-ss7/5766)'
+‘strss7 004. 2007-03-13T23:36:37-0600 (x400p-ss7/5766)’
 
      Older chips were not being recognized correctly either.  Reflected
      device table and a few missing break statements was the cause.
 
-     _*fixed*_ in 'strss7-0.9a.6'
+     _*fixed*_ in ‘strss7-0.9a.6’
 
-'strss7 003. 2007-03-13T02:40:38-0600 (x400p-ss7/5766)'
+‘strss7 003. 2007-03-13T02:40:38-0600 (x400p-ss7/5766)’
 
      It appears that V401PE cards were almost loading (configuring,
      mapping, downloading firmware) but were failing to configure at the
@@ -715,30 +715,30 @@ the most part bugs are currently available.
      the DS2156 and skip register 0x7d when it exists.  The DS2156 chip
      will work for both V401T (D33D) and V401E (D44D) cards.
 
-     _*fixed*_ in 'strss7-0.9a.6'
+     _*fixed*_ in ‘strss7-0.9a.6’
 
-'strsctp 003. 2007-03-10T05:59:10-0700'
+‘strsctp 003. 2007-03-10T05:59:10-0700’
 
-     One serious locking problem discovered.  'sctp_cleanup_read(9)' was
-     suppressing IRQs across calls to 'putnext(9)' (*note
+     One serious locking problem discovered.  ‘sctp_cleanup_read(9)’ was
+     suppressing IRQs across calls to ‘putnext(9)’ (*note
      (*manpages*)putnext(9)::) when delivering data and
      acknowledgements.  Recent kernels on Fedora and Ubuntu were
      complaining about IRQs suppressed across calls to
-     'local_bh_enable(9)' in M2PA and that is what lead to the
+     ‘local_bh_enable(9)’ in M2PA and that is what lead to the
      discovery.
 
-     _*fixed*_ in 'strsctp-0.9.2.7'
+     _*fixed*_ in ‘strsctp-0.9.2.7’
 
-'strtty 001. 2007-03-09T15:31:23-0700'
+‘strtty 001. 2007-03-09T15:31:23-0700’
 
      The package was installing /dev/ptmx and /dev/pts/n device and
      removing them when uninstalling.  This caused havoc with Linux's
      UNIX'95 pseudo-terminal devices.  They have been strapped out until
      later.
 
-     _*fixed*_ in 'strtty-0.9.2.2'
+     _*fixed*_ in ‘strtty-0.9.2.2’
 
-'sigtran 001. 2007-03-08T21:09:59-0700'
+‘sigtran 001. 2007-03-08T21:09:59-0700’
 
      The inital timeout values associated with a freshly pushed M2PA
      module were being set to HZ based values instead of milliseconds.
@@ -746,17 +746,17 @@ the most part bugs are currently available.
      values), but could have affected applications programs on systems
      where the tick clock is 100 Hz.
 
-     _*fixed*_ in 'sigtran-0.9.2.2'
+     _*fixed*_ in ‘sigtran-0.9.2.2’
 
-'strss7 002. 2007-03-08T21:05:47-0700'
+‘strss7 002. 2007-03-08T21:05:47-0700’
 
      Timers were message up (using HZ instead of milliseconds) on the
      X400P driver.  This did not affect architectures with 1000 HZ or
      1024 HZ tick clocks, but 100 HZ systems object.
 
-     _*fixed*_ in 'strss7-0.9a.6'
+     _*fixed*_ in ‘strss7-0.9a.6’
 
-'streams 005. 2007-03-07T15:53:06-0700'
+‘streams 005. 2007-03-07T15:53:06-0700’
 
      Demand loading of kernel modules for clone devices opened, for
      example, as /dev/streams/clone/mux was requesting module
@@ -764,60 +764,60 @@ the most part bugs are currently available.
      streams-mux or /dev/streams/mux and the modules were failing to
      demand load.
 
-     _*fixed*_ in 'streams-0.9.2.2'
+     _*fixed*_ in ‘streams-0.9.2.2’
 
-'strss7 001. 2007-03-05T15:58:14-0700'
+‘strss7 001. 2007-03-05T15:58:14-0700’
 
      For some reason the package was always building and installing the
-     'libxnet' texinfo document which was keeping the RPM from
-     installing after the 'strxnet' package.  This was fixed in
-     'doc/manual/Makefile.am' with the addition of a 'WITH_XNET'
+     ‘libxnet’ texinfo document which was keeping the RPM from
+     installing after the ‘strxnet’ package.  This was fixed in
+     ‘doc/manual/Makefile.am’ with the addition of a ‘WITH_XNET’
      conditional.
 
-     _*fixed*_ in 'strss7-0.9a.6'
+     _*fixed*_ in ‘strss7-0.9a.6’
 
-'strinet 002. 2007-03-05T01:24:13-0700'
-     RPMs built on 2.4 kernels have using the '%dev' construct for RPM
+‘strinet 002. 2007-03-05T01:24:13-0700’
+     RPMs built on 2.4 kernels have using the ‘%dev’ construct for RPM
      instead of installing devices using the init scripts.  RPM
      complains loudly because the dev package defines some of the same
-     iBCS devices (e.g.  '/dev/ipip') as we are attempting to install.
+     iBCS devices (e.g.  ‘/dev/ipip’) as we are attempting to install.
      In the meantime, use -force.
 
-     Fixed in 'strinet.spec' to never build devices ala rpm for strinet
+     Fixed in ‘strinet.spec’ to never build devices ala rpm for strinet
      package.
 
-'strnsl 001. 2007-03-05T01:21:21-0700'
-     RPMs built on 2.4 kernels install the 'include strnsl' line to
-     'modules.conf' when there is no such directory installed by any of
-     the rpms.  This means that 'depmod' complains loudly about the
+‘strnsl 001. 2007-03-05T01:21:21-0700’
+     RPMs built on 2.4 kernels install the ‘include strnsl’ line to
+     ‘modules.conf’ when there is no such directory installed by any of
+     the rpms.  This means that ‘depmod’ complains loudly about the
      missing directory.  This was fixed for the current release.
 
-'streams 004. 2007-02-26T08:25:09-0700'
+‘streams 004. 2007-02-26T08:25:09-0700’
 
-     J�r�my Compostella pointed out error in clone.c.  When an automatic
+     Jrmy Compostella pointed out error in clone.c.  When an automatic
      clone minor device was unregistered, it was unregistering the modid
      instead of the major number.  This was not noticed because all
      OpenSS7 drivers have the same modid as major number (strconf does
      this automatically).
 
-     _*fixed*_ in 'streams-0.9.2.2'
+     _*fixed*_ in ‘streams-0.9.2.2’
 
-'streams 003. 2007-02-26T08:25:09-0700'
+‘streams 003. 2007-02-26T08:25:09-0700’
 
-     J�r�my Compostella pointed out syntax error in strsched.c that kept
+     Jrmy Compostella pointed out syntax error in strsched.c that kept
      synqs from compiling properly.
 
-     _*fixed*_ in 'streams-0.9.2.2'
+     _*fixed*_ in ‘streams-0.9.2.2’
 
-'strcompat 001. 2007-01-12T11:40:15-0600'
+‘strcompat 001. 2007-01-12T11:40:15-0600’
 
-     A bug in the 'mi_copyout(9)' function was discovered by inspection.
+     A bug in the ‘mi_copyout(9)’ function was discovered by inspection.
      The function should complete the last stage of a non-TRANSPARENT
-     input-output control operation by returning an 'M_IOCACK(9)'
-     message, but did not.  This was fixed for release '0.9.2.5'.
+     input-output control operation by returning an ‘M_IOCACK(9)’
+     message, but did not.  This was fixed for release ‘0.9.2.5’.
 
-'strsctp test-sctp_n -o 9.1 Sun, 29 Oct 2006 16:27:35 -0700'
-'test-sctp_n -o 9.2 Sun, 29 Oct 2006 16:27:35 -0700'
+‘strsctp test-sctp_n -o 9.1 Sun, 29 Oct 2006 16:27:35 -0700’
+‘test-sctp_n -o 9.2 Sun, 29 Oct 2006 16:27:35 -0700’
 
      When the number of test packets is set to 300, we are crashing on
      high speed SMP HT box.  This seems to be a locking problem of
@@ -829,7 +829,7 @@ the most part bugs are currently available.
      Note that there does not seem to be a problem with similar TPI
      tests, so the problem might be NPI interface related after all.
 
-'strsctp test-sctp_n -o 7.1 Sun, 15 Oct 2006 06:22:05 -0600'
+‘strsctp test-sctp_n -o 7.1 Sun, 15 Oct 2006 06:22:05 -0600’
 
      I notice that when the message size in this test is larger than the
      receive window size on the receiver, the receiver aborts the
@@ -840,18 +840,18 @@ the most part bugs are currently available.
      for interface testing not packet testing.  Packet tests at IP level
      should reveal this problem.
 
-'streams 002. 2006-09-24T20:02:00+0000'
+‘streams 002. 2006-09-24T20:02:00+0000’
 
      Discovered asynchronous thread cancellation inconsistencies in
-     libLiS libpLiS by inspection during documentation.  'isastream(2s)'
-     (*note (*manpages*)isastream(2s)::), 'fattach(2)' (*note
+     libLiS libpLiS by inspection during documentation.  ‘isastream(2s)’
+     (*note (*manpages*)isastream(2s)::), ‘fattach(2)’ (*note
      (*manpages*)fattach(2)::) were not performing proper asynchronous
      thread cancellation suppression so that these function contained a
      cancellation point when the should not.
 
-     _*fixed*_ in 'streams-0.7a.6.rc3'
+     _*fixed*_ in ‘streams-0.7a.6.rc3’
 
-'streams 001. 2006-07-05T21:54:49+0000'
+‘streams 001. 2006-07-05T21:54:49+0000’
 
      Fedora Core 5 reports a rwlock bug during udp module unloading as
      follows:
@@ -867,12 +867,12 @@ the most part bugs are currently available.
             {sys_delete_module+406}
             {system_call+126}
 
-     It appears that 'unregister_strnod(9)' (*note
+     It appears that ‘unregister_strnod(9)’ (*note
      (*manpages*)unregister_strnod(9)::) is scheduling while holding a
-     write lock on cdevsw_lock.  This is probably in 'iput(9)' (*note
+     write lock on cdevsw_lock.  This is probably in ‘iput(9)’ (*note
      (*manpages*)iput(9)::) called within cmin_del.
 
-     _*fixed*_ in 'streams-0.7a.6.rc2'
+     _*fixed*_ in ‘streams-0.7a.6.rc2’
 
      There were a number of places where sleeping functions were called
      with spin-locks held, causing the CPU awaking from the sleep to
@@ -880,7 +880,7 @@ the most part bugs are currently available.
      buggy, so I reworked all of these cdev and fmod sections to handle
      spin locks properly.  FC5/SMP on HT no longer reports these bugs.
 
-'strinet 001.'
+‘strinet 001.’
      Several test cases are failing sending messages.  ICMP port
      unreachable errors are resulting.  It appears that the caching of
      destination addresses is somehow making the receiver think that it
@@ -889,15 +889,15 @@ the most part bugs are currently available.
 6.4.3 Beta Releases
 -------------------
 
-"Beta" releases are releases that have received some testing, but the
-testing to date is not exhaustive.  "Beta" release packages do not ship
+“Beta” releases are releases that have received some testing, but the
+testing to date is not exhaustive.  “Beta” release packages do not ship
 with known defects.  All known defects are resolved before distribution;
 however, as exhaustive testing has not been performed, unknown defects
-may exist.  The purpose for a "beta" release is to provide a baseline
+may exist.  The purpose for a “beta” release is to provide a baseline
 for other organizations to participate in the rigorous testing of the
 package.
 
-"Beta" release packages ship containing warnings that the package has
+“Beta” release packages ship containing warnings that the package has
 not been exhaustively tested and that the package may cause systems to
 crash.  Suitability of software in this category for production use is
 not advised by the project; however, as always, is at the discretion of

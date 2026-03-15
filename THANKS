@@ -1,6 +1,6 @@
-OpenSS7 -- acknowledgements.  2020-03-03
+OpenSS7 -- acknowledgements.  2026-03-14
 $Id: THANKS,v 1.1.2.25 2011-05-10 13:45:30 brian Exp $
-Copyright (c) 2008-2020  Monavacon Limited. <http://www.monavacon.com/>
+Copyright (c) 2008-2026  Monavacon Limited. <http://www.monavacon.com/>
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2001  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -10,57 +10,57 @@ Acknowledgements
 
 The OpenSS7 Project was funded in part by:
 
-     * Monavacon Limited (http://www.monavacon.com/)
-     * OpenSS7 Corporation (http://www.openss7.com/)
+     • Monavacon Limited (http://www.monavacon.com/)
+     • OpenSS7 Corporation (http://www.openss7.com/)
 
 Thanks to the subscribers to and sponsors of The OpenSS7 Project.
 Without their support, open software like this would not be possible.
 
 As with most open source projects, this project would not have been
 possible without the valiant efforts and productive software of the
-'Free Software Foundation', the 'Linux Kernel Community', and the open
+‘Free Software Foundation’, the ‘Linux Kernel Community’, and the open
 source software movement at large.
 
 Sponsors
 --------
 
-Funding for completion of the 'OpenSS7 OpenSS7' package was provided in
+Funding for completion of the ‘OpenSS7 OpenSS7’ package was provided in
 part by:
 
-     * Monavacon Limited
-     * OpenSS7 Corporation
+     • Monavacon Limited
+     • OpenSS7 Corporation
 
 Additional funding for The OpenSS7 Project was provided by:
 
-     * Monavacon Limited                    * OpenSS7 Corporation
-     * AirNet Communications                * Comverse Ltd.
-     * eServGlobal (NZ) Pty Ltd.            * Excel Telecommunications
-     * France Telecom                       * GeoLink SA
-     * HOB International                    * Lockheed Martin Co.
-     * Motorola                             * NetCentrex S. A.
-     * Newnet Communications, Inc.          * Nortel Networks
-     * Peformance Technologies, Inc.        * Sonus Networks Inc.
-     * SS8 Networks Inc.                    * SysMaster Corporation
-     * TECORE                               * Tumsan Oy
-     * Verisign                             * Vodare Ltd.
+     • Monavacon Limited                    • OpenSS7 Corporation
+     • AirNet Communications                • Comverse Ltd.
+     • eServGlobal (NZ) Pty Ltd.            • Excel Telecommunications
+     • France Telecom                       • GeoLink SA
+     • HOB International                    • Lockheed Martin Co.
+     • Motorola                             • NetCentrex S. A.
+     • Newnet Communications, Inc.          • Nortel Networks
+     • Peformance Technologies, Inc.        • Sonus Networks Inc.
+     • SS8 Networks Inc.                    • SysMaster Corporation
+     • TECORE                               • Tumsan Oy
+     • Verisign                             • Vodare Ltd.
 
 Contributors
 ------------
 
-The primary contributor to the 'OpenSS7 OpenSS7' package is Brian F. G.
+The primary contributor to the ‘OpenSS7 OpenSS7’ package is Brian F. G.
 Bidulock <bidulock@openss7.org>.  The following is a list of notable
 contributors to The OpenSS7 Project:
 
-     - Per Berquist                        - Kutluk Testicioglu
-     - John Boyd                           - John Wenker
-     - Chuck Winters                       - Angel Diaz
-     - Peter Courtney                      - J�r�my Compostella
-     - Tom Chandler                        - Sylvain Chouleur
-     - Gurol Ackman                        - Christophe Nolibos
-     - Pierre Crepieux                     - Bryan Shupe
-     - Christopher Lydick                  - D. Milanovic
-     - Omer Tunali                         - Tony Abo
-     - John Hodgkinson                     - Others
+     − Per Berquist                        − Kutluk Testicioglu
+     − John Boyd                           − John Wenker
+     − Chuck Winters                       − Angel Diaz
+     − Peter Courtney                      − Jrmy Compostella
+     − Tom Chandler                        − Sylvain Chouleur
+     − Gurol Ackman                        − Christophe Nolibos
+     − Pierre Crepieux                     − Bryan Shupe
+     − Christopher Lydick                  − D. Milanovic
+     − Omer Tunali                         − Tony Abo
+     − John Hodgkinson                     − Others
 
 Supporters
 ----------
@@ -72,99 +72,99 @@ certification.
 Telecommunications
 ..................
 
-     * Integrated Telecom Solutions         * AASTRA
-     * Accuris Networks                     * Aculab
-     * Adax                                 * AEPONA
-     * AirNet Communications                * Airwide Solutions
-     * Alacre                               * Alcatel
-     * Alcatel-Lucent                       * Altobridge
-     * Anam                                 * Apertio (now Nokia)
-     * Alaska Power & Telephone             * Aricent
-     * Artesyn (now Emerson)                * Arthus Technologies
-     * Bharti Telesoft                      * BubbleMotion
-     * Continuous Computing                 * Cellnext Solutions Limited
+     • Integrated Telecom Solutions         • AASTRA
+     • Accuris Networks                     • Aculab
+     • Adax                                 • AEPONA
+     • AirNet Communications                • Airwide Solutions
+     • Alacre                               • Alcatel
+     • Alcatel-Lucent                       • Altobridge
+     • Anam                                 • Apertio (now Nokia)
+     • Alaska Power & Telephone             • Aricent
+     • Artesyn (now Emerson)                • Arthus Technologies
+     • Bharti Telesoft                      • BubbleMotion
+     • Continuous Computing                 • Cellnext Solutions Limited
        (Trillium)
-     * Cisco                                * Codent Networks
-     * Cogeco Cable Inc.                    * Comverse Ltd.
-     * Condor Networks                      * Coral Telecom
-     * Corecess                             * Corelatus
-     * Cosini                               * Data Connection
-     * Datacraft                            * Datatek Applications Inc.
-     * Datatronics                          * Dialogic
-     * Digium                               * Druid Software
-     * DTAG (Deutsche Telecom AG)           * Empirix
-     * Engage Communication Inc.            * Ericsson
-     * eServGlobal (NZ) Pty Ltd.            * ETSI
-     * Excel Telecommunications             * Flextronics (now Aricent)
-     * France Telecom                       * Gemini Mobile Technologies
-     * Geolink (now SeaMobile)              * Global Edge
-     * Huawei                               * IBSYS Canada
-     * Integral Access (now Telco           * Integrat Mobile Aggregation
+     • Cisco                                • Codent Networks
+     • Cogeco Cable Inc.                    • Comverse Ltd.
+     • Condor Networks                      • Coral Telecom
+     • Corecess                             • Corelatus
+     • Cosini                               • Data Connection
+     • Datacraft                            • Datatek Applications Inc.
+     • Datatronics                          • Dialogic
+     • Digium                               • Druid Software
+     • DTAG (Deutsche Telecom AG)           • Empirix
+     • Engage Communication Inc.            • Ericsson
+     • eServGlobal (NZ) Pty Ltd.            • ETSI
+     • Excel Telecommunications             • Flextronics (now Aricent)
+     • France Telecom                       • Gemini Mobile Technologies
+     • Geolink (now SeaMobile)              • Global Edge
+     • Huawei                               • IBSYS Canada
+     • Integral Access (now Telco           • Integrat Mobile Aggregation
        Systems)                               Services
-     * Kineto Wireless                      * Lucent
-     * Maestro Communications               * MCI
-     * Mindspeed                            * Mobis
-     * Mobixell                             * Motivity Telecom, Inc.
-     * Motorola                             * Mpathix Inc.
-     * m-Wise Inc.                          * Myriad Group
-     * Net2Phone                            * NetCentrex S. A.
-     * NetTest A/S (now Anritsu)            * NeuvaTel PCS
-     * Newnet Communications, Inc.          * NMS (now Dialogic)
-     * Noble Systems Corporation            * Nokia
-     * Nortel Networks                      * j2 Global Communications,
+     • Kineto Wireless                      • Lucent
+     • Maestro Communications               • MCI
+     • Mindspeed                            • Mobis
+     • Mobixell                             • Motivity Telecom, Inc.
+     • Motorola                             • Mpathix Inc.
+     • m-Wise Inc.                          • Myriad Group
+     • Net2Phone                            • NetCentrex S. A.
+     • NetTest A/S (now Anritsu)            • NeuvaTel PCS
+     • Newnet Communications, Inc.          • NMS (now Dialogic)
+     • Noble Systems Corporation            • Nokia
+     • Nortel Networks                      • j2 Global Communications,
                                               Inc.
-     * OnMobile                             * Orange
-     * Ouroboros                            * P3 Solutions GmbH
-     * Primal Technologies Inc.             * Propolys Pte Ltd.
-     * Peformance Technologies, Inc.        * Pulse Voice Inc.
-     * Reliance Communications              * Roamware Inc.
-     * SONORYS Technology GmbH              * Sonus Networks Inc.
-     * Spider Ltd.  (now Emerson)           * SS8 Networks Inc.
-     * Oasis Systems                        * Stratus
-     * Stratus Technologies Bermuda         * Sicap AG
+     • OnMobile                             • Orange
+     • Ouroboros                            • P3 Solutions GmbH
+     • Primal Technologies Inc.             • Propolys Pte Ltd.
+     • Peformance Technologies, Inc.        • Pulse Voice Inc.
+     • Reliance Communications              • Roamware Inc.
+     • SONORYS Technology GmbH              • Sonus Networks Inc.
+     • Spider Ltd.  (now Emerson)           • SS8 Networks Inc.
+     • Oasis Systems                        • Stratus
+     • Stratus Technologies Bermuda         • Sicap AG
        Ltd.
-     * Switchlab Ltd.                       * Synapse Mobile Networks SA
-     * SysMaster Corporation                * Tata Communications
-     * Tecore                               * Tekno Telecom LLC
-     * Telcordia                            * Telecom Italia
-     * Teledesign                           * Telemetrics Inc.
-     * Telnor                               * TE-Systems
-     * Texas Instruments Inc.               * Tumsan Oy
-     * Ulticom                              * Vanu Inc.
-     * Vecto Communications SRL             * Veraz Networks
-     * VeriSign                             * Vodare Ltd.
-     * VSE NET GmbH                         * The Software Group Limited
-     * WINGcon GmbH                         * Wipro Technologies
-     * Xentel Inc.                          * YCOM SA
-     * ZTE Corporation
+     • Switchlab Ltd.                       • Synapse Mobile Networks SA
+     • SysMaster Corporation                • Tata Communications
+     • Tecore                               • Tekno Telecom LLC
+     • Telcordia                            • Telecom Italia
+     • Teledesign                           • Telemetrics Inc.
+     • Telnor                               • TE-Systems
+     • Texas Instruments Inc.               • Tumsan Oy
+     • Ulticom                              • Vanu Inc.
+     • Vecto Communications SRL             • Veraz Networks
+     • VeriSign                             • Vodare Ltd.
+     • VSE NET GmbH                         • The Software Group Limited
+     • WINGcon GmbH                         • Wipro Technologies
+     • Xentel Inc.                          • YCOM SA
+     • ZTE Corporation
 
 Aerospace and Military
 ......................
 
-     * Advanced Technologies                * Altobridge
-     * Altobridge                           * BBN (Bolt, Beranek, and
+     • Advanced Technologies                • Altobridge
+     • Altobridge                           • BBN (Bolt, Beranek, and
                                               Neuman)
-     * ARINC                                * Boldon James
-     * ATOS Origin                          * Lockheed Martin Co.
-     * Boeing                               * Northrop Grumman Corporation
-     * Boldon James                         * QinetiQ
-     * CRNA                                 * SAAB
-     * DSNA-DGAC (1)                        * Sandia National Laboratories
-     * DLR (2)                              * Thales
-     * DSNA-DTI                             * Wright-Patterson Air Force
+     • ARINC                                • Boldon James
+     • ATOS Origin                          • Lockheed Martin Co.
+     • Boeing                               • Northrop Grumman Corporation
+     • Boldon James                         • QinetiQ
+     • CRNA                                 • SAAB
+     • DSNA-DGAC (1)                        • Sandia National Laboratories
+     • DLR (2)                              • Thales
+     • DSNA-DTI                             • Wright-Patterson Air Force
                                               Base
-     * Egis-Avia (Sofreavia)
-     * MetaSlash, Inc.
-     * Sofreavia
-     * FAA WJHTC(3)
-     * Thales ATM/Air Systems
+     • Egis-Avia (Sofreavia)
+     • MetaSlash, Inc.
+     • Sofreavia
+     • FAA WJHTC(3)
+     • Thales ATM/Air Systems
 
    ---------- Footnotes ----------
 
-   (1) La Direction des Services de la Navigation A�rienne - La
-Direction G�n�ral de l'Aviation Civile
+   (1) La Direction des Services de la Navigation Arienne - La Direction
+Gnral de l'Aviation Civile
 
-   (2) Deutsches Zentrum f�r Luft- unde Raumfarht
+   (2) Deutsches Zentrum fr Luft- unde Raumfarht
 
    (3) Federal Aviation Administration - William J. Hughes Technical
 Center
@@ -172,46 +172,46 @@ Center
 Financial, Business and Security
 ................................
 
-     * Alebra                               * Alebra
-     * Automated Trading Desk (now          * Boldon James
+     • Alebra                               • Alebra
+     • Automated Trading Desk (now          • Boldon James
        Citi)
-     * Banco Credicoop                      * Fujitsu-Seimens
-     * BeMac                                * FutureSoft
-     * Boldon James                         * GSX
-     * CyberSource Corporation              * HOB International
-     * Fujitsu-Seimens                      * HP (Hewlett-Packard)
-     * FutureSoft                           * IBM
-     * Gcom, Inc.
-     * GSX
-     * HOB International
-     * HP (Hewlett-Packard)
-     * IBM
-     * Lightbride (now CyberSource)
-     * MasterCard                           * Alert Logic
-     * Network Executive Software           * Apani
+     • Banco Credicoop                      • Fujitsu-Seimens
+     • BeMac                                • FutureSoft
+     • Boldon James                         • GSX
+     • CyberSource Corporation              • HOB International
+     • Fujitsu-Seimens                      • HP (Hewlett-Packard)
+     • FutureSoft                           • IBM
+     • Gcom, Inc.
+     • GSX
+     • HOB International
+     • HP (Hewlett-Packard)
+     • IBM
+     • Lightbride (now CyberSource)
+     • MasterCard                           • Alert Logic
+     • Network Executive Software           • Apani
        Inc.
-     * Packetware Inc.                      * BeMac
-     * Packetware Inc.                      * ERCOM
-     * Prism Holdings Ltd.                  * Hitech Systems
-     * S2 Systems (now ACI)                 * iMETRIK
-     * Symicron Computer                    * Intrado Inc.
+     • Packetware Inc.                      • BeMac
+     • Packetware Inc.                      • ERCOM
+     • Prism Holdings Ltd.                  • Hitech Systems
+     • S2 Systems (now ACI)                 • iMETRIK
+     • Symicron Computer                    • Intrado Inc.
        Communications Limited
 
 Education, Health Care and Nuclear Power
 ........................................
 
-     * IEEE Computer Society                * Ateb
-     * ENST (1)                             * Mandexin Systems Corporation
-     * HTW-Saarland (2)
-     * Kansas State University              * Areva NP
-     * University of North Carolina         * European Organization for
+     • IEEE Computer Society                • Ateb
+     • ENST (1)                             • Mandexin Systems Corporation
+     • HTW-Saarland (2)
+     • Kansas State University              • Areva NP
+     • University of North Carolina         • European Organization for
        Charlotte                              Nuclear Research
 
    ---------- Footnotes ----------
 
-   (1) Ecole Nationale Sup�rieure des T�l�communications
+   (1) Ecole Nationale Suprieure des Tlcommunications
 
-   (2) Hochschule f�r Technik und Wirtschaft des Saarlandes
+   (2) Hochschule fr Technik und Wirtschaft des Saarlandes
 
 Agencies
 --------
@@ -221,17 +221,17 @@ and certifications that it has without the free availability of
 specifications documents and standards from standards bodies and
 industry associations.  In particular, the following:
 
-     * 3GPP (Third Generation Partnership Project)
-     * ATM Forum
-     * EIA/TIA (Electronic Industries Alliance)
-     * ETSI (European Telecommunications Standards Institute)
-     * ICAO (International Civil Aviation Organization)
-     * IEEE (Institute of Electrical and Electronic Engineers)
-     * IETF (The Internet Engineering Task Force)
-     * ISO (International Organization for Standardization)
-     * ITU (International Telecommunications Union)
-     * Mulutiservices Forum
-     * The Open Group
+     • 3GPP (Third Generation Partnership Project)
+     • ATM Forum
+     • EIA/TIA (Electronic Industries Alliance)
+     • ETSI (European Telecommunications Standards Institute)
+     • ICAO (International Civil Aviation Organization)
+     • IEEE (Institute of Electrical and Electronic Engineers)
+     • IETF (The Internet Engineering Task Force)
+     • ISO (International Organization for Standardization)
+     • ITU (International Telecommunications Union)
+     • Mulutiservices Forum
+     • The Open Group
 
 Of these, ICAO, ISO, IEEE and EIA have made at least some documents
 publicly available.  ANSI is notably missing from the list: at one time

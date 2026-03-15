@@ -354,7 +354,7 @@ dnl pull out versions from release number
     AC_CACHE_CHECK([for kernel major release number], [linux_cv_k_major], [dnl
 	linux_cv_k_major="`echo $linux_cv_k_release | sed -e 's|[[^0-9]].*||'`" ])
     case ${linux_cv_k_major:-0} in
-    (2|3|4|5) ;;
+    (2|3|4|5|6) ;;
     (*)
 	AC_MSG_ERROR([
 *** 
@@ -370,7 +370,7 @@ dnl pull out versions from release number
     AC_CACHE_CHECK([for kernel minor release number], [linux_cv_k_minor], [dnl
 	linux_cv_k_minor="`echo $linux_cv_k_release | sed -e 's|[[0-9]]*\.||;s|[[^0-9]].*||'`" ])
     case ${linux_cv_k_major:-0}.${linux_cv_k_minor:-0} in
-    (2.4|2.6|3.*|4.*|5.*) ;;
+    (2.4|2.6|3.*|4.*|5.*|6.*) ;;
     (*)
 	AC_MSG_ERROR([
 *** 
@@ -436,8 +436,13 @@ dnl pull out versions from release number
 	AC_DEFINE_UNQUOTED([LINUX_5_X], [1], [Define for the linux 5.x kernel series.])
 	kseries="${kmajor}.${kminor}${kflavor:+-$kflavor}"
     fi
+    if test "$linux_cv_k_major" -eq 6
+    then
+	AC_DEFINE_UNQUOTED([LINUX_6_X], [1], [Define for the linux 6.x kernel series.])
+	kseries="${kmajor}.${kminor}${kflavor:+-$kflavor}"
+    fi
     AC_SUBST([kseries])
-    if test "$linux_cv_k_major" -eq 5 -o "$linux_cv_k_major" -eq 4 -o "$linux_cv_k_major" -eq 3 -o \( "$linux_cv_k_major" -eq 2 -a \( "$linux_cv_k_minor" -gt 5 -o "$linux_cv_k_patch" -ge 48 \) \)
+    if test "$linux_cv_k_major" -eq 6 -o "$linux_cv_k_major" -eq 5 -o "$linux_cv_k_major" -eq 4 -o "$linux_cv_k_major" -eq 3 -o \( "$linux_cv_k_major" -eq 2 -a \( "$linux_cv_k_minor" -gt 5 -o "$linux_cv_k_patch" -ge 48 \) \)
     then
 	AC_DEFINE_UNQUOTED([WITH_KO_MODULES], [1], [Define for linux 2.5.48+ .ko kernel modules.])
 	kext=".ko"
@@ -455,6 +460,7 @@ dnl pull out versions from release number
     AM_CONDITIONAL([WITH_LINUX_3_X], [test $linux_cv_k_major -eq 3])
     AM_CONDITIONAL([WITH_LINUX_4_X], [test $linux_cv_k_major -eq 4])
     AM_CONDITIONAL([WITH_LINUX_5_X], [test $linux_cv_k_major -eq 5])
+    AM_CONDITIONAL([WITH_LINUX_6_X], [test $linux_cv_k_major -eq 6])
     AM_CONDITIONAL([WITH_KO_MODULES], [test :${linux_cv_k_ko_modules:-no} = :yes])
     AC_SUBST([kext])dnl
     AC_SUBST([KERNEL_NOVERSION])dnl
@@ -1739,6 +1745,15 @@ dnl
 dnl RedHat/CentOS 7.7 placing extraneous blank at end of line.
 dnl
 	    linux_cv_k_compiler=`cat /proc/version | sed -e 's,^.*(gcc version,gcc version,;s,)).*[$],),;s,) ).*[$],) ,;s,  *$,,' 2>/dev/null`
+	    if ! echo "$linux_cv_k_compiler" | grep '^gcc version' >/dev/null 2>&1
+	    then
+dnl
+dnl Modern kernels (6.x+) use cross-compiler names like x86_64-linux-gnu-gcc-13
+dnl in /proc/version instead of "gcc version X.Y.Z".  Extract the version from
+dnl the new format: ...(x86_64-linux-gnu-gcc-13 (Ubuntu X.Y.Z-...) X.Y.Z, ...
+dnl
+		linux_cv_k_compiler=`cat /proc/version | sed -n 's|.*[[^ ]]*gcc[[^ ]]* (\([[^)]]*\)) \([[0-9]][[0-9.]]*\),.*|gcc version \2 (\1)|p' 2>/dev/null`
+	    fi
 	else
 dnl
 dnl	    not all distros leave this hanging around
@@ -1813,6 +1828,38 @@ dnl
 	(:no)
 	    case :"$linux_cv_k_compiler_vmatch" in
 		(:no)
+		    if test -t 0 && test -t 1
+		    then
+			AC_MSG_WARN([
+*** 
+*** The kernel compiler was:
+***   "$linux_cv_k_compiler",
+*** and the current compiler is:
+***   "$linux_cv_compiler".
+*** 
+*** These compilers do not match, not even in version.
+*** This can cause real problems later.
+*** ])
+			AC_MSG_NOTICE([Continue with the current compiler? [[y/N]]])
+			linux_kcc_reply=
+			read linux_kcc_reply
+			case "$linux_kcc_reply" in
+			    y|Y|yes|YES)
+				AC_MSG_WARN([
+*** Proceeding with a compiler mismatch at user request.
+*** Results may be unreliable if the kernel headers and compiler
+*** generate incompatible code.
+*** ])
+				;;
+			    *)
+				AC_MSG_ERROR([
+*** Configuration aborted due to kernel compiler mismatch.
+*** Retry with the correct compiler in KCC, or accept the warning
+*** interactively when running configure from a terminal.
+*** ])
+				;;
+			esac
+		    else
 	    AC_MSG_ERROR([
 *** 
 *** The kernel compiler was:
@@ -1825,6 +1872,7 @@ dnl
 *** Specify the correct compiler with the KCC environment
 *** variable when retrying.
 *** ])
+		    fi
 		    ;;
 		(:yes)
 	    AC_MSG_WARN([
@@ -2295,6 +2343,18 @@ dnl
 	linux_builddir=`pwd`
 	linux_srcdir=`(cd ${srcdir}; pwd)`
 	linux_cv_k_cflags=$(env - PATH="$PATH" ${linux_srcdir}/scripts/cflagcheck -C ${_ksrcdir} CC="$KCC" ${linux_setup_kernel_cflags_tmp:+$linux_setup_kernel_cflags_tmp }srctree=${_ksrcdir} objtree=${_kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${_kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${_ksrcdir} TOPDIR=${_ksrcdir} KBUILD_SRC=${_ksrcdir} KBUILD_OUTPUT=${_kbuilddir} KBUILD_EXTMOD=${linux_builddir} -I${_ksrcdir} -I${_khdrdir} -I${_kbuilddir} MYDEFAULT='cflag-check' | tail -1)
+dnl
+dnl	Kernel 6.x Kbuild does not work with cflagcheck script.  Fall back to
+dnl	extracting flags from a dummy module build.
+dnl
+	if test -z "$linux_cv_k_cflags" ; then
+	    linux_cv_k_cflags_tmp_dir=`mktemp -d`
+	    echo 'obj-m := _cftest.o' > "$linux_cv_k_cflags_tmp_dir/Kbuild"
+	    echo 'MODULE_LICENSE("GPL");' > "$linux_cv_k_cflags_tmp_dir/_cftest.c"
+	    linux_cv_k_cflags_gcc_line=`make -C ${_kbuilddir} M="$linux_cv_k_cflags_tmp_dir" modules V=1 CC="$KCC" 2>&1 | grep "$KCC.*-c.*_cftest" | sed "s|.*$KCC ||;s| -c .*||"`
+	    linux_cv_k_cflags=`echo "$linux_cv_k_cflags_gcc_line" | tr ' ' '\n' | grep -vE '^-I|^-include|^-D|^-W|^-nostdinc|^[$]' | grep -vE '^\./|^/' | tr '\n' ' ' | sed 's|  *[$]||'`
+	    rm -rf "$linux_cv_k_cflags_tmp_dir"
+	fi
 	linux_cv_k_cflags_orig="$linux_cv_k_cflags"])
 	linux_cflags=
 	AC_ARG_WITH([k-optimize],
@@ -2393,7 +2453,7 @@ dnl	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Wnested-externs"
 dnl	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Wunreachable-code"
 dnl	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Winline"
 dnl	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Wdisabled-optimization"
-	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Wp,-D_FORTIFY_SOURCE=2"
+	    linux_cflags="${linux_cflags}${linux_cflags:+ }-U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2"
 	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Werror${WFLAGS:+ }${WFLAGS}"
 	fi
 	AC_ARG_ENABLE([k-inline],
@@ -2482,8 +2542,24 @@ dnl
 	linux_builddir=`pwd`
 	linux_srcdir=`(cd ${srcdir}; pwd)`
 	linux_cv_k_cppflags=$(env - PATH="$PATH" ${linux_srcdir}/scripts/cflagcheck -C ${_ksrcdir} CC="$KCC" srctree=${_ksrcdir} objtree=${_kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${_kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${_ksrcdir} TOPDIR=${_ksrcdir} KBUILD_SRC=${_ksrcdir} KBUILD_OUTPUT=${_kbuilddir} KBUILD_EXTMOD=${linux_builddir} -I${_ksrcdir} -I${_khdrdir} -I${_kbuilddir} MYDEFAULT='cppflag-check' | tail -1)
+dnl
+dnl	Kernel 6.x Kbuild does not work with cflagcheck script.  Fall back to
+dnl	extracting include flags from a dummy module build.
+dnl
+	if test -z "$linux_cv_k_cppflags" ; then
+	    if test -n "$linux_cv_k_cflags_gcc_line" ; then
+		linux_cv_k_cppflags=`echo "$linux_cv_k_cflags_gcc_line" | grep -oE '(-I[[^ ]]+|-include [[^ ]]+)' | tr '\n' ' ' | sed "s|-I\./|-I${_kbuilddir}/|g;s|-include \./|-include ${_kbuilddir}/|g;s|  *[$]||"`
+	    else
+		linux_cv_k_cppflags_tmp_dir=`mktemp -d`
+		echo 'obj-m := _cftest.o' > "$linux_cv_k_cppflags_tmp_dir/Kbuild"
+		echo 'MODULE_LICENSE("GPL");' > "$linux_cv_k_cppflags_tmp_dir/_cftest.c"
+		linux_cv_k_cppflags_gcc_line=`make -C ${_kbuilddir} M="$linux_cv_k_cppflags_tmp_dir" modules V=1 CC="$KCC" 2>&1 | grep "$KCC.*-c.*_cftest" | sed "s|.*$KCC ||;s| -c .*||"`
+		linux_cv_k_cppflags=`echo "$linux_cv_k_cppflags_gcc_line" | grep -oE '(-I[[^ ]]+|-include [[^ ]]+)' | tr '\n' ' ' | sed "s|-I\./|-I${_kbuilddir}/|g;s|-include \./|-include ${_kbuilddir}/|g;s|  *[$]||"`
+		rm -rf "$linux_cv_k_cppflags_tmp_dir"
+	    fi
+	fi
 	linux_cv_k_cppflags_orig="$linux_cv_k_cppflags"])
-	linux_cv_k_cppflags="-nostdinc -isystem `$KCC -print-file-name=include` -iwithprefix include -DLINUX $linux_cv_k_cppflags"
+	linux_cv_k_cppflags="-nostdinc -isystem `$KCC -print-file-name=include` -iwithprefix include -DLINUX -D__KERNEL__ $linux_cv_k_cppflags"
 dnl
 dnl	Need to adjust 2.6.3 kernel stupid include includes to add the absolute
 dnl	location of the source directory.  include2 on the otherhand is properly
@@ -2557,6 +2633,24 @@ dnl
 	linux_builddir=`pwd`
 	linux_srcdir=`(cd ${srcdir}; pwd)`
 	linux_cv_k_modflags=$(env - PATH="$PATH" ${linux_srcdir}/scripts/cflagcheck -C ${_ksrcdir} CC="$KCC" srctree=${_ksrcdir} objtree=${_kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${_kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${_ksrcdir} TOPDIR=${_ksrcdir} KBUILD_SRC=${_ksrcdir} KBUILD_OUTPUT=${_kbuilddir} KBUILD_EXTMOD=${linux_builddir} -I${_ksrcdir} -I${_khdrdir} -I${_kbuilddir} MYDEFAULT='modflag-check' | tail -1)
+dnl
+dnl	Kernel 6.x Kbuild does not work with cflagcheck script.  Fall back to
+dnl	extracting module flags from the gcc line captured earlier.
+dnl
+	linux_cv_k_modflags=`echo "$linux_cv_k_modflags" | sed 's|^[[[:space:]]]*$||'`
+	if test -z "$linux_cv_k_modflags" ; then
+	    if test -z "$linux_cv_k_cflags_gcc_line" ; then
+		linux_cv_k_modflags_tmp_dir=`mktemp -d`
+		echo 'obj-m := _mftest.o' > "$linux_cv_k_modflags_tmp_dir/Kbuild"
+		echo '#include <linux/module.h>' > "$linux_cv_k_modflags_tmp_dir/_mftest.c"
+		echo 'MODULE_LICENSE("GPL");' >> "$linux_cv_k_modflags_tmp_dir/_mftest.c"
+		linux_cv_k_cflags_gcc_line=`make -C ${_kbuilddir} M="$linux_cv_k_modflags_tmp_dir" modules V=1 CC="$KCC" 2>&1 | grep "$KCC.*-c.*_mftest" | sed "s|.*$KCC ||;s| -c .*||"`
+		rm -rf "$linux_cv_k_modflags_tmp_dir"
+	    fi
+	    if test -n "$linux_cv_k_cflags_gcc_line" ; then
+		linux_cv_k_modflags=`echo "$linux_cv_k_cflags_gcc_line" | grep -oE '(-DMODULE|-DCC_USING_[[^ ]]+)' | tr '\n' ' ' | sed 's|  *[$]||'`
+	    fi
+	fi
 	linux_cv_k_modflags_orig="$linux_cv_k_modflags"])
 dnl
 dnl	Unfortunately we need to rip the module flags from the kernel source

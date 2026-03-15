@@ -512,20 +512,20 @@ cdev_lookup(major_t major, int load)
 				break;
 			read_unlock(&cdevsw_lock);
 			snprintf(devname, sizeof(devname), "char-major-%d", major);
-			request_module(devname);
+			request_module("%s", devname);
 			read_lock(&cdevsw_lock);
 			if ((cdev = __cdev_lookup(major)))
 				break;
 			read_unlock(&cdevsw_lock);
 			snprintf(devname, sizeof(devname), "streams-major-%d", major);
-			request_module(devname);
+			request_module("%s", devname);
 			read_lock(&cdevsw_lock);
 #if defined CONFIG_DEVFS || 1
 			if ((cdev = __cdev_lookup(major)))
 				break;
 			read_unlock(&cdevsw_lock);
 			snprintf(devname, sizeof(devname), "/dev/streams/%d", major);
-			request_module(devname);
+			request_module("%s", devname);
 			read_lock(&cdevsw_lock);
 #endif				/* CONFIG_DEVFS */
 		} while (0);
@@ -566,7 +566,7 @@ cdrv_lookup(modID_t modid, int load)
 				break;
 			read_unlock(&fmodsw_lock);
 			snprintf(modname, sizeof(modname), "streams-modid-%d", modid);
-			request_module(modname);
+			request_module("%s", modname);
 			read_lock(&fmodsw_lock);
 			if ((cdev = __cdrv_lookup(modid)))
 				break;
@@ -608,7 +608,7 @@ fmod_lookup(modID_t modid, int load)
 				break;
 			read_unlock(&fmodsw_lock);
 			snprintf(modname, sizeof(modname), "streams-modid-%d", modid);
-			request_module(modname);
+			request_module("%s", modname);
 			read_lock(&fmodsw_lock);
 			if ((fmod = __fmod_lookup(modid)))
 				break;
@@ -713,14 +713,14 @@ cdev_search(const char *name, int load)
 				break;
 			read_unlock(&cdevsw_lock);
 			snprintf(devname, sizeof(devname), "streams-%s", name);
-			request_module(devname);
+			request_module("%s", devname);
 			read_lock(&cdevsw_lock);
 #if defined CONFIG_DEVFS || 1
 			if ((cdev = __cdev_search(name)))
 				break;
 			read_unlock(&cdevsw_lock);
 			snprintf(devname, sizeof(devname), "/dev/streams/%s", name);
-			request_module(devname);
+			request_module("%s", devname);
 			read_lock(&cdevsw_lock);
 #endif				/* CONFIG_DEVFS */
 		} while (0);
@@ -772,7 +772,7 @@ fmod_search(const char *name, int load)
 				break;
 			read_unlock(&fmodsw_lock);
 			snprintf(devname, sizeof(devname), "streams-%s", name);
-			request_module(devname);
+			request_module("%s", devname);
 			read_lock(&fmodsw_lock);
 		} while (0);
 		/* try to acquire the module */
@@ -827,14 +827,14 @@ cmin_search(struct cdevsw *cdev, const char *name, int load)
 					break;
 				read_unlock(&cdevsw_lock);
 				snprintf(devname, sizeof(devname), "streams-%s", name);
-				request_module(devname);
+				request_module("%s", devname);
 				read_lock(&cdevsw_lock);
 #if defined CONFIG_DEVFS || 1
 				if ((cmin = __cmin_search(cdev, name)))
 					break;
 				read_unlock(&cdevsw_lock);
 				snprintf(devname, sizeof(devname), "/dev/streams/%s", name);
-				request_module(devname);
+				request_module("%s", devname);
 				read_lock(&cdevsw_lock);
 #endif				/* CONFIG_DEVFS */
 			}
@@ -844,7 +844,7 @@ cmin_search(struct cdevsw *cdev, const char *name, int load)
 				break;
 			read_unlock(&cdevsw_lock);
 			snprintf(devname, sizeof(devname), "streams-%s-%s", cdev->d_name, name);
-			request_module(devname);
+			request_module("%s", devname);
 			read_lock(&cdevsw_lock);
 #if defined CONFIG_DEVFS || 1
 			if ((cmin = __cmin_search(cdev, name)))
@@ -852,7 +852,7 @@ cmin_search(struct cdevsw *cdev, const char *name, int load)
 			read_unlock(&cdevsw_lock);
 			snprintf(devname, sizeof(devname), "/dev/streams/%s/%s", cdev->d_name,
 				 name);
-			request_module(devname);
+			request_module("%s", devname);
 			read_lock(&cdevsw_lock);
 #endif				/* CONFIG_DEVFS */
 		} while (0);
@@ -1433,7 +1433,7 @@ is_module_name(const char *name)
  * address (or text address).  Note that streams_module_address is only used when installing IP
  * hooks, which is normally during module initialization time. */
 
-#ifdef HAVE_KMEMB_STRUCT_MODULE_NEXT
+#if defined(HAVE_KMEMB_STRUCT_MODULE_NEXT) && LINUX_VERSION_CODE < KERNEL_VERSION(2,6,18)
 /* 2.4.33 kernel approach */
 /* The issues here are that module->next is used to link modules together from module_list; however,
  * modules are pushed onto the list, so modules loaded after specfs are "earlier" on the list and we
@@ -1560,17 +1560,17 @@ __streams_module_address(unsigned long addr)
 		}
 		if (!is_module_name(mod->name))
 			return NULL;
-#ifdef HAVE_KMEMB_STRUCT_MODULE_INIT_LAYOUT
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6,4,0)
+		if (within_module(addr, mod))
+			return mod;
+#elif defined HAVE_KMEMB_STRUCT_MODULE_INIT_LAYOUT
 		if ((unsigned long) mod->init_layout.base <= addr && addr < (unsigned long) mod->init_layout.base + mod->init_layout.size)
+			return mod;
+		if ((unsigned long) mod->core_layout.base <= addr && addr < (unsigned long) mod->core_layout.base + mod->core_layout.size)
 			return mod;
 #else
 		if ((unsigned long) mod->module_init <= addr && addr < (unsigned long) mod->module_init + mod->init_size)
 			return mod;
-#endif
-#ifdef HAVE_KMEMB_STRUCT_MODULE_CORE_LAYOUT
-		if ((unsigned long) mod->core_layout.base <= addr && addr < (unsigned long) mod->core_layout.base + mod->core_layout.size)
-			return mod;
-#else
 		if ((unsigned long) mod->module_core <= addr && addr < (unsigned long) mod->module_core + mod->core_size)
 			return mod;
 #endif
@@ -1657,17 +1657,17 @@ __streams_module_address(unsigned long addr)
 		}
 		if (!is_module_name(mod->name))
 			return NULL;
-#ifdef HAVE_KMEMB_STRUCT_MODULE_INIT_LAYOUT
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6,4,0)
+		if (within_module(addr, mod))
+			return mod;
+#elif defined HAVE_KMEMB_STRUCT_MODULE_INIT_LAYOUT
 		if ((unsigned long) mod->init_layout.base <= addr && addr < (unsigned long) mod->init_layout.base + mod->init_layout.size)
+			return mod;
+		if ((unsigned long) mod->core_layout.base <= addr && addr < (unsigned long) mod->core_layout.base + mod->core_layout.size)
 			return mod;
 #else
 		if ((unsigned long) mod->module_init <= addr && addr < (unsigned long) mod->module_init + mod->init_size)
 			return mod;
-#endif
-#ifdef HAVE_KMEMB_STRUCT_MODULE_CORE_LAYOUT
-		if ((unsigned long) mod->core_layout.base <= addr && addr < (unsigned long) mod->core_layout.base + mod->core_layout.size)
-			return mod;
-#else
 		if ((unsigned long) mod->module_core <= addr && addr < (unsigned long) mod->module_core + mod->core_size)
 			return mod;
 #endif

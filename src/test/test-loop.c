@@ -381,11 +381,6 @@ start_signals(void)
 	sigaddset(&mask, SIGPIPE);
 	sigaddset(&mask, SIGHUP);
 	sigprocmask(SIG_UNBLOCK, &mask, NULL);
-	siginterrupt(SIGALRM, 1);
-	siginterrupt(SIGPOLL, 1);
-	siginterrupt(SIGURG, 1);
-	siginterrupt(SIGPIPE, 1);
-	siginterrupt(SIGHUP, 1);
 	return __RESULT_SUCCESS;
 }
 

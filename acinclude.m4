@@ -983,6 +983,9 @@ dnl----------------------------------------------------------------------------
 #ifdef HAVE_KINC_LINUX_SLAB_H
 #include <linux/slab.h>
 #endif
+#ifdef HAVE_KINC_LINUX_CRED_H
+#include <linux/cred.h>
+#endif
 #include <linux/fs.h>
 #include <linux/file.h>
 #ifdef HAVE_KINC_LINUX_FDTABLE_H
@@ -1007,6 +1010,9 @@ dnl----------------------------------------------------------------------------
 #endif
 #ifdef HAVE_KINC_LINUX_NAMEI_H
 #include <linux/namei.h>
+#endif
+#ifdef HAVE_KINC_LINUX_SMPBOOT_H
+#include <linux/smpboot.h>
 #endif
 #ifdef HAVE_KINC_LINUX_PATH_H
 #include <linux/path.h>
@@ -1199,6 +1205,7 @@ dnl----------------------------------------------------------------------------
 	struct cred.gid.val,
 	struct cred.euid.val,
 	struct cred.egid.val,
+	struct ctl_table.child,
 	struct ctl_table.ctl_name,
 	struct ctl_table.de,
 	struct ctl_table.parent,
@@ -1219,6 +1226,8 @@ dnl----------------------------------------------------------------------------
 	struct file_operations.unlocked_ioctl,
 	struct file_operations.readdir,
 	struct file_operations.iterate,
+	struct file_operations.iterate_shared,
+	struct file_operations.sendpage,
 	struct files_struct.fdtab,
 	struct files_struct.max_fdset,
 	struct file_system_type.get_sb,

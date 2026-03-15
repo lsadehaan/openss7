@@ -210,7 +210,10 @@ __STRUTIL_EXTERN_INLINE int
 drv_priv(cred_t *crp)
 {
 	/* FIXME: also need to check for capabilities */
-#ifdef HAVE_KMEMB_STRUCT_CRED_UID_VAL
+#ifdef __KERNEL__
+	if (uid_eq(crp->cr_uid, GLOBAL_ROOT_UID) || uid_eq(crp->cr_ruid, GLOBAL_ROOT_UID))
+		return (0);
+#elif defined HAVE_KMEMB_STRUCT_CRED_UID_VAL
 	if (crp->cr_uid.val == 0 || crp->cr_ruid.val == 0)
 		return (0);
 #else

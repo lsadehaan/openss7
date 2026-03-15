@@ -1175,8 +1175,14 @@ snapmsg(mblk_t *mp, ssize_t len)
 
 }
 
+/* Compat: struct timeval removed from kernel headers in 5.6+ */
+struct x400p_timeval {
+	long tv_sec;
+	long tv_usec;
+};
+
 noinline fastcall __hot void
-xp_dup_to_xray(struct xp *xp, mblk_t *mp, uint mask, size_t hlen, struct timeval *tv, size_t mlen)
+xp_dup_to_xray(struct xp *xp, mblk_t *mp, uint mask, size_t hlen, struct x400p_timeval *tv, size_t mlen)
 {
 	for (; xp; xp = xp->xray.next) {
 		mblk_t *dp;
@@ -1235,16 +1241,16 @@ noinline fastcall __hot void
 xp_xray_data(struct ch *ch, mblk_t *mp, uint flags, size_t hlen)
 {
 	struct sp *sp = ch->sp;
-	struct timeval tv = { 0, 0 };
+	struct x400p_timeval tv = { 0, 0 };
 	size_t mlen = 0;
 
 	prefetch(sp);
 	if (unlikely(flags & NI_TIMESTAMP)) {
 		/* some xray stream wants a timestamp */
 #if defined HAVE_KFUNC_KTIME_GET_REAL_TS64
-		struct timespec ts = { 0, 0 };
+		struct timespec64 ts = { 0, 0 };
 
-		getnstimeofday(&ts);
+		ktime_get_real_ts64(&ts);
 		tv.tv_sec = ts.tv_sec;
 		tv.tv_usec = ts.tv_nsec / NSEC_PER_USEC;
 #else

@@ -344,8 +344,8 @@
    qi_qopen, qi_qclose, qi_admin). In binary compatibility mode, this sets the
    number of parameters passed in registers to zero. Otherwise, it defaults to
    the CONFIG_REPARM setting for the kernel. */
-#if defined __i386__ || defined __x86_64__ || defined __k8__
-#undef STREAMSCALL
+#if defined __i386__
+#define STREAMSCALL(__x) __x __attribute__((__regparm__(3)))
 #else
 #define STREAMSCALL(__x) __x
 #endif
@@ -355,8 +355,8 @@
    qi_qopen, qi_qclose, qi_admin). In binary compatibility mode, this sets the
    number of parameters passed in registers to zero. Otherwise, it defaults to
    the CONFIG_REPARM setting for the kernel. */
-#if defined __i386__ || defined __x86_64__ || defined __k8__
-#undef streamscall
+#if defined __i386__
+#define streamscall __attribute__((__regparm__(3)))
 #else
 #define streamscall
 #endif

@@ -61,6 +61,7 @@
 #ifdef NEED_LINUX_AUTOCONF_H
 #include NEED_LINUX_AUTOCONF_H
 #endif
+#include <linux/version.h>
 #include <linux/types.h>
 #include <linux/kdev_t.h>
 
@@ -83,7 +84,7 @@ typedef struct cred {
 
 #include <sys/openss7/config.h>
 
-#ifdef HAVE_KINC_LINUX_CRED_H
+#if defined(HAVE_KINC_LINUX_CRED_H) || LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,29)
 
 #include <linux/cred.h>
 

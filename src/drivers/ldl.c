@@ -312,8 +312,13 @@ static inline void skb_set_mac_header(struct sk_buff *skb, const int offset)
 
 #define ldldev		net_device
 #define driver_started(dev)	 1
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,0,0)
+#define	START_BH_ATOMIC(dev)	netif_tx_lock_bh(dev)
+#define	END_BH_ATOMIC(dev)	netif_tx_unlock_bh(dev)
+#else
 #define	START_BH_ATOMIC(dev)	spin_lock_bh(&(dev)->queue_lock)
 #define	END_BH_ATOMIC(dev)	spin_unlock_bh(&(dev)->queue_lock)
+#endif
 
 #else
 

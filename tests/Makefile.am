@@ -86,6 +86,7 @@ TESTSUITE_DEPS		+= \
 			$(TESTSUITE)-nuls.at \
 			$(TESTSUITE)-pipe.at \
 			$(TESTSUITE)-pipemod.at \
+			$(TESTSUITE)-regress.at \
 			$(TESTSUITE)-sad.at \
 			$(TESTSUITE)-sc.at \
 			$(TESTSUITE)-sctp.at \

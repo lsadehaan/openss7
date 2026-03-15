@@ -804,16 +804,16 @@ function read_modobject(command, dir, own, src,
 		if (substr(flags,6,1) == "d")
 		    continue
 		if (substr(flags,1,1) == "l") {
-		    if (substr(flags,7,1) == "O" || !values["modversions"]) {
+		    if (substr(flags,7,1) == "O" || !values["modversions"] || sec ~ /^\.export_symbol/) {
 			if (sec == ".modinfo") {
 			    if (sym ~ /^_?__mod_version[0-9]*$/)
 				mod_vers[mod] = 1
 			    continue
 			}
-			if (sub(/^_?_?__ksymtab/,"",sec)) {
+			if (sub(/^_?_?__ksymtab/,"",sec) || sec ~ /^\.?_?_?export_symbol/) {
 			    sub(/\+.*/,"",sec)
 			    if (sub(/^_unused/,"",sec)) { unused = "UNUSED_" } else { unused = "" }
-			    if (sub(/^_?__ksymtab_/,"",sym)) {
+			    if (sub(/^_?__ksymtab_/,"",sym) || sub(/^_?__export_symbol_/,"",sym)) {
 				print_debug(3,pfx "symbol: " sym)
 				set_symbol(sym, mod, "", "EXPORT_" unused "SYMBOL" toupper(sec), "", 0, own, "", 0, "ko object")
 				count_syms++
@@ -824,11 +824,11 @@ function read_modobject(command, dir, own, src,
 		    continue
 		}
 		if (substr(flags,1,1) == "g") {
-		    if (substr(flags,7,1) == "O" || !values["modversions"]) {
-			if (sub(/^_?_?__ksymtab/,"",sec)) {
+		    if (substr(flags,7,1) == "O" || !values["modversions"] || sec ~ /^\.export_symbol/) {
+			if (sub(/^_?_?__ksymtab/,"",sec) || sec ~ /^\.?_?_?export_symbol/) {
 			    sub(/\+.*/,"",sec)
 			    if (sub(/^_unused/,"",sec)) { unused = "UNUSED_" } else { unused = "" }
-			    if (sub(/^_?__ksymtab_/,"",sym)) {
+			    if (sub(/^_?__ksymtab_/,"",sym) || sub(/^_?__export_symbol_/,"",sym)) {
 				print_debug(3,pfx "symbol: " sym)
 				set_symbol(sym, mod, "", "EXPORT_" unused "SYMBOL" toupper(sec), "", 0, own, "", 0, "ko object")
 				count_syms++
@@ -1004,7 +1004,7 @@ function read_systemmap(command, mod, own, src,		result,val,flag,sym,count_syms,
 		mod_vers[mod] = 1
 		continue
 	    }
-	    if (sub(/^_?__ksymtab_/,"",sym)) {
+	    if (sub(/^_?__ksymtab_/,"",sym) || sub(/^_?__export_symbol_/,"",sym)) {
 		print_debug(3,"r: systemmap, symbol: " sym)
 		set_symbol(sym, mod, "", "", "", 0, own, "", 0, "systemmap")
 		count_syms++
@@ -1298,7 +1298,10 @@ function read_mymodules(modules, src,    i,pair,ind,base,name,sym,fmt) {
 	    print_debug(4,sprintf(fmt,base,"supported",sym))
 	}
 	if (!(sym in crcs) && values["modversions"]) {
-	    print_error("r: mymodules, symbol " sym " defined in module " mods[sym] " has no version")
+	    if (ownr[sym] == values["pkgdirectory"])
+		print_warns("r: mymodules, symbol " sym " defined in module " mods[sym] " has no version (internal)")
+	    else
+		print_error("r: mymodules, symbol " sym " defined in module " mods[sym] " has no version")
 	    continue
 	}
     }
@@ -1702,6 +1705,7 @@ function write_header(file, mod, base)
 #include <linux/build-salt.h>\n\
 #endif\n\
 #include <linux/module.h>\n\
+#define INCLUDE_VERMAGIC\n\
 #include <linux/vermagic.h>\n\
 #include <linux/compiler.h>\n\
 \n\
@@ -1773,7 +1777,8 @@ function write_modversions(file, mod, base,	count_unds,count_weak,pair,ind,name,
     }
     if (text) {
 	print "\n\
-#ifdef CONFIG_MODVERSIONS\n\
+#include <linux/version.h>\n\
+#if defined(CONFIG_MODVERSIONS) && LINUX_VERSION_CODE < KERNEL_VERSION(6,7,0)\n\
 static const struct modversion_info ____versions[]\n\
 __attribute_used__\n\
 __attribute__((section(\"__versions\"))) = {\
@@ -1792,7 +1797,8 @@ __attribute__((section(\"__versions\"))) = {\
 	}
 	if (text) {
 	    print "\n\
-#ifdef CONFIG_MODVERSIONS\n\
+#include <linux/version.h>\n\
+#if defined(CONFIG_MODVERSIONS) && LINUX_VERSION_CODE < KERNEL_VERSION(6,7,0)\n\
 static const struct modversion_info ____weak_versions[]\n\
 __attribute_used__\n\
 __attribute__((section(\"__weak_versions\"))) = {\
@@ -1812,10 +1818,12 @@ __attribute__((section(\"__weak_versions\"))) = {\
 	}
 	if (text) {
 	    print "\n\
+#include <linux/version.h>\n\
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6,7,0)\n\
 static const struct modversion_info ____absolute[]\n\
 __attribute_used__\n\
 __attribute__((section(\"__absolute\"))) = {\
-" text "\n};" > file
+" text "\n};\n#endif" > file
 	}
     }
     if (values["rip-weak"]) {
@@ -1831,10 +1839,12 @@ __attribute__((section(\"__absolute\"))) = {\
 	}
 	if (text) {
 	    print "\n\
+#include <linux/version.h>\n\
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6,7,0)\n\
 static const struct modversion_info ____weak_absolute[]\n\
 __attribute_used__\n\
 __attribute__((section(\"__weak_absolute\"))) = {\
-" text "\n};" > file
+" text "\n};\n#endif" > file
 	}
     }
     print_debug(1, "w: mymodules, " base ": unds " count_unds ", weak " count_weak)
@@ -1901,14 +1911,22 @@ function write_rippedsyms(file, mod, base,	fname,count_unds,count_weak,pair,name
     fmt = "w: mymodules, %-20s: %14s; %-30s"
     fname = file; sub(/\.mod\.c$/,".lds",fname)
     count_unds = 0; count_weak = 0; defs = ""
-    for (pair in mod_unds) {
-	split(pair, ind, SUBSEP); name = ind[1]; sym = ind[2]
-	if (name != mod) continue
-	if (sym in crcs || (!values["modversions"] && sym in exps)) continue
-	if (!(sym in mapsyms)) {
-	    print_error(sprintf(fmt, base, "norm no res", sym))
-	    continue
-	}
+	for (pair in mod_unds) {
+	    split(pair, ind, SUBSEP); name = ind[1]; sym = ind[2]
+	    if (name != mod) continue
+	    if (sym in crcs)
+		continue
+	    # Kernel 6.7+ no longer emits the custom __absolute/__versions payloads
+	    # this script used to consume from generated .mod.o files. For OpenSS7
+	    # intra-package dependencies, the export plus MODULE_INFO(depends=...)
+	    # is sufficient; do not try to synthesize linker-script definitions.
+	    if ((sym in exps) && (sym in mods) && (ownr[sym] == values["pkgdirectory"]))
+		continue
+	    if (!values["modversions"] && sym in exps) continue
+	    if (!(sym in mapsyms)) {
+		print_error(sprintf(fmt, base, "norm no res", sym))
+		continue
+	    }
 	if (!(sym in maptypes)) {
 	    print_error(sprintf(fmt, base, "norm no typ", sym))
 	    continue
@@ -1934,11 +1952,13 @@ function write_rippedsyms(file, mod, base,	fname,count_unds,count_weak,pair,name
 	    print_error(sprintf(fmt, base, "norm no def", sym))
 	}
     }
-    if (values["weak-symbols"]) {
+	if (values["weak-symbols"]) {
 	for (pair in mod_weak) {
 	    split(pair, ind, SUBSEP); name = ind[1]; sym = ind[2]
 	    if (name != mod) continue
 	    if (sym in crcs && !values["weak-hidden"]) continue
+	    if ((sym in exps) && (sym in mods) && (ownr[sym] == values["pkgdirectory"]))
+		continue
 	    if (!(sym in mapsyms)) {
 		print_warns(sprintf(fmt, base, "weak no res", sym))
 		continue

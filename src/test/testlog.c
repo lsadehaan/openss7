@@ -60,6 +60,8 @@
 
  *****************************************************************************/
 
+#include <config.h>
+
 static char const ident[] __attribute__ ((unused)) = "src/test/testlog.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
 /*

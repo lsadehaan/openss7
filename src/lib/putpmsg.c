@@ -133,7 +133,10 @@ __old_putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, 
 	args.band = band;
 	args.flags = flags;
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-overflow"
 	if (likely((err = write(fd, &args, LFS_GETMSG_PUTMSG_ULEN)) >= 0)) {
+#pragma GCC diagnostic pop
 		return (err);
 	}
 	return (err);

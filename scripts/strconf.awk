@@ -1063,6 +1063,21 @@ function write_makenodes(file) {
  * EDITS TO THIS FILE WILL BE LOST: EDIT strconf.awk INSTEAD.\n\
  */\n\
 \n\
+#include \"config.h\"\n\
+\n\
+#ifndef PACKAGE\n\
+#define PACKAGE \"openss7\"\n\
+#endif\n\
+#ifndef VERSION\n\
+#define VERSION \"unknown\"\n\
+#endif\n\
+#ifndef PACKAGE_ENVR\n\
+#define PACKAGE_ENVR VERSION\n\
+#endif\n\
+#ifndef PACKAGE_DATE\n\
+#define PACKAGE_DATE \"unknown\"\n\
+#endif\n\
+\n\
 static char const ident[] = \"makenodes (\" PACKAGE_ENVR \" \" PACKAGE_DATE \")\";\n\
 \n\
 #if defined(linux)\n\

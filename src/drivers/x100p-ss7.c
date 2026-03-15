@@ -9753,7 +9753,11 @@ xp_remove(struct pci_dev *dev)
 		printd(("%s: freed irq\n", DRV_NAME));
 	}
 	if (cd->wvir) {
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,18,0)
+		dma_free_coherent(&dev->dev, 1024, cd->wvir, cd->wdma);
+#else
 		pci_free_consistent(dev, 1024, cd->wvir, cd->wdma);
+#endif
 		printd(("%s: freed dma memory\n", DRV_NAME));
 	}
 	if (cd->io_region) {
@@ -9829,7 +9833,11 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 	}
 	cd->iobase = cd->io_region;
 	printd(("%s: iobase %ld bytes at %lx\n", DRV_NAME, cd->io_length, cd->io_region));
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,18,0)
+	if (!(cd->wvir = (typeof(cd->wvir)) dma_alloc_coherent(&dev->dev, 1024, &cd->wdma, GFP_KERNEL))) {
+#else
 	if (!(cd->wvir = (typeof(cd->wvir)) pci_alloc_consistent(dev, 1024, &cd->wdma))) {
+#endif
 		ptrace(("%s: ERROR: Could not allocate read/write dma buffer\n", DRV_NAME));
 		goto error_remove;
 	}

@@ -301,11 +301,11 @@ dnl
     AC_SUBST([tcllibdir])dnl
     if test :"${tclsrcdir+set}" != :set ; then tclsrcdir='${datarootdir}' ; fi
     AC_SUBST([tclsrcdir])dnl
-    if test :"${syslibdir+set}" != :set ; then syslibdir='${rootdir}/lib' ; fi
+    if test :"${syslibdir+set}" != :set || test -z "$syslibdir" ; then syslibdir="${rootdir}/lib" ; fi
     AC_SUBST([syslibdir])dnl
-    if test :"${sysbindir+set}" != :set ; then sysbindir='${rootdir}/bin' ; fi
+    if test :"${sysbindir+set}" != :set ; then sysbindir="${rootdir}/bin" ; fi
     AC_SUBST([sysbindir])dnl
-    if test :"${syssbindir+set}" != :set ; then syssbindir='${rootdir}/sbin' ; fi
+    if test :"${syssbindir+set}" != :set ; then syssbindir="${rootdir}/sbin" ; fi
     AC_SUBST([syssbindir])dnl
 dnl
 dnl Need to check this before libtool gets done
@@ -942,8 +942,8 @@ dnl USER_CFLAGS="${USER_CFLAGS:+$USER_CFLAGS }-Wno-trigraphs"
     then
 	    USER_CFLAGS=`echo " $USER_CFLAGS" | sed -e 's, -Wall,,g'`
 	    USER_CFLAGS="-Wall${USER_CFLAGS:+ $USER_CFLAGS}"
-	    USER_CFLAGS=`echo " $USER_CFLAGS" | sed -e 's% (-Wp,)?-D_FORTIFY_SOURCE=[[0-9]]*%%g'`
-	    USER_CFLAGS="-Wp,-D_FORTIFY_SOURCE=2${USER_CFLAGS:+ $USER_CFLAGS}"
+	    USER_CFLAGS=`echo " $USER_CFLAGS" | sed -e 's% (-Wp,)?-[DU]_FORTIFY_SOURCE=\{0,1\}[[0-9]]*%%g'`
+	    USER_CFLAGS="-U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2${USER_CFLAGS:+ $USER_CFLAGS}"
 dnl	    USER_CFLAGS="${USER_CFLAGS:+$USER_CFLAGS }-Wno-system-headers"
 dnl	    USER_CFLAGS=`echo " $USER_CFLAGS" | sed -r -e 's, -W(no-)?undef,,g'`
 dnl	    USER_CFLAGS="${USER_CFLAGS:+$USER_CFLAGS }-Wundef"
@@ -970,6 +970,8 @@ dnl	    USER_CFLAGS="${USER_CFLAGS:+$USER_CFLAGS }-Winline"
 dnl	    USER_CFLAGS="${USER_CFLAGS:+$USER_CFLAGS }-Wdisabled-optimization"
 	    USER_CFLAGS=`echo " $USER_CFLAGS" | sed -r -e 's, -W(no-)?error,,g'`
 	    USER_DFLAGS="${USER_DFLAGS:+$USER_DFLAGS }-Werror"
+dnl	    GCC 13+ false positives with -Werror
+	    USER_CFLAGS="${USER_CFLAGS:+$USER_CFLAGS }-Wno-missing-braces -Wno-dangling-pointer -Wno-maybe-uninitialized"
     fi
     USER_CFLAGS="${CFLAGS:$CFLAGS }$USER_CFLAGS"; CFLAGS=
     USER_CFLAGS=`echo "$USER_CFLAGS" | sed -e 's,^[[[:space:]]]*,,;s,[[[:space:]]]*$,,;s,[[[:space:]]][[[:space:]]]*, ,g'`
@@ -1074,8 +1076,8 @@ dnl USER_CXXFLAGS="${USER_CXXFLAGS:+$USER_CXXFLAGS }-Wno-trigraphs"
     then
 	    USER_CXXFLAGS=`echo " $USER_CXXFLAGS" | sed -e 's, -Wall,,g'`
 	    USER_CXXFLAGS="-Wall${USER_CXXFLAGS:+ $USER_CXXFLAGS}"
-	    USER_CXXFLAGS=`echo " $USER_CXXFLAGS" | sed -e 's% (-Wp,)?-D_FORTIFY_SOURCE=[[0-9]]*%%g'`
-	    USER_CXXFLAGS="-Wp,-D_FORTIFY_SOURCE=2${USER_CXXFLAGS:+ $USER_CXXFLAGS}"
+	    USER_CXXFLAGS=`echo " $USER_CXXFLAGS" | sed -e 's% (-Wp,)?-[DU]_FORTIFY_SOURCE=\{0,1\}[[0-9]]*%%g'`
+	    USER_CXXFLAGS="-U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2${USER_CXXFLAGS:+ $USER_CXXFLAGS}"
 dnl	    USER_CXXFLAGS="${USER_CXXFLAGS:+$USER_CXXFLAGS }-Wno-system-headers"
 dnl	    USER_CXXFLAGS=`echo " $USER_CXXFLAGS" | sed -r -e 's, -W(no-)?undef,,g'`
 dnl	    USER_CXXFLAGS="${USER_CXXFLAGS:+$USER_CXXFLAGS }-Wundef"
@@ -1186,8 +1188,8 @@ dnl USER_GCJFLAGS="${USER_GCJFLAGS:+$USER_GCJFLAGS }-Wno-trigraphs"
     then
 	    USER_GCJFLAGS=`echo " $USER_GCJFLAGS" | sed -e 's, -Wall,,g'`
 	    USER_GCJFLAGS="-Wall${USER_GCJFLAGS:+ $USER_GCJFLAGS}"
-	    USER_GCJFLAGS=`echo " $USER_GCJFLAGS" | sed -e 's% (-Wp,)?-D_FORTIFY_SOURCE=[[0-9]]*%%g'`
-	    USER_GCJFLAGS="-Wp,-D_FORTIFY_SOURCE=2${USER_GCJFLAGS:+ $USER_GCJFLAGS}"
+	    USER_GCJFLAGS=`echo " $USER_GCJFLAGS" | sed -e 's% (-Wp,)?-[DU]_FORTIFY_SOURCE=\{0,1\}[[0-9]]*%%g'`
+	    USER_GCJFLAGS="-U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2${USER_GCJFLAGS:+ $USER_GCJFLAGS}"
 dnl	    USER_GCJFLAGS="${USER_GCJFLAGS:+$USER_GCJFLAGS }-Wno-system-headers"
 dnl	    USER_GCJFLAGS=`echo " $USER_GCJFLAGS" | sed -r -e 's, -W(no-)?undef,,g'`
 dnl	    USER_GCJFLAGS="${USER_GCJFLAGS:+$USER_GCJFLAGS }-Wundef"

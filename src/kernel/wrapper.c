@@ -840,7 +840,7 @@ __asm__(".global " __stringify(secure_tcp_sequence_number));
 EXPORT_SYMBOL_GPL(secure_tcp_sequence_number);
 #endif				/* HAVE_SECURE_TCP_SEQUENCE_NUMBER_ADDR */
 
-#if defined WITH_32BIT_CONVERSION && !defined HAVE_COMPAT_IOCTL
+#if defined WITH_32BIT_CONVERSION && !defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_COMPAT_IOCTL
 /* These are only required for early transitional 2.6 kernels that did not
  * support the compat ioctl framework.  See src/modules/sth.c */
 
@@ -862,7 +862,7 @@ __asm__(".global " __stringify(ioctl32_sem));
 EXPORT_SYMBOL_GPL(ioctl32_sem);	/* used by src/modules/sth.c */
 #endif				/* HAVE_IOCTL32_SEM_ADDR */
 
-#endif				/* defined WITH_32BIT_CONVERSION && !defined HAVE_COMPAT_IOCTL */
+#endif				/* defined WITH_32BIT_CONVERSION && !defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_COMPAT_IOCTL */
 
 #ifdef HAVE_KERNEL_FATTACH_SUPPORT
 /* These are only required when we have kernel fattach support.  We don't

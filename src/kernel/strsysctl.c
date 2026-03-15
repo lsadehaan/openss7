@@ -118,7 +118,9 @@ STATIC struct ctl_table streams_table[] = {
 	 .data = &sysctl_str_maxpsz,
 	 .maxlen = sizeof(ulong),
 	 .mode = 0644,
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CHILD
 	 .child = NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
 	 .parent = NULL,
 #endif
@@ -126,7 +128,7 @@ STATIC struct ctl_table streams_table[] = {
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
 	 .poll = NULL,
 #endif
-#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
+#if defined(HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY) && LINUX_VERSION_CODE < KERNEL_VERSION(5,9,0)
 	 .strategy = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
@@ -144,7 +146,9 @@ STATIC struct ctl_table streams_table[] = {
 	 .data = &sysctl_str_minpsz,
 	 .maxlen = sizeof(ulong),
 	 .mode = 0644,
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CHILD
 	 .child = NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
 	 .parent = NULL,
 #endif
@@ -152,7 +156,7 @@ STATIC struct ctl_table streams_table[] = {
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
 	 .poll = NULL,
 #endif
-#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
+#if defined(HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY) && LINUX_VERSION_CODE < KERNEL_VERSION(5,9,0)
 	 .strategy = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
@@ -170,7 +174,9 @@ STATIC struct ctl_table streams_table[] = {
 	 .data = &sysctl_str_hiwat,
 	 .maxlen = sizeof(ulong),
 	 .mode = 0644,
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CHILD
 	 .child = NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
 	 .parent = NULL,
 #endif
@@ -178,7 +184,7 @@ STATIC struct ctl_table streams_table[] = {
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
 	 .poll = NULL,
 #endif
-#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
+#if defined(HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY) && LINUX_VERSION_CODE < KERNEL_VERSION(5,9,0)
 	 .strategy = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
@@ -196,7 +202,9 @@ STATIC struct ctl_table streams_table[] = {
 	 .data = &sysctl_str_lowat,
 	 .maxlen = sizeof(ulong),
 	 .mode = 0644,
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CHILD
 	 .child = NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
 	 .parent = NULL,
 #endif
@@ -204,7 +212,7 @@ STATIC struct ctl_table streams_table[] = {
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
 	 .poll = NULL,
 #endif
-#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
+#if defined(HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY) && LINUX_VERSION_CODE < KERNEL_VERSION(5,9,0)
 	 .strategy = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
@@ -221,7 +229,9 @@ STATIC struct ctl_table streams_table[] = {
 	 .data = &sysctl_str_cltime,
 	 .maxlen = sizeof(ulong),
 	 .mode = 0644,
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CHILD
 	 .child = NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
 	 .parent = NULL,
 #endif
@@ -233,7 +243,7 @@ STATIC struct ctl_table streams_table[] = {
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
 	 .poll = NULL,
 #endif
-#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
+#if defined(HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY) && LINUX_VERSION_CODE < KERNEL_VERSION(5,9,0)
 	 .strategy = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
@@ -251,7 +261,9 @@ STATIC struct ctl_table streams_table[] = {
 	 .data = &sysctl_str_rtime,
 	 .maxlen = sizeof(ulong),
 	 .mode = 0644,
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CHILD
 	 .child = NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
 	 .parent = NULL,
 #endif
@@ -263,7 +275,7 @@ STATIC struct ctl_table streams_table[] = {
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
 	 .poll = NULL,
 #endif
-#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
+#if defined(HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY) && LINUX_VERSION_CODE < KERNEL_VERSION(5,9,0)
 	 .strategy = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
@@ -281,7 +293,9 @@ STATIC struct ctl_table streams_table[] = {
 	 .data = &sysctl_str_ioctime,
 	 .maxlen = sizeof(ulong),
 	 .mode = 0644,
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CHILD
 	 .child = NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
 	 .parent = NULL,
 #endif
@@ -293,7 +307,7 @@ STATIC struct ctl_table streams_table[] = {
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
 	 .poll = NULL,
 #endif
-#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
+#if defined(HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY) && LINUX_VERSION_CODE < KERNEL_VERSION(5,9,0)
 	 .strategy = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
@@ -311,7 +325,9 @@ STATIC struct ctl_table streams_table[] = {
 	 .data = &sysctl_str_nstrpush,
 	 .maxlen = sizeof(ulong),
 	 .mode = 0644,
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CHILD
 	 .child = NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
 	 .parent = NULL,
 #endif
@@ -319,7 +335,7 @@ STATIC struct ctl_table streams_table[] = {
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
 	 .poll = NULL,
 #endif
-#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
+#if defined(HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY) && LINUX_VERSION_CODE < KERNEL_VERSION(5,9,0)
 	 .strategy = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
@@ -337,7 +353,9 @@ STATIC struct ctl_table streams_table[] = {
 	 .data = &sysctl_str_strthresh,
 	 .maxlen = sizeof(ulong),
 	 .mode = 0644,
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CHILD
 	 .child = NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
 	 .parent = NULL,
 #endif
@@ -345,7 +363,7 @@ STATIC struct ctl_table streams_table[] = {
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
 	 .poll = NULL,
 #endif
-#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
+#if defined(HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY) && LINUX_VERSION_CODE < KERNEL_VERSION(5,9,0)
 	 .strategy = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
@@ -363,7 +381,9 @@ STATIC struct ctl_table streams_table[] = {
 	 .data = &sysctl_str_strhold,
 	 .maxlen = sizeof(ulong),
 	 .mode = 0644,
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CHILD
 	 .child = NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
 	 .parent = NULL,
 #endif
@@ -375,7 +395,7 @@ STATIC struct ctl_table streams_table[] = {
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
 	 .poll = NULL,
 #endif
-#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
+#if defined(HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY) && LINUX_VERSION_CODE < KERNEL_VERSION(5,9,0)
 	 .strategy = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
@@ -393,7 +413,9 @@ STATIC struct ctl_table streams_table[] = {
 	 .data = &sysctl_str_strctlsz,
 	 .maxlen = sizeof(ulong),
 	 .mode = 0644,
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CHILD
 	 .child = NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
 	 .parent = NULL,
 #endif
@@ -401,7 +423,7 @@ STATIC struct ctl_table streams_table[] = {
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
 	 .poll = NULL,
 #endif
-#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
+#if defined(HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY) && LINUX_VERSION_CODE < KERNEL_VERSION(5,9,0)
 	 .strategy = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
@@ -419,7 +441,9 @@ STATIC struct ctl_table streams_table[] = {
 	 .data = &sysctl_str_strmsgsz,
 	 .maxlen = sizeof(ulong),
 	 .mode = 0644,
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CHILD
 	 .child = NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
 	 .parent = NULL,
 #endif
@@ -427,7 +451,7 @@ STATIC struct ctl_table streams_table[] = {
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
 	 .poll = NULL,
 #endif
-#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
+#if defined(HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY) && LINUX_VERSION_CODE < KERNEL_VERSION(5,9,0)
 	 .strategy = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
@@ -444,7 +468,9 @@ STATIC struct ctl_table streams_table[] = {
 	 .data = &sysctl_str_nstrmsgs,
 	 .maxlen = sizeof(ulong),
 	 .mode = 0644,
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CHILD
 	 .child = NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
 	 .parent = NULL,
 #endif
@@ -452,7 +478,7 @@ STATIC struct ctl_table streams_table[] = {
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
 	 .poll = NULL,
 #endif
-#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
+#if defined(HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY) && LINUX_VERSION_CODE < KERNEL_VERSION(5,9,0)
 	 .strategy = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
@@ -470,7 +496,9 @@ STATIC struct ctl_table streams_table[] = {
 	 .data = &sysctl_str_nband,
 	 .maxlen = sizeof(ulong),
 	 .mode = 0644,
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CHILD
 	 .child = NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
 	 .parent = NULL,
 #endif
@@ -478,8 +506,8 @@ STATIC struct ctl_table streams_table[] = {
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
 	 .poll = NULL,
 #endif
-#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
-	 .strategry = NULL,
+#if defined(HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY) && LINUX_VERSION_CODE < KERNEL_VERSION(5,9,0)
+	 .strategy = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
 	 .de = NULL,
@@ -495,7 +523,9 @@ STATIC struct ctl_table streams_table[] = {
 	 .data = &sysctl_str_reuse_fmodsw,
 	 .mode = sizeof(int),
 	 .maxlen = 0644,
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CHILD
 	 .child = NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
 	 .parent = NULL,
 #endif
@@ -503,7 +533,7 @@ STATIC struct ctl_table streams_table[] = {
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
 	 .poll = NULL,
 #endif
-#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
+#if defined(HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY) && LINUX_VERSION_CODE < KERNEL_VERSION(5,9,0)
 	 .strategy = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
@@ -521,7 +551,9 @@ STATIC struct ctl_table streams_table[] = {
 	 .data = &sysctl_str_max_apush,
 	 .maxlen = sizeof(ulong),
 	 .mode = 0644,
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CHILD
 	 .child = NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
 	 .parent = NULL,
 #endif
@@ -529,7 +561,7 @@ STATIC struct ctl_table streams_table[] = {
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
 	 .poll = NULL,
 #endif
-#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
+#if defined(HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY) && LINUX_VERSION_CODE < KERNEL_VERSION(5,9,0)
 	 .strategy = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
@@ -546,7 +578,9 @@ STATIC struct ctl_table streams_table[] = {
 	 .data = &sysctl_str_max_stramod,
 	 .maxlen = sizeof(ulong),
 	 .mode = 0644,
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CHILD
 	 .child = NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
 	 .parent = NULL,
 #endif
@@ -554,7 +588,7 @@ STATIC struct ctl_table streams_table[] = {
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
 	 .poll = NULL,
 #endif
-#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
+#if defined(HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY) && LINUX_VERSION_CODE < KERNEL_VERSION(5,9,0)
 	 .strategy = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
@@ -572,7 +606,9 @@ STATIC struct ctl_table streams_table[] = {
 	 .data = &sysctl_str_max_strdev,
 	 .maxlen = sizeof(ulong),
 	 .mode = 0444,
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CHILD
 	 .child = NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
 	 .parent = NULL,
 #endif
@@ -580,7 +616,7 @@ STATIC struct ctl_table streams_table[] = {
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
 	 .poll = NULL,
 #endif
-#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
+#if defined(HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY) && LINUX_VERSION_CODE < KERNEL_VERSION(5,9,0)
 	 .strategy = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
@@ -598,7 +634,9 @@ STATIC struct ctl_table streams_table[] = {
 	 .data = &sysctl_str_max_strmod,
 	 .maxlen = sizeof(ulong),
 	 .mode = 0444,
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CHILD
 	 .child = NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
 	 .parent = NULL,
 #endif
@@ -606,7 +644,7 @@ STATIC struct ctl_table streams_table[] = {
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
 	 .poll = NULL,
 #endif
-#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
+#if defined(HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY) && LINUX_VERSION_CODE < KERNEL_VERSION(5,9,0)
 	 .strategy = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
@@ -624,7 +662,9 @@ STATIC struct ctl_table streams_table[] = {
 	 .data = &sysctl_str_max_mblk,
 	 .maxlen = sizeof(ulong),
 	 .mode = 0644,
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CHILD
 	 .child = NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
 	 .parent = NULL,
 #endif
@@ -632,7 +672,7 @@ STATIC struct ctl_table streams_table[] = {
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
 	 .poll = NULL,
 #endif
-#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
+#if defined(HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY) && LINUX_VERSION_CODE < KERNEL_VERSION(5,9,0)
 	 .strategy = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
@@ -649,7 +689,9 @@ STATIC struct ctl_table streams_table[] = {
 	 .data = &sysctl_str_msg_priority,
 	 .maxlen = sizeof(int),
 	 .mode = 0644,
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CHILD
 	 .child = NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
 	 .parent = NULL,
 #endif
@@ -657,7 +699,7 @@ STATIC struct ctl_table streams_table[] = {
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
 	 .poll = NULL,
 #endif
-#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
+#if defined(HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY) && LINUX_VERSION_CODE < KERNEL_VERSION(5,9,0)
 	 .strategy = NULL,
 #endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
@@ -674,6 +716,7 @@ STATIC struct ctl_table streams_table[] = {
 	}
 };
 
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CHILD
 STATIC struct ctl_table streams_root_table[] = {
 	{
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CTL_NAME
@@ -692,6 +735,7 @@ STATIC struct ctl_table streams_root_table[] = {
 	 .procname = NULL,
 	}
 };
+#endif
 
 BIG_STATIC int
 strsysctl_init(void)
@@ -700,7 +744,10 @@ strsysctl_init(void)
 	sysctl_str_minpsz = STRMINPSZ;	/* stream head default min packet size */
 	sysctl_str_hiwat = STRHIGH;	/* stream head default hi water mark */
 	sysctl_str_lowat = STRLOW;	/* stream head default lo water mark */
-#if defined HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT || defined HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
+#if !defined HAVE_KMEMB_STRUCT_CTL_TABLE_CHILD
+	if ((streams_sysctl_handle = register_sysctl("dev/streams", streams_table)))
+		return (0);
+#elif defined HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT || defined HAVE_KMEMB_STRUCT_CTL_TABLE_POLL
 	if ((streams_sysctl_handle = register_sysctl_table(streams_root_table)))
 		return (0);
 #else

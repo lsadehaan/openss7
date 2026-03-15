@@ -127,12 +127,21 @@ streams_drivers_proc_open(struct inode *inode, struct file *file)
 	return ret;
 }
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,6,0)
+static const struct proc_ops streams_drivers_proc_fops = {
+	.proc_open = streams_drivers_proc_open,
+	.proc_read = seq_read,
+	.proc_lseek = seq_lseek,
+	.proc_release = seq_release,
+};
+#else
 static const struct file_operations streams_drivers_proc_fops = {
 	.open = streams_drivers_proc_open,
 	.read = seq_read,
 	.llseek = seq_lseek,
 	.release = seq_release,
 };
+#endif
 #endif
 
 /* ---------------------- */
@@ -366,12 +375,21 @@ streams_cdevsw_proc_open(struct inode *inode, struct file *file)
 	return seq_open(file, &streams_cdevsw_proc_seqops);
 }
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,6,0)
+static const struct proc_ops streams_cdevsw_proc_fops = {
+	.proc_open = streams_cdevsw_proc_open,
+	.proc_read = seq_read,
+	.proc_lseek = seq_lseek,
+	.proc_release = seq_release,
+};
+#else
 static const struct file_operations streams_cdevsw_proc_fops = {
 	.open = streams_cdevsw_proc_open,
 	.read = seq_read,
 	.llseek = seq_lseek,
 	.release = seq_release,
 };
+#endif
 
 /* ---------------------- */
 
@@ -471,12 +489,21 @@ streams_fmodsw_proc_open(struct inode *inode, struct file *file)
 	return seq_open(file, &streams_fmodsw_proc_seqops);
 }
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,6,0)
+static const struct proc_ops streams_fmodsw_proc_fops = {
+	.proc_open = streams_fmodsw_proc_open,
+	.proc_read = seq_read,
+	.proc_lseek = seq_lseek,
+	.proc_release = seq_release,
+};
+#else
 static const struct file_operations streams_fmodsw_proc_fops = {
 	.open = streams_fmodsw_proc_open,
 	.read = seq_read,
 	.llseek = seq_lseek,
 	.release = seq_release,
 };
+#endif
 
 /* --------------------------- */
 
@@ -513,12 +540,21 @@ streams_strinfo_proc_open(struct inode *inode, struct file *file)
 	return single_open(file, seq_streams_strinfo_show, NULL);
 }
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,6,0)
+static const struct proc_ops streams_strinfo_proc_fops = {
+	.proc_open = streams_strinfo_proc_open,
+	.proc_read = seq_read,
+	.proc_lseek = seq_lseek,
+	.proc_release = seq_release,
+};
+#else
 static const struct file_operations streams_strinfo_proc_fops = {
 	.open = streams_strinfo_proc_open,
 	.read = seq_read,
 	.llseek = seq_lseek,
 	.release = seq_release,
 };
+#endif
 
 /* -------------------------- */
 
@@ -681,12 +717,21 @@ streams_shinfo_proc_open(struct inode *inode, struct file *file)
 	return seq_open(file, &streams_shinfo_proc_seqops);
 }
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,6,0)
+static const struct proc_ops streams_shinfo_proc_fops = {
+	.proc_open = streams_shinfo_proc_open,
+	.proc_read = seq_read,
+	.proc_lseek = seq_lseek,
+	.proc_release = seq_release,
+};
+#else
 static const struct file_operations streams_shinfo_proc_fops = {
 	.open = streams_shinfo_proc_open,
 	.read = seq_read,
 	.llseek = seq_lseek,
 	.release = seq_release,
 };
+#endif
 
 /* ----------- */
 
@@ -808,12 +853,21 @@ streams_queue_proc_open(struct inode *inode, struct file *file)
 	return seq_open(file, &streams_queue_proc_seqops);
 }
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,6,0)
+static const struct proc_ops streams_queue_proc_fops = {
+	.proc_open = streams_queue_proc_open,
+	.proc_read = seq_read,
+	.proc_lseek = seq_lseek,
+	.proc_release = seq_release,
+};
+#else
 static const struct file_operations streams_queue_proc_fops = {
 	.open = streams_queue_proc_open,
 	.read = seq_read,
 	.llseek = seq_lseek,
 	.release = seq_release,
 };
+#endif
 
 /* ----------- */
 
@@ -907,12 +961,21 @@ streams_msgb_proc_open(struct inode *inode, struct file *file)
 	return seq_open(file, &streams_msgb_proc_seqops);
 }
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,6,0)
+static const struct proc_ops streams_msgb_proc_fops = {
+	.proc_open = streams_msgb_proc_open,
+	.proc_read = seq_read,
+	.proc_lseek = seq_lseek,
+	.proc_release = seq_release,
+};
+#else
 static const struct file_operations streams_msgb_proc_fops = {
 	.open = streams_msgb_proc_open,
 	.read = seq_read,
 	.llseek = seq_lseek,
 	.release = seq_release,
 };
+#endif
 
 /* ----------- */
 
@@ -1004,12 +1067,21 @@ streams_datab_proc_open(struct inode *inode, struct file *file)
 	return seq_open(file, &streams_datab_proc_seqops);
 }
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,6,0)
+static const struct proc_ops streams_datab_proc_fops = {
+	.proc_open = streams_datab_proc_open,
+	.proc_read = seq_read,
+	.proc_lseek = seq_lseek,
+	.proc_release = seq_release,
+};
+#else
 static const struct file_operations streams_datab_proc_fops = {
 	.open = streams_datab_proc_open,
 	.read = seq_read,
 	.llseek = seq_lseek,
 	.release = seq_release,
 };
+#endif
 
 /* ----------- */
 
@@ -1091,12 +1163,21 @@ streams_linkblk_proc_open(struct inode *inode, struct file *file)
 	return seq_open(file, &streams_linkblk_proc_seqops);
 }
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,6,0)
+static const struct proc_ops streams_linkblk_proc_fops = {
+	.proc_open = streams_linkblk_proc_open,
+	.proc_read = seq_read,
+	.proc_lseek = seq_lseek,
+	.proc_release = seq_release,
+};
+#else
 static const struct file_operations streams_linkblk_proc_fops = {
 	.open = streams_linkblk_proc_open,
 	.read = seq_read,
 	.llseek = seq_lseek,
 	.release = seq_release,
 };
+#endif
 
 /* ----------- */
 
@@ -1213,12 +1294,21 @@ streams_strevent_proc_open(struct inode *inode, struct file *file)
 	return seq_open(file, &streams_strevent_proc_seqops);
 }
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,6,0)
+static const struct proc_ops streams_strevent_proc_fops = {
+	.proc_open = streams_strevent_proc_open,
+	.proc_read = seq_read,
+	.proc_lseek = seq_lseek,
+	.proc_release = seq_release,
+};
+#else
 static const struct file_operations streams_strevent_proc_fops = {
 	.open = streams_strevent_proc_open,
 	.read = seq_read,
 	.llseek = seq_lseek,
 	.release = seq_release,
 };
+#endif
 
 /* ----------- */
 
@@ -1312,12 +1402,21 @@ streams_qband_proc_open(struct inode *inode, struct file *file)
 	return seq_open(file, &streams_qband_proc_seqops);
 }
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,6,0)
+static const struct proc_ops streams_qband_proc_fops = {
+	.proc_open = streams_qband_proc_open,
+	.proc_read = seq_read,
+	.proc_lseek = seq_lseek,
+	.proc_release = seq_release,
+};
+#else
 static const struct file_operations streams_qband_proc_fops = {
 	.open = streams_qband_proc_open,
 	.read = seq_read,
 	.llseek = seq_lseek,
 	.release = seq_release,
 };
+#endif
 
 /* ----------- */
 
@@ -1411,12 +1510,21 @@ streams_strapush_proc_open(struct inode *inode, struct file *file)
 	return seq_open(file, &streams_strapush_proc_seqops);
 }
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,6,0)
+static const struct proc_ops streams_strapush_proc_fops = {
+	.proc_open = streams_strapush_proc_open,
+	.proc_read = seq_read,
+	.proc_lseek = seq_lseek,
+	.proc_release = seq_release,
+};
+#else
 static const struct file_operations streams_strapush_proc_fops = {
 	.open = streams_strapush_proc_open,
 	.read = seq_read,
 	.llseek = seq_lseek,
 	.release = seq_release,
 };
+#endif
 
 #endif				/* defined CONFIG_STREAMS_DEBUG */
 

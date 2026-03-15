@@ -196,6 +196,10 @@ $(MODPOST_SYMSETS): stamp-modpost
 modobj = %.mod.o
 modsrc = %.mod.c
 
+# modpost generates the per-module .mod.c sources as side effects.
+$(modsrc): stamp-modpost
+	@test -f $@
+
 if am__fastdepCC
 ## am__fastdepCC
 $(modobj): $(modsrc) stamp-modpost

@@ -344,8 +344,13 @@ do_spipe(int *fds)
 	fops_get(f_op);
 	fops_get(f_op);
 
+#ifdef HAVE_KMEMB_STRUCT_FILE_F_VFSMNT
 	fr->f_dentry = fw->f_dentry = dget(dentry);
 	fr->f_vfsmnt = fw->f_vfsmnt = mntget(mntget(mnt));
+#else
+	fr->f_path.dentry = fw->f_path.dentry = dget(dentry);
+	fr->f_path.mnt = fw->f_path.mnt = mntget(mntget(mnt));
+#endif
 #if 0				/* FIXME: need for 2.6.11 */
 	fr->f_mapping = fw->f_mapping = snode->i_mapping;
 #endif
@@ -442,10 +447,17 @@ do_spipe(int *fds)
 #endif
 	fops_put(f_op);
 	fops_put(f_op);
+#ifdef HAVE_KMEMB_STRUCT_FILE_F_VFSMNT
 	fr->f_dentry = fw->f_dentry = NULL;
 	dput(dentry);
 	dput(dentry);
 	fr->f_vfsmnt = fw->f_vfsmnt = NULL;
+#else
+	fr->f_path.dentry = fw->f_path.dentry = NULL;
+	dput(dentry);
+	dput(dentry);
+	fr->f_path.mnt = fw->f_path.mnt = NULL;
+#endif
 	mntput(mnt);
 	mntput(mnt);
 	put_unused_fd(fdr);
@@ -464,9 +476,15 @@ do_spipe(int *fds)
 #error Need some way to delete a file pointer from the list.
 #endif
 	fops_put(f_op);
+#ifdef HAVE_KMEMB_STRUCT_FILE_F_VFSMNT
 	fw->f_dentry = NULL;
 	dput(dentry);
 	fw->f_vfsmnt = NULL;
+#else
+	fw->f_path.dentry = NULL;
+	dput(dentry);
+	fw->f_path.mnt = NULL;
+#endif
 	mntput(mnt);
 	put_unused_fd(fdr);
 	put_unused_fd(fdw);

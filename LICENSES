@@ -1,6 +1,6 @@
-OpenSS7 -- licenses.  2020-03-03
+OpenSS7 -- licenses.  2026-03-14
 $Id: LICENSES,v 1.1.2.30 2011-07-27 07:52:10 brian Exp $
-Copyright (c) 2008-2020  Monavacon Limited. <http://www.monavacon.com/>
+Copyright (c) 2008-2026  Monavacon Limited. <http://www.monavacon.com/>
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2001  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -16,7 +16,7 @@ GNU Free Documentation License
                     GNU FREE DOCUMENTATION LICENSE
                      Version 1.3, 3 November 2008
 
-     Copyright (C) 2000, 2001, 2002, 2007, 2008 Free Software Foundation, Inc.
+     Copyright © 2000, 2001, 2002, 2007, 2008 Free Software Foundation, Inc.
      <http://fsf.org/>
 
      Everyone is permitted to copy and distribute verbatim copies
@@ -25,7 +25,7 @@ GNU Free Documentation License
   0. PREAMBLE
 
      The purpose of this License is to make a manual, textbook, or other
-     functional and useful document "free" in the sense of freedom: to
+     functional and useful document “free” in the sense of freedom: to
      assure everyone the effective freedom to copy and redistribute it,
      with or without modifying it, either commercially or
      noncommercially.  Secondarily, this License preserves for the
@@ -498,7 +498,7 @@ GNU Affero General Public License
                 The GNU Affero General Public License.
                       Version 3, 19 November 2007
 
-     Copyright (C) 2007 Free Software Foundation, Inc. <http://fsf.org/>
+     Copyright © 2007 Free Software Foundation, Inc. <http://fsf.org/>
 
      Everyone is permitted to copy and distribute verbatim copies of this
      license document, but changing it is not allowed.
@@ -1198,7 +1198,7 @@ This license is from the Revision 2.0.0 Data Link Provider Interface
 (DLPI) specification published by UNIX International Inc, August 20,
 1991:
 
-Copyright (C) 1991 UNIX International, Inc.
+Copyright © 1991 UNIX International, Inc.
 All Rights Reserved.
 
 Permission is granted to make and distribute verbatim copies of this
@@ -1243,7 +1243,7 @@ members.
 Trademarks:
 ...........
 
-UNIX(R) is a registered trademark of UNIX System Laboratories in the
+UNIX® is a registered trademark of UNIX System Laboratories in the
 United States and other countries.
 
 X/Open(TM) is a trademark of the X/Open Company Ltd.  in the UK and
@@ -1255,7 +1255,7 @@ UNIX International NPI License
 This license is from the Revision 2.0.0 Network Provider Interface (NPI)
 specification published by UNIX International Inc, August 17, 1992:
 
-Copyright (C) 1992 UNIX International, Inc.
+Copyright © 1992 UNIX International, Inc.
 All Rights Reserved.
 
 Permission is granted to make and distribute verbatim copies of this
@@ -1299,7 +1299,7 @@ members.
 Trademarks:
 ...........
 
-UNIX(R) is a registered trademark of UNIX System Laboratories in the
+UNIX® is a registered trademark of UNIX System Laboratories in the
 United States and other countries.
 
 X/Open(TM) is a trademark of the X/Open Company Ltd.  in the UK and
@@ -1311,7 +1311,7 @@ UNIX International TPI License
 This license is from the Revision 1.5 Transport Provider Interface (TPI)
 specification published by UNIX International Inc, December 10, 1992:
 
-Copyright (C) 1992 UNIX International, Inc.
+Copyright © 1992 UNIX International, Inc.
 All Rights Reserved.
 
 Permission is granted to make and distribute verbatim copies of this
@@ -1356,7 +1356,7 @@ members.
 Trademarks:
 ...........
 
-UNIX(R) is a registered trademark of UNIX System Laboratories in the
+UNIX® is a registered trademark of UNIX System Laboratories in the
 United States and other countries.
 
 X/Open(TM) is a trademark of the X/Open Company Ltd.  in the UK and
@@ -1365,17 +1365,17 @@ other countries.
 Sun RPC License
 ===============
 
-This license is taken from the 'DISCLAIMER' file of the
-'tirpcsrc2.3.tar.Z' package released by 'Sun Microsystems, Inc.' and is
-also referenced by the 'tirpcsrc_99.tar.Z' package release from 'Sun
-Microsystems, Inc.'.
+This license is taken from the ‘DISCLAIMER’ file of the
+‘tirpcsrc2.3.tar.Z’ package released by ‘Sun Microsystems, Inc.’ and is
+also referenced by the ‘tirpcsrc_99.tar.Z’ package release from ‘Sun
+Microsystems, Inc.’.
 
 
                             SUN RPC LICENSE
 
-Copyright (C) 1984, Sun Microsystems, Inc.
+Copyright © 1984, Sun Microsystems, Inc.
 
-Sun RPC is a product of 'Sun Microsystems, Inc.' and is provided for
+Sun RPC is a product of ‘Sun Microsystems, Inc.’ and is provided for
 unrestricted use provided that this legend is included on all tape media
 and as a part of the software program in whole or part.  Users may copy
 or modify Sun RPC without charge, but are not authorized to license or
@@ -1387,16 +1387,16 @@ WARRANTIES OF DESIGN, MERCHANTIBILITY AND FITNESS FOR A PARTICULAR
 PURPOSE, OR ARISING FROM A COURSE OF DEALING, USAGE OR TRADE PRACTICE.
 
 Sun RPC is provided with no support and without any obligation on the
-part of 'Sun Microsystems, Inc.' to assist in its use, correction,
+part of ‘Sun Microsystems, Inc.’ to assist in its use, correction,
 modification or enhancement.
 
 SUN MICROSYSTEMS, INC. SHALL HAVE NO LIABILITY WITH RESPECT TO THE
 INFRINGEMENT OF COPYRIGHTS, TRADE SECRETS OR ANY PATENTS BY SUN RPC OR
 ANY PART THEREOF.
 
-In no event will 'Sun Microsystems, Inc.' be liable for any lost revenue
+In no event will ‘Sun Microsystems, Inc.’ be liable for any lost revenue
 or profits or other special, indirect and consequential damages, even if
-'Sun' has been advised of the possibility of such damages.
+‘Sun’ has been advised of the possibility of such damages.
 
 Sun Microsystems, Inc.
 2550 Garcia Avenue
@@ -1409,16 +1409,16 @@ BSD/USL Combined License
 
                        BSD/USL COMBINED LICENSE
 
-Copyright (C) 1982, 1986, 1988
+Copyright © 1982, 1986, 1988
 The Regents of the University of California
 All Rights Reserved.
 
-(C) UNIX System Laboratories, Inc.
+© UNIX System Laboratories, Inc.
 
 All or some portions of this file are derived from material licensed to
-the 'University of California' by 'American Telephone and Telegraph Co.'
-or 'UNIX System Laboratories, Inc.' and are reproduced herein with the
-permission of 'UNIX System Laboratories, Inc.'
+the ‘University of California’ by ‘American Telephone and Telegraph Co.’
+or ‘UNIX System Laboratories, Inc.’ and are reproduced herein with the
+permission of ‘UNIX System Laboratories, Inc.’
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -1435,8 +1435,8 @@ met:
   3. All advertising materials mentioning features or use of this
      software must display the following acknowledgment:
 
-          This product includes software developed by the 'University of
-          California, Berkeley', and its contributors.
+          This product includes software developed by the ‘University of
+          California, Berkeley’, and its contributors.
 
   4. Neither the name of the University nor the names of its
      contributors may be used to endorse or promote products derived

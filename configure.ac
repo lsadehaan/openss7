@@ -62,6 +62,16 @@ _OPENSS7_DIRCHANGE
 
 AC_CONFIG_SRCDIR([openss7.lsm.in])
 AC_CONFIG_HEADERS([config.h src/include/sys/openss7/config.h src/include/sys/openss7/wrapper.h])
+AH_BOTTOM([
+/* Compat: MODULE_SUPPORTED_DEVICE was removed in kernel 5.12 */
+#ifndef MODULE_SUPPORTED_DEVICE
+#define MODULE_SUPPORTED_DEVICE(x)
+#endif
+/* Compat: KBUILD_MODFILE needed by MODULE_FILE macro in kernel 5.4+ */
+#ifndef KBUILD_MODFILE
+#define KBUILD_MODFILE KBUILD_MODNAME
+#endif
+])
 
 AC_CONFIG_AUX_DIR([scripts])
 AC_CONFIG_MACRO_DIR([m4])

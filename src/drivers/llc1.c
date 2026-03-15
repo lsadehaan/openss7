@@ -2836,7 +2836,7 @@ llc1error(dip, fmt, a1, a2, a3, a4, a5, a6)
 {
 	static long last;
 	static char *lastfmt;
-	time_t now;
+	long now;
 
 	/*
 	 * Don't print same error message too often.

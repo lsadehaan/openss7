@@ -121,7 +121,18 @@ struct nit_ifdrops {
   * set.  It contains the timestamp of the arrival time of the packet.
   */
 struct nit_iftime {
+#ifdef __KERNEL__
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,6,0)
+	struct {
+		long tv_sec;
+		long tv_usec;
+	} nh_timestamp;
+#else
 	struct timeval nh_timestamp;
+#endif
+#else
+	struct timeval nh_timestamp;
+#endif
 };
 
 /** @} */

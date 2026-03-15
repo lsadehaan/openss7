@@ -4384,6 +4384,8 @@ drv_getparm(const unsigned int parm, void *value_p)
 		*(pid_t *) value_p = process_group(current);
 #elif defined HAVE_KMEMB_STRUCT_TASK_STRUCT_PGRP
 		*(pid_t *) value_p = current->pgrp;
+#elif defined HAVE_KFUNC_TASK_PGRP_VNR
+		*(pid_t *) value_p = task_pgrp_vnr(current);
 #else
 		*(pid_t *) value_p = current->signal->pgrp;
 #endif
@@ -4410,7 +4412,11 @@ drv_getparm(const unsigned int parm, void *value_p)
 	case TIME:
 	{
 #if defined HAVE_KFUNC_KTIME_GET_REAL_TS64
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6,4,0)
+		*(time64_t *) value_p = ktime_get_real_seconds();
+#else
 		*(time_t *) value_p = (time_t) ktime_get_real_seconds();
+#endif
 #else
 		struct timeval tv;
 

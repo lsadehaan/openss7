@@ -527,8 +527,8 @@ BEGIN {
 	show_complete("checked", "commands")
     }
 
-    types["function" ] = "2 3 9"  ; onerror["function" ] = "E"
-    types["prototype"] = "2 3 9"  ; onerror["prototype"] = "E"
+    types["function" ] = "2 3 9"  ; onerror["function" ] = "W"
+    types["prototype"] = "2 3 9"  ; onerror["prototype"] = "W"
     types["variable" ] = "2 3 9"  ; onerror["variable" ] = "S"
     types["externvar"] = "2 3 9"  ; onerror["externvar"] = "E"
     types["macro"    ] = "3 9 7"  ; onerror["macro"    ] = "S"

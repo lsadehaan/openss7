@@ -70,7 +70,10 @@ include am/help.am
 include am/pr.am
 
 AUTOMAKE_OPTIONS = nostdinc
-AM_CPPFLAGS = -I. -I$(top_builddir) -I$(srcdir)
+AM_CPPFLAGS = -I. -I$(top_builddir) -I$(srcdir) \
+	      -DPACKAGE_DATE=\"$(PACKAGE_DATE)\" \
+	      -DPACKAGE_ENVR=\"$(PACKAGE_ENVR)\"
+INCLUDES = $(AM_CPPFLAGS)
 
 dist_bin_SCRIPTS		=
 
@@ -195,7 +198,7 @@ KERNEL_OBJECTS			+= $(libOS7specfs_a_OBJECTS)
 KERNEL_MODULES			+= specfs.o
 
 specfs.o: stamp-verobjs
-	@list=`$(ECHO) " $(libOS7specfs_a_OBJECTS) " | sed -e 's| lib[^[:space:]]*_a-| $(kpre)|g'` ; \
+	@list="$(libOS7specfs_a_OBJECTS)" ; \
 	$(ECHO_Q) "  CCLD  " $@ ; \
 	$(ECHO_V) "$(LD) -r -o $@ $$list" ; \
 	$(LD) -r -o $@ $$list ; \
@@ -238,7 +241,7 @@ KERNEL_OBJECTS			+= $(libOS7streams_a_OBJECTS)
 KERNEL_MODULES			+= streams.o
 
 streams.o: stamp-verobjs
-	@list=`$(ECHO) " $(libOS7streams_a_OBJECTS) " | sed -e 's| lib[^[:space:]]*_a-| $(kpre)|g'` ; \
+	@list="$(libOS7streams_a_OBJECTS)" ; \
 	$(ECHO_Q) "  CCLD  " $@ ; \
 	$(ECHO_V) "$(LD) -r -o $@ $$list" ; \
 	$(LD) -r -o $@ $$list
@@ -2435,6 +2438,20 @@ test_nuls_LDFLAGS		= $(USER_LDFLAGS)
 test_nuls_LDADD			= libstreams.la
 
 pkglibexec_PROGRAMS		+= test-nuls
+
+## =====================================================================
+
+test_lib_regress_SOURCES	= src/test/test-lib-regress.c \
+				  src/lib/getpmsg.c \
+				  src/lib/putpmsg.c \
+				  src/lib/testcancel.c
+test_lib_regress_CPPFLAGS	= $(TEST_INCLUDES)
+test_lib_regress_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_lib_regress_LDFLAGS	= $(USER_LDFLAGS)
+test_lib_regress_LDADD		= libstreams.la
+
+pkglibexec_PROGRAMS		+= test-lib-regress
+AM_INSTALLCHECK_STD_OPTIONS_EXEMPT += test-lib-regress
 
 ## =====================================================================
 

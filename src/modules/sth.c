@@ -47,9 +47,11 @@
 
  *****************************************************************************/
 
+#include "config.h"
+
 static char const ident[] = "src/modules/sth.c (" PACKAGE_ENVR ") " PACKAGE_DATE;
 
-#ifndef HAVE_KTYPE_BOOL
+#if !defined(__KERNEL__) && !defined(HAVE_KTYPE_BOOL)
 #include <stdbool.h>		/* for bool type, true and false */
 #endif
 
@@ -124,7 +126,7 @@ static char const ident[] = "src/modules/sth.c (" PACKAGE_ENVR ") " PACKAGE_DATE
 #endif
 
 #ifdef WITH_32BIT_CONVERSION
-#ifndef HAVE_KFUNC_COMPAT_PTR
+#if !defined(HAVE_KFUNC_COMPAT_PTR) && LINUX_VERSION_CODE < KERNEL_VERSION(2,6,26)
 /* this gets ugly */
 typedef u32 compat_uptr_t;
 STATIC inline void __user *
@@ -271,7 +273,11 @@ struct streamtab sthinfo = {
 /* Unfortunately we cannot use the spin lock.  In stropen() we need to call qopen() (that can sleep)
  * with the lock held.  Therefore, use the more efficient mutex if available, otherwise, the big old
  * semaphore. */
-#if defined HAVE_KMEMB_STRUCT_INODE_I_MUTEX
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,38)
+#define stri_trylock(__i)   down_write_killable(&(__i)->i_rwsem)
+#define stri_lock(__i)      inode_lock(__i)
+#define stri_unlock(__i)    inode_unlock(__i)
+#elif defined HAVE_KMEMB_STRUCT_INODE_I_MUTEX
 #define stri_trylock(__i)   mutex_lock_interruptible(&(__i)->i_mutex)
 #define stri_lock(__i)	    mutex_lock(&(__i)->i_mutex)
 #define stri_unlock(__i)    mutex_unlock(&(__i)->i_mutex)
@@ -515,7 +521,10 @@ strdetached(struct stdata *sd)
  */
 
 #if !defined HAVE_KMACRO_SET_TASK_STATE
-#ifdef CONFIG_DEBUG_ATOMIC_SLEEP
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,14,0)
+#define set_task_state(tsk, state_value)		\
+	WRITE_ONCE((tsk)->__state, (state_value))
+#elif defined CONFIG_DEBUG_ATOMIC_SLEEP
 #define set_task_state(tsk, state_value)			\
 	do {							\
 		(tsk)->task_state_change = _THIS_IP_;		\
@@ -937,7 +946,9 @@ strcopyin(const void __user *from, void *to, size_t len)
 #endif
 
 /* How to find the session leader pid number for the current task.  Just use current_session(). */
-#if   defined HAVE_KFUNC_TASK_SESSION_VNR
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,38)
+#define current_session() task_session_vnr(current)
+#elif defined HAVE_KFUNC_TASK_SESSION_VNR
 /* kernels with pid namespaces */
 #define current_session() task_session_vnr(current)
 #elif defined HAVE_KFUNC_TASK_SESSION_NR
@@ -953,7 +964,9 @@ strcopyin(const void __user *from, void *to, size_t len)
 
 /* How to find the session leader pid for the current task.  Just use current_sid(). */
 #ifdef HAVE_KFUNC_PID_NR
-#if defined HAVE_KFUNC_TASK_SESSION
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,38)
+#define current_sid() task_session(current)
+#elif defined HAVE_KFUNC_TASK_SESSION
 #define current_sid() task_session(current)
 #else
 #error Need a way to get the session leader of the current task.
@@ -964,7 +977,9 @@ strcopyin(const void __user *from, void *to, size_t len)
 #endif
 
 /* How to find the current process group pid number: just use current_pgrp(). */
-#if   defined HAVE_KFUNC_TASK_PGRP_VNR
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,38)
+#define current_pgrp() task_pgrp_vnr(current)
+#elif defined HAVE_KFUNC_TASK_PGRP_VNR
 #define current_pgrp() task_pgrp_vnr(current)
 #elif defined HAVE_KFUNC_TASK_PGRP_NR
 #define current_pgrp() task_pgrp_nr(current)
@@ -978,7 +993,9 @@ strcopyin(const void __user *from, void *to, size_t len)
 
 /* How to find the current process group pid: just use current_pgid(). */
 #ifdef HAVE_KFUNC_PID_NR
-#if defined HAVE_KFUNC_TASK_PGRP
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,38)
+#define current_pgid() task_pgrp(current)
+#elif defined HAVE_KFUNC_TASK_PGRP
 #define current_pgid() task_pgrp(current)
 #else
 #error Need a way to get the process group of the current task.
@@ -1881,7 +1898,13 @@ alloc_data(struct stdata *sd, ssize_t dlen, const void __user *dbuf)
 				err = strcopyin(dbuf, dp->b_rptr, dlen);
 				break;
 			case STRCSUM:
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,19,0)
+				dp->b_csum = csum_and_copy_from_user(dbuf, dp->b_rptr, dlen);
+				if (dp->b_csum == 0 && dlen > 0)
+					err = -EFAULT;
+#else
 				dp->b_csum = csum_and_copy_from_user(dbuf, dp->b_rptr, dlen, 0, &err);
+#endif
 				dp->b_flag |= MSGCSUM;
 				break;
 			}
@@ -8259,7 +8282,7 @@ str_i_look(const struct file *file, struct stdata *sd, unsigned long arg)
 
 	if (!(err = straccess_rlock(sd, FAPPEND))) {
 		if (SAMESTR(q) && (q = q->q_next))
-			snprintf(fmname, FMNAMESZ + 1, _RD(q)->q_qinfo->qi_minfo->mi_idname);
+			snprintf(fmname, FMNAMESZ + 1, "%s", _RD(q)->q_qinfo->qi_minfo->mi_idname);
 		else
 			err = -EINVAL;
 		srunlock(sd);
@@ -10655,7 +10678,7 @@ _strioctl_locked(struct inode *inode, struct file *file, unsigned int cmd, unsig
 #endif
 
 #if defined WITH_32BIT_CONVERSION
-#if defined HAVE_COMPAT_IOCTL
+#if defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_COMPAT_IOCTL
 
 /* Just about every 64-bit architecture has a 32-bit compatibility mode */
 STATIC __unlikely long
@@ -10685,7 +10708,7 @@ unregister_ioctl32(void *opaque)
 
 EXPORT_SYMBOL(unregister_ioctl32);
 
-#else				/* defined HAVE_COMPAT_IOCTL */
+#else				/* defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_COMPAT_IOCTL */
 /*
  *  This is the more difficult way of doing things for pre-2.6.11 kernels that do not have
  *  compat_ioctl file operations.  Unfortunately, the CDROM driver has stolen the standard STREAMS
@@ -10994,7 +11017,7 @@ unregister_ioctl32(void *opaque)
 
 EXPORT_SYMBOL(unregister_ioctl32);
 
-#endif				/* defined HAVE_COMPAT_IOCTL */
+#endif				/* defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_COMPAT_IOCTL */
 #else				/* defined WITH_32BIT_CONVERSION */
 
 __unlikely streams_fastcall void *
@@ -11035,7 +11058,7 @@ struct file_operations strm_f_ops ____cacheline_aligned = {
 #if defined HAVE_UNLOCKED_IOCTL
 	.unlocked_ioctl = _strioctl,
 #endif
-#if defined HAVE_COMPAT_IOCTL && defined WITH_32BIT_CONVERSION
+#if defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_COMPAT_IOCTL && defined WITH_32BIT_CONVERSION
 	.compat_ioctl = _strioctl_compat,
 #endif
 #if defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_IOCTL
@@ -11046,7 +11069,9 @@ struct file_operations strm_f_ops ____cacheline_aligned = {
 	.flush = strflush,
 	.release = strclose,
 	.fasync = strfasync,
+#ifdef HAVE_KMEMB_STRUCT_FILE_OPERATIONS_SENDPAGE
 	.sendpage = _strsendpage,
+#endif
 #if defined HAVE_PUTPMSG_GETPMSG_FILE_OPS
 	.getpmsg = _strgetpmsg,
 	.putpmsg = _strputpmsg,
@@ -12041,7 +12066,7 @@ sthinit(void)
 		goto no_strmod;
 	if (sth_modid == 0 && result >= 0)
 		sth_modid = result;
-#if defined WITH_32BIT_CONVERSION && !defined HAVE_COMPAT_IOCTL
+#if defined WITH_32BIT_CONVERSION && !defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_COMPAT_IOCTL
 	streams_register_ioctl32_conversions();
 #endif
 	sthunlocked = 1;
@@ -12057,7 +12082,7 @@ void __exit
 #endif
 sthexit(void)
 {
-#if defined WITH_32BIT_CONVERSION && !defined HAVE_COMPAT_IOCTL
+#if defined WITH_32BIT_CONVERSION && !defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_COMPAT_IOCTL
 	streams_unregister_ioctl32_conversions();
 #endif
 	unregister_strmod(&sth_fmod);

@@ -1470,7 +1470,11 @@ ss_socket_get(struct socket *sock, ss_t *ss)
 			sk->sk_write_space = ss_write_space;
 			sk->sk_error_report = ss_error_report;
 #ifdef LINUX_2_4
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6,4,0)
+			inet_set_bit(RECVERR, sk);
+#else
 			inet_sk(sk)->recverr = 1;
+#endif
 #else
 			sk->ip_recverr = 1;
 #endif
@@ -1521,7 +1525,11 @@ ss_socket_grab(struct socket *sock, ss_t *ss)
 				sk->sk_error_report = ss_error_report;
 			}
 #ifdef LINUX_2_4
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6,4,0)
+			inet_set_bit(RECVERR, sk);
+#else
 			inet_sk(sk)->recverr = 1;
+#endif
 #else
 			sk->ip_recverr = 1;
 #endif
@@ -13276,8 +13284,17 @@ ss_socket(ss_t *ss)
 		ensure(ss->sock->sk, return (-EFAULT));
 		ss->sock->sk->sk_allocation = GFP_ATOMIC;
 		ss_socket_get(ss->sock, ss);
-		if (ss->p.prot.family == PF_INET)
+		if (ss->p.prot.family == PF_INET) {
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6,4,0)
+			/* Enable IP_PKTINFO, IP_RECVTTL, IP_RECVTOS, IP_RECVOPTS */
+			inet_set_bit(PKTINFO, ss->sock->sk);
+			inet_set_bit(TTL, ss->sock->sk);
+			inet_set_bit(TOS, ss->sock->sk);
+			inet_set_bit(RECVOPTS, ss->sock->sk);
+#else
 			inet_sk(ss->sock->sk)->cmsg_flags |= 0x0f;
+#endif
+		}
 		return (0);
 	}
 	LOGNO(ss, "ERROR: from sock_create %d", err);
@@ -13575,6 +13592,17 @@ ss_sendmsg(ss_t *ss, struct msghdr *msg, int len)
 	ensure(ss->sock, return (-EPROTO));
 	LOGDA(ss, "SS_SENDMSG");
 	{
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,18,0)
+		/* Kernel 5.18+ removed set_fs(); use kvec iterator for kernel-space buffers */
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6,4,0)
+		iov_iter_kvec(&msg->msg_iter, WRITE, (struct kvec *)iter_iov(&msg->msg_iter),
+			      msg->msg_iter.nr_segs, len);
+#else
+		iov_iter_kvec(&msg->msg_iter, WRITE, (struct kvec *)msg->msg_iter.iov,
+			      msg->msg_iter.nr_segs, len);
+#endif
+		err = sock_sendmsg(ss->sock, msg);
+#else
 		mm_segment_t fs = get_fs();
 
 		set_fs(KERNEL_DS);
@@ -13587,6 +13615,7 @@ ss_sendmsg(ss_t *ss, struct msghdr *msg, int len)
 		err = sock_sendmsg(ss->sock, msg, len);
 #endif
 		set_fs(fs);
+#endif
 	}
 	if (err <= 0)
 		LOGNO(ss, "ERROR: from sock_sendmsg() %d", err);
@@ -13615,6 +13644,16 @@ ss_recvmsg(ss_t *ss, struct msghdr *msg, int size)
 	ensure(ss->sock, return (-EPROTO));
 	LOGDA(ss, "SS_RECVMSG");
 	{
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,18,0)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6,4,0)
+		iov_iter_kvec(&msg->msg_iter, READ, (struct kvec *)iter_iov(&msg->msg_iter),
+			      msg->msg_iter.nr_segs, size);
+#else
+		iov_iter_kvec(&msg->msg_iter, READ, (struct kvec *)msg->msg_iter.iov,
+			      msg->msg_iter.nr_segs, size);
+#endif
+		err = sock_recvmsg(ss->sock, msg, MSG_DONTWAIT | MSG_NOSIGNAL);
+#else
 		mm_segment_t fs = get_fs();
 
 		set_fs(KERNEL_DS);
@@ -13627,6 +13666,7 @@ ss_recvmsg(ss_t *ss, struct msghdr *msg, int size)
 		err = sock_recvmsg(ss->sock, msg, size, MSG_DONTWAIT | MSG_NOSIGNAL);
 #endif
 		set_fs(fs);
+#endif
 	}
 	if (err < 0) {
 		LOGNO(ss, "ERROR: from sock_recvmsg() %d", err);
@@ -14313,7 +14353,7 @@ t_error_ack(ss_t *ss, queue_t *q, mblk_t *msg, t_scalar_t prim, t_scalar_t error
 	return (-ENOBUFS);
 }
 
-static fastcall __hot_in void ss_r_recvmsg(ss_t *ss, queue_t *q);
+static fastcall __hot_read void ss_r_recvmsg(ss_t *ss, queue_t *q);
 
 /**
  * t_ok_ack: - issue a T_OK_ACK primitive
@@ -14824,8 +14864,7 @@ ss_sock_sendmsg(ss_t *ss, mblk_t *mp, struct msghdr *msg)
 			n = 16;
 		msg->msg_flags |= (MSG_DONTWAIT | MSG_NOSIGNAL);
 #ifdef HAVE_KMEMB_STRUCT_MSGHDR_MSG_ITER
-		msg->msg_iter.iov = iov;
-		msg->msg_iter.nr_segs = n;
+		iov_iter_init(&msg->msg_iter, WRITE, iov, n, 0);
 #else
 		msg->msg_iov = iov;
 		msg->msg_iovlen = n;
@@ -14987,8 +15026,7 @@ ss_setup_message(mblk_t *mp, int size, int type)
 	iov->iov_base = mp->b_rptr;
 	iov->iov_len = size;
 #ifdef HAVE_KMEMB_STRUCT_MSGHDR_MSG_ITER
-	msg->msg_iter.iov = iov;
-	msg->msg_iter.nr_segs = 1;
+	iov_iter_init(&msg->msg_iter, READ, iov, 1, size);
 #else
 	msg->msg_iov = iov;
 	msg->msg_iovlen = 1;

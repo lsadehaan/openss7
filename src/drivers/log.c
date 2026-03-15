@@ -65,7 +65,7 @@ static char const ident[] = "src/drivers/log.c (" PACKAGE_ENVR ") " PACKAGE_DATE
  *  is present in the system would information be passed upstream.  This is far preferrable to
  *  cmn_err(9) which generates each and every message to the kernel log.
  */
-#include <stdarg.h>
+#include <linux/stdarg.h>
 
 #ifdef NEED_LINUX_AUTOCONF_H
 #include NEED_LINUX_AUTOCONF_H

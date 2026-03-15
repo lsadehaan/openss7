@@ -1029,9 +1029,17 @@ ip2xinet_devopen(struct net_device *dev)
 
 	/* Assign the hardware address of the board: use "\0IP2Xx", where x is 0 to 7. The first
 	   byte is '\0': a safe choice with regard to multicast */
-	for (i = 0; i < ETH_ALEN; i++)
-		dev->dev_addr[i] = "\0IP2X0"[i];
-	dev->dev_addr[ETH_ALEN - 1] += ((struct ip2xinet_dev *)dev - ip2xinet_devs);	/* the number */
+	{
+		unsigned char addr[ETH_ALEN];
+		for (i = 0; i < ETH_ALEN; i++)
+			addr[i] = "\0IP2X0"[i];
+		addr[ETH_ALEN - 1] += ((struct ip2xinet_dev *)dev - ip2xinet_devs);
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,15,0)
+		dev_addr_set(dev, addr);
+#else
+		memcpy(dev->dev_addr, addr, ETH_ALEN);
+#endif
+	}
 
 	privp->state = 1;
 	if (ip2xinet_status.ip2x_dlstate == DL_IDLE)

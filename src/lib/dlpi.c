@@ -378,10 +378,10 @@ static void _dlpi_walk(dlpi_walkfunc_t *fn, void *arg, uint flags);
 static __hot void
 __dlpi_putuser(void *arg)
 {
-	int fd = *(int *) arg;
+	dlpi_handle_t dh = (dlpi_handle_t) arg;
 
-	dlpi_handle_t dh = __dlpi_dhs[fd];
-
+	if (dh == NULL)
+		return;
 	__dlpi_user_unlock(dh);
 	__dlpi_list_unlock(NULL);
 	return;
@@ -993,7 +993,7 @@ __dlpi_bind_r(dlpi_handle_t dh, uint sap, uint *boundsap)
 {
 	int ret = DLPI_SUCCESS;
 
-	pthread_cleanup_push_defer_np(__dlpi_putuser, &dh);
+	pthread_cleanup_push_defer_np(__dlpi_putuser, dh);
 	if (__dlpi_getuser(dh, &ret)) {
 		ret = _dlpi_bind(dh, sap, boundsap);
 		__dlpi_putuser(dh);
@@ -1181,7 +1181,7 @@ __dlpi_disabmulti_r(dlpi_handle_t dh, const void *aptr, size_t alen)
 {
 	int ret = DLPI_SUCCESS;
 
-	pthread_cleanup_push_defer_np(__dlpi_putuser, NULL);
+	pthread_cleanup_push_defer_np(__dlpi_putuser, dh);
 	if (__dlpi_getuser(dh, &ret)) {
 		ret = _dlpi_disabmulti(dh, aptr, alen);
 		__dlpi_putuser(dh);
@@ -1284,7 +1284,7 @@ __dlpi_disabnotify_r(dlpi_handle_t dh, dlpi_notifyid_t id, void **argp)
 {
 	int ret = DLPI_SUCCESS;
 
-	pthread_cleanup_push_defer_np(__dlpi_putuser, &dh);
+	pthread_cleanup_push_defer_np(__dlpi_putuser, dh);
 	if (__dlpi_getuser(dh, &ret)) {
 		ret = _dlpi_disabnotify(dh, id, argp);
 		__dlpi_putuser(dh);
@@ -1380,7 +1380,7 @@ __dlpi_enabmulti_r(dlpi_handle_t dh, const void *aptr, size_t alen)
 {
 	int ret = DLPI_SUCCESS;
 
-	pthread_cleanup_push_defer_np(__dlpi_putuser, &dh);
+	pthread_cleanup_push_defer_np(__dlpi_putuser, dh);
 	if (__dlpi_getuser(dh, &ret)) {
 		ret = _dlpi_enabmulti(dh, aptr, alen);
 		__dlpi_putuser(dh);
@@ -1506,7 +1506,7 @@ __dlpi_enabnotify_r(dlpi_handle_t dh, uint notes, dlpi_notifyfunc_t *fncp, void 
 {
 	int ret = DLPI_SUCCESS;
 
-	pthread_cleanup_push_defer_np(__dlpi_putuser, &dh);
+	pthread_cleanup_push_defer_np(__dlpi_putuser, dh);
 	if (__dlpi_getuser(dh, &ret)) {
 		ret = _dlpi_enabnotify(dh, notes, fncp, arg, nid);
 		__dlpi_putuser(dh);
@@ -1565,10 +1565,10 @@ __dlpi_fd_r(dlpi_handle_t dh)
 {
 	int err = DLPI_SUCCESS, ret = -1;
 
-	pthread_cleanup_push_defer_np(__dlpi_putuser, &dh);
+	pthread_cleanup_push_defer_np(__dlpi_putuser, dh);
 	if (__dlpi_hlduser(dh, &err)) {
 		ret = _dlpi_fd(dh);
-		__dlpi_putuser(&dh);
+		__dlpi_putuser(dh);
 	}
 	pthread_cleanup_pop_restore_np(0);
 	return (ret);
@@ -1678,7 +1678,7 @@ __dlpi_get_physaddr_r(dlpi_handle_t dh, uint type, void *aptr, size_t *alen)
 {
 	int ret = DLPI_SUCCESS;
 
-	pthread_cleanup_push_defer_np(__dlpi_putuser, &dh);
+	pthread_cleanup_push_defer_np(__dlpi_putuser, dh);
 	if (__dlpi_getuser(dh, &ret)) {
 		ret = _dlpi_get_physaddr(dh, type, aptr, alen);
 		__dlpi_putuser(dh);
@@ -1898,7 +1898,7 @@ __dlpi_info_r(dlpi_handle_t dh, dlpi_info_t * iptr, uint opt)
 {
 	int ret = DLPI_SUCCESS;
 
-	pthread_cleanup_push_defer_np(__dlpi_putuser, &dh);
+	pthread_cleanup_push_defer_np(__dlpi_putuser, dh);
 	if (__dlpi_getuser(dh, &ret) != NULL) {
 		ret = _dlpi_info(dh, iptr, opt);
 		__dlpi_putuser(dh);
@@ -1963,12 +1963,13 @@ __dlpi_linkname_r(dlpi_handle_t dh)
 
 	char *ret = NULL;
 
-	pthread_cleanup_push_defer_np(__dlpi_putuser, &dh);
+	pthread_cleanup_push_defer_np(__dlpi_putuser, dh);
 	if (__dlpi_hlduser(dh, &err) != NULL) {
-		if (dh->du_linkname == NULL)
-			return (NULL);
-		ret = __dlpi_get_tsd()->strbuf;
-		strncpy(ret, dh->du_linkname, BUFSIZ);
+		if (dh->du_linkname != NULL) {
+			ret = __dlpi_get_tsd()->strbuf;
+			strncpy(ret, dh->du_linkname, BUFSIZ - 1);
+			ret[BUFSIZ - 1] = '\0';
+		}
 		__dlpi_putuser(dh);
 	}
 	pthread_cleanup_pop_restore_np(0);
@@ -2534,7 +2535,7 @@ __dlpi_promiscoff_r(dlpi_handle_t dh, uint level)
 {
 	int ret = DLPI_SUCCESS;
 
-	pthread_cleanup_push_defer_np(__dlpi_putuser, &dh);
+	pthread_cleanup_push_defer_np(__dlpi_putuser, dh);
 	if (__dlpi_getuser(dh, &ret)) {
 		ret = _dlpi_promiscoff(dh, level);
 		__dlpi_putuser(dh);
@@ -2623,7 +2624,7 @@ __dlpi_promiscon_r(dlpi_handle_t dh, uint level)
 {
 	int ret = DLPI_SUCCESS;
 
-	pthread_cleanup_push_defer_np(__dlpi_putuser, &dh);
+	pthread_cleanup_push_defer_np(__dlpi_putuser, dh);
 	if (__dlpi_getuser(dh, &ret)) {
 		ret = _dlpi_promiscon(dh, level);
 		__dlpi_putuser(dh);
@@ -2705,7 +2706,7 @@ __dlpi_recv_r(dlpi_handle_t dh, void **saptr, size_t *salen, void *buf, size_t *
 {
 	int ret = DLPI_SUCCESS;
 
-	pthread_cleanup_push_defer_np(__dlpi_putuser, &dh);
+	pthread_cleanup_push_defer_np(__dlpi_putuser, dh);
 	if (__dlpi_hlduser(dh, &ret)) {
 		ret = _dlpi_recv(dh, saptr, salen, buf, buflen, wait, recvp);
 		__dlpi_putuser(dh);
@@ -2785,7 +2786,7 @@ __dlpi_send_r(dlpi_handle_t dh, const void *daptr, size_t dalen, const void *buf
 {
 	int ret = DLPI_SUCCESS;
 
-	pthread_cleanup_push_defer_np(__dlpi_putuser, &dh);
+	pthread_cleanup_push_defer_np(__dlpi_putuser, dh);
 	if (__dlpi_hlduser(dh, &ret)) {
 		ret = _dlpi_send(dh, daptr, dalen, buf, buflen, sendp);
 		__dlpi_putuser(dh);
@@ -2887,7 +2888,7 @@ __dlpi_set_physaddr_r(dlpi_handle_t dh, uint type, const void *aptr, size_t alen
 {
 	int ret = DLPI_SUCCESS;
 
-	pthread_cleanup_push_defer_np(__dlpi_putuser, &dh);
+	pthread_cleanup_push_defer_np(__dlpi_putuser, dh);
 	if (__dlpi_getuser(dh, &ret)) {
 		ret = _dlpi_set_physaddr(dh, type, aptr, alen);
 		__dlpi_putuser(dh);
@@ -2971,7 +2972,7 @@ __dlpi_set_timeout_r(dlpi_handle_t dh, int seconds)
 {
 	int ret = DLPI_SUCCESS;
 
-	pthread_cleanup_push_defer_np(__dlpi_putuser, &dh);
+	pthread_cleanup_push_defer_np(__dlpi_putuser, dh);
 	if (__dlpi_getuser(dh, &ret)) {
 		ret = _dlpi_set_timeout(dh, seconds);
 		__dlpi_putuser(dh);
@@ -3515,7 +3516,7 @@ __dlpi_unbind_r(dlpi_handle_t dh)
 {
 	int ret = DLPI_SUCCESS;
 
-	pthread_cleanup_push_defer_np(__dlpi_putuser, &dh);
+	pthread_cleanup_push_defer_np(__dlpi_putuser, dh);
 	if (__dlpi_getuser(dh, &ret)) {
 		ret = _dlpi_unbind(dh);
 		__dlpi_putuser(dh);

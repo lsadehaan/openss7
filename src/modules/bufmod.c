@@ -63,6 +63,14 @@ static char const ident[] = "src/modules/bufmod.c (" PACKAGE_ENVR ") " PACKAGE_D
 #include <linux/init.h>
 #include <linux/sched.h>
 
+/* Compat: struct timeval removed from kernel headers in 5.6+ */
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,6,0)
+struct timeval {
+	long tv_sec;
+	long tv_usec;
+};
+#endif
+
 #define _SVR4_SOURCE	1
 #define _MPS_SOURCE	1	/* for mi_ functions */
 #define _SUN_SOURCE	1	/* for sun version of mi_timer_alloc */
@@ -717,9 +725,9 @@ STATIC noinline fastcall __hot_get void
 bufmod_gettimeval(const struct sb *sb, struct sb_hdr *sbh)
 {
 #if defined HAVE_KFUNC_KTIME_GET_REAL_TS64
-	struct timespec ts;
+	struct timespec64 ts;
 
-	getnstimeofday(&ts);
+	ktime_get_real_ts64(&ts);
 	sbh->sbh_timestamp.tv_sec = ts.tv_sec;
 	sbh->sbh_timestamp.tv_usec = ts.tv_nsec / NSEC_PER_USEC;
 #else

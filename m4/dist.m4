@@ -822,7 +822,7 @@ AC_DEFUN([_DISTRO_ADJUST_64BIT_LIBDIR], [dnl
 		eval "dist_cv_lib32dir_eval=\"$dist_cv_lib32dir\""
 		dist_cv_lib32dir_eval=`echo "$dist_cv_lib32dir_eval" | sed -e "s,\<NONE\>,$ac_default_prefix,g;s,//,/,g"`
 	    ])
-	    lib32dir="$dist_cv_lib32dir"
+	    lib32dir="$dist_cv_lib32dir_eval"
 	    AC_CACHE_CHECK([for 64-bit lib name], [dist_cv_lib64dir_eval], [dnl
 		if test -z "$dist_cv_libdirs" ; then
 		    dist_cv_lib64dir=`echo "$libdir" | sed -r -e 's|\<lib\>|lib64|g'`
@@ -832,7 +832,7 @@ AC_DEFUN([_DISTRO_ADJUST_64BIT_LIBDIR], [dnl
 		eval "dist_cv_lib64dir_eval=\"$dist_cv_lib64dir\""
 		dist_cv_lib64dir_eval=`echo "$dist_cv_lib64dir_eval" | sed -e "s,\<NONE\>,$ac_default_prefix,g;s,//,/,g"`
 	    ])
-	    lib64dir="$dist_cv_lib64dir"
+	    lib64dir="$dist_cv_lib64dir_eval"
 	    libdir="$lib64dir"
 	    pkglib32dir='${lib32dir}/${PACKAGE}'
 	    pkglibexec32dir='${pkglibexecdir}/lib32'
@@ -848,7 +848,7 @@ AC_DEFUN([_DISTRO_ADJUST_64BIT_LIBDIR], [dnl
 		eval "dist_cv_syslib32dir_eval=\"$dist_cv_syslib32dir\""
 		dist_cv_syslib32dir_eval=`echo "$dist_cv_syslib32dir_eval" | sed -e "s,\<NONE\>,$ac_default_prefix,g;s,//,/,g"`
 	    ])
-	    syslib32dir="$dist_cv_syslib32dir"
+	    syslib32dir="$dist_cv_syslib32dir_eval"
 	    AC_CACHE_CHECK([for 64-bit syslib name],[dist_cv_syslib64dir_eval], [dnl
 		if test -z "$dist_cv_syslibdirs" ; then
 		    dist_cv_syslib64dir=`echo "$syslibdir" | sed -r -e 's|\<lib\>|lib64|g'`
@@ -858,7 +858,7 @@ AC_DEFUN([_DISTRO_ADJUST_64BIT_LIBDIR], [dnl
 		eval "dist_cv_syslib64dir_eval=\"$dist_cv_syslib64dir\""
 		dist_cv_syslib64dir_eval=`echo "$dist_cv_syslib64dir_eval" | sed -e "s,\<NONE\>,$ac_default_prefix,g;s,//,/,g"`
 	    ])
-	    syslib64dir="$dist_cv_syslib64dir"
+	    syslib64dir="$dist_cv_syslib64dir_eval"
 	    syslibdir="$syslib64dir"
 	    have_32bit_libs=yes
 	    ;;
