@@ -4391,14 +4391,21 @@ tpi_init_nproto(unsigned char proto)
 	if ((ip = tpi_bhash[slot].ipproto) != NULL)
 		return (-EALREADY);	/* already initialized */
 	ip = tpi_bhash[slot].ipproto = &tpi_proto[slot];
+	ip->kmod = NULL;
 	ip->next = READ_ONCE(inet_protos[hash]);
 	if (ip->next != NULL) {
 		if ((ip->kmod = streams_module_address((ulong) ip->next))
-		    && ip->kmod != THIS_MODULE && !try_module_get(ip->kmod))
+		    && ip->kmod != THIS_MODULE && !try_module_get(ip->kmod)) {
+			tpi_bhash[slot].ipproto = NULL;
+			ip->kmod = NULL;
 			return (-EAGAIN);
+		}
 		if (inet_del_protocol(ip->next, proto) != 0) {
 			if (ip->kmod != NULL && ip->kmod != THIS_MODULE)
 				module_put(ip->kmod);
+			ip->kmod = NULL;
+			ip->next = NULL;
+			tpi_bhash[slot].ipproto = NULL;
 			return (-EAGAIN);
 		}
 	}
@@ -4407,6 +4414,9 @@ tpi_init_nproto(unsigned char proto)
 			inet_add_protocol(ip->next, proto);
 		if (ip->kmod != NULL && ip->kmod != THIS_MODULE)
 			module_put(ip->kmod);
+		ip->kmod = NULL;
+		ip->next = NULL;
+		tpi_bhash[slot].ipproto = NULL;
 		return (-EAGAIN);
 	}
 #if defined HAVE_KFUNC_IN_ATOMIC || defined in_atomic

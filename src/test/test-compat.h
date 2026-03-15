@@ -16,8 +16,4 @@
 typedef unsigned long ulong;
 #endif
 
-#ifndef POLLMSG
-#define POLLMSG 0
-#endif
-
 #endif

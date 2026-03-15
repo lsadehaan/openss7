@@ -1168,8 +1168,15 @@ is_current_pgrp_orphaned_(void)
 #define is_current_pgrp_orphaned() is_current_pgrp_orphaned_()
 #endif
 #elif LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,38)
-extern int is_current_pgrp_orphaned(void);
-#define is_current_pgrp_orphaned() is_current_pgrp_orphaned()
+int is_current_pgrp_orphaned(void) __attribute__((__weak__));
+static inline int
+is_current_pgrp_orphaned_(void)
+{
+	if (is_current_pgrp_orphaned)
+		return is_current_pgrp_orphaned();
+	return 0;
+}
+#define is_current_pgrp_orphaned() is_current_pgrp_orphaned_()
 #else
 #error Need a way to check if process group is orphaned.
 #endif
@@ -1937,9 +1944,10 @@ alloc_data(struct stdata *sd, ssize_t dlen, const void __user *dbuf)
 				break;
 			case STRCSUM:
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(5,19,0)
-				dp->b_csum = csum_and_copy_from_user(dbuf, dp->b_rptr, dlen);
-				if (dp->b_csum == 0 && dlen > 0)
+				if (unlikely(copy_from_user(dp->b_rptr, dbuf, dlen) != 0))
 					err = -EFAULT;
+				else
+					dp->b_csum = csum_partial(dp->b_rptr, dlen, 0);
 #else
 				dp->b_csum = csum_and_copy_from_user(dbuf, dp->b_rptr, dlen, 0, &err);
 #endif

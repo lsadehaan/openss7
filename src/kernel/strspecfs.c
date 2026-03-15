@@ -836,7 +836,7 @@ spec_dir_iterate(struct file *file, struct dir_context *ctx)
 STATIC struct file_operations spec_dir_f_ops = {
 	.owner = THIS_MODULE,
 	.read = generic_read_dir,
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,11,0)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,7,0)
 	.iterate_shared = spec_dir_iterate,
 #elif defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_READDIR
 	.readdir = spec_dir_readdir,
@@ -1033,7 +1033,7 @@ spec_root_iterate(struct file *file, struct dir_context *ctx)
 STATIC struct file_operations spec_root_f_ops = {
 	.owner = THIS_MODULE,
 	.read = generic_read_dir,
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,11,0)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,7,0)
 	.iterate_shared = spec_root_iterate,
 #elif defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_READDIR
 	.readdir = spec_root_readdir,

@@ -521,8 +521,8 @@ STATIC struct ctl_table streams_table[] = {
 #endif
 	 .procname = "reuse_fmodsw",
 	 .data = &sysctl_str_reuse_fmodsw,
-	 .mode = sizeof(int),
-	 .maxlen = 0644,
+	 .mode = 0644,
+	 .maxlen = sizeof(int),
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CHILD
 	 .child = NULL,
 #endif

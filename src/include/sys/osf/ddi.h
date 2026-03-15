@@ -55,8 +55,8 @@
 #endif				/* __KERNEL__ */
 
 /* Compat: time_t removed from kernel headers in 6.x */
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(6,0,0) && !defined(time_t)
-#define time_t long
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6,0,0)
+typedef long time_t;
 #endif
 
 #ifndef __EXTERN_INLINE
