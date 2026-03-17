@@ -1750,17 +1750,49 @@ __attribute__((section(\".gnu.linkonce.this_module\"))) = {\n\
 	print "#ifdef MODULE_ARCH_INIT\n\t.arch = MODULE_ARCH_INIT,\n#endif" > file
 	print "};\n#endif" > file
 }
+# Generate a binary __versions entry for kernel 6.7+ format.
+# Format: 4-byte next (LE), 4-byte crc (LE), name\0 padded to 4 bytes.
+# Returns a C string literal fragment like: "\x0c\x00\x00\x00\xf5\xc5\x78\xfb" "memset\0\0"
+function gen_binversion(crc_str, sym_name,    crc_val, name_len, padded_len, next_val, result, i, b) {
+    # Parse CRC hex value
+    crc_val = strtonum(crc_str)
+    name_len = length(sym_name) + 1  # include null terminator
+    padded_len = int((name_len + 3) / 4) * 4  # pad to 4-byte boundary
+    next_val = 8 + padded_len  # 4 (next) + 4 (crc) + padded name
+
+    # Generate "next" field (little-endian u32)
+    result = "\n\t\""
+    for (i = 0; i < 4; i++) {
+        b = and(rshift(next_val, i * 8), 0xFF)
+        result = result sprintf("\\x%02x", b)
+    }
+    # Generate "crc" field (little-endian u32)
+    for (i = 0; i < 4; i++) {
+        b = and(rshift(crc_val, i * 8), 0xFF)
+        result = result sprintf("\\x%02x", b)
+    }
+    result = result "\""
+    # Generate name with null padding
+    result = result "\n\t\"" sym_name "\\0"
+    for (i = name_len; i < padded_len; i++) {
+        result = result "\\0"
+    }
+    result = result "\""
+    return result
+}
 function write_modversions(file, mod, base,	count_unds,count_weak,pair,ind,name,sym,add,fmt)
 {
     fmt = "w: mymodules, %-20s: %14s; %-30s"
     count_unds = 0; count_weak = 0
     text = ""
+    bintext = ""
     for (pair in mod_unds) {
 	split(pair, ind, SUBSEP); name = ind[1]; sym = ind[2]
 	if (name != mod) continue
 	if (!(sym in crcs)) continue
 	print_debug(3,sprintf(fmt, base, crcs[sym], sym))
 	text = text "\n\t{ " crcs[sym] ", \"" sym "\" },"
+	bintext = bintext gen_binversion(crcs[sym], sym)
 	count_unds++
     }
     if (values["weak-versions"]) {
@@ -1772,6 +1804,7 @@ function write_modversions(file, mod, base,	count_unds,count_weak,pair,ind,name,
 	    if (!(sym in crcs)) continue
 	    print_debug(3,sprintf(fmt, base, crcs[sym], sym))
 	    text = text "\n\t{ " crcs[sym] ", \"" sym "\" },"
+	    bintext = bintext gen_binversion(crcs[sym], sym)
 	    count_weak++
 	}
     }
@@ -1779,13 +1812,23 @@ function write_modversions(file, mod, base,	count_unds,count_weak,pair,ind,name,
 	print "\n\
 #include <linux/version.h>\n\
 #if defined(CONFIG_MODVERSIONS)\n\
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6,7,0)\n\
+/* Kernel 6.7+ uses packed binary format for __versions */\n\
+static const char ____versions[]\n\
+__attribute__((__used__))\n\
+__attribute__((section(\"__versions\"))) =\
+" bintext ";\n\
+#else\n\
 static const struct modversion_info ____versions[]\n\
 __attribute_used__\n\
 __attribute__((section(\"__versions\"))) = {\
-" text "\n};\n#endif" > file
+" text "\n};\n\
+#endif\n\
+#endif" > file
     }
     if (values["weak-versions"] && values["weak-hidden"]) {
 	text = ""
+	bintext = ""
 	for (pair in mod_weak) {
 	    split(pair, ind, SUBSEP); name = ind[1]; sym = ind[2]
 	    if (name != mod) continue
@@ -1793,16 +1836,25 @@ __attribute__((section(\"__versions\"))) = {\
 	    if (!(sym in crcs)) continue
 	    print_debug(3,sprintf(fmt, base, crcs[sym], sym))
 	    text = text "\n\t{ " crcs[sym] ", \"" sym "\" },"
+	    bintext = bintext gen_binversion(crcs[sym], sym)
 	    count_weak++
 	}
 	if (text) {
 	    print "\n\
 #include <linux/version.h>\n\
 #if defined(CONFIG_MODVERSIONS)\n\
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6,7,0)\n\
+static const char ____weak_versions[]\n\
+__attribute__((__used__))\n\
+__attribute__((section(\"__weak_versions\"))) =\
+" bintext ";\n\
+#else\n\
 static const struct modversion_info ____weak_versions[]\n\
 __attribute_used__\n\
 __attribute__((section(\"__weak_versions\"))) = {\
-" text "\n};\n#endif" > file
+" text "\n};\n\
+#endif\n\
+#endif" > file
 	}
     }
     # NOTE: ____absolute and ____weak_absolute sections are disabled on
