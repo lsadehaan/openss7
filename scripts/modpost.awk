@@ -1778,7 +1778,7 @@ function write_modversions(file, mod, base,	count_unds,count_weak,pair,ind,name,
     if (text) {
 	print "\n\
 #include <linux/version.h>\n\
-#if defined(CONFIG_MODVERSIONS) && LINUX_VERSION_CODE < KERNEL_VERSION(6,7,0)\n\
+#if defined(CONFIG_MODVERSIONS)\n\
 static const struct modversion_info ____versions[]\n\
 __attribute_used__\n\
 __attribute__((section(\"__versions\"))) = {\
@@ -1798,7 +1798,7 @@ __attribute__((section(\"__versions\"))) = {\
 	if (text) {
 	    print "\n\
 #include <linux/version.h>\n\
-#if defined(CONFIG_MODVERSIONS) && LINUX_VERSION_CODE < KERNEL_VERSION(6,7,0)\n\
+#if defined(CONFIG_MODVERSIONS)\n\
 static const struct modversion_info ____weak_versions[]\n\
 __attribute_used__\n\
 __attribute__((section(\"__weak_versions\"))) = {\
@@ -1812,6 +1812,7 @@ __attribute__((section(\"__weak_versions\"))) = {\
 	    if (name != mod) continue
 	    if (sym in crcs) continue
 	    if (sym in mapaddrs) { add = mapaddrs[sym] } else { add = "00000000" }
+	    if (add == "00000000") continue
 	    print_debug(3,sprintf(fmt, base, "0x" add, sym))
 	    text = text "\n\t{ " "0x" add ", \"" sym "\" },"
 	    count_unds++
@@ -1819,7 +1820,7 @@ __attribute__((section(\"__weak_versions\"))) = {\
 	if (text) {
 	    print "\n\
 #include <linux/version.h>\n\
-#if LINUX_VERSION_CODE < KERNEL_VERSION(6,7,0)\n\
+#ifdef CONFIG_MODVERSIONS\n\
 static const struct modversion_info ____absolute[]\n\
 __attribute_used__\n\
 __attribute__((section(\"__absolute\"))) = {\
@@ -1833,6 +1834,7 @@ __attribute__((section(\"__absolute\"))) = {\
 	    if (name != mod) continue
 	    if (sym in crcs) continue
 	    if (sym in mapaddrs) { add = mapaddrs[sym] } else { add = "00000000" }
+	    if (add == "00000000") continue
 	    print_debug(3,sprintf(fmt, base, "0x" add, sym))
 	    text = text "\n\t{ " "0x" add ", \"" sym "\" },"
 	    count_weak++
@@ -1840,7 +1842,7 @@ __attribute__((section(\"__absolute\"))) = {\
 	if (text) {
 	    print "\n\
 #include <linux/version.h>\n\
-#if LINUX_VERSION_CODE < KERNEL_VERSION(6,7,0)\n\
+#ifdef CONFIG_MODVERSIONS\n\
 static const struct modversion_info ____weak_absolute[]\n\
 __attribute_used__\n\
 __attribute__((section(\"__weak_absolute\"))) = {\

@@ -2584,6 +2584,34 @@ dnl
 	linux_cv_k_cppflags=`echo " $linux_cv_k_cppflags " | sed -e "s| -Iinclude/asm| -I${_ksrcdir}/include/asm|g;s|^[[[:space:]]]*||;s|[[[:space:]]]*$||"`
 	linux_cv_k_cppflags=`echo " $linux_cv_k_cppflags " | sed -e "s| -Iarch/| -I${_ksrcdir}/arch/|g;s|^[[[:space:]]]*||;s|[[[:space:]]]*$||"`
 dnl
+dnl	Kernel 6.x+: Kbuild probe may return empty CPPFLAGS on modern
+dnl	kernels. Ensure essential include directories are always present
+dnl	so that configure probes can find linux/version.h and kernel
+dnl	config headers. Without these, CONFIG_SMP, CONFIG_MODVERSIONS
+dnl	and other critical features are detected as absent.
+dnl
+	if ! echo " $linux_cv_k_cppflags " | grep -q " -I${_kbuilddir}/include " 2>/dev/null ; then
+	    linux_cv_k_cppflags="$linux_cv_k_cppflags -I${_kbuilddir}/include"
+	fi
+	if ! echo " $linux_cv_k_cppflags " | grep -q " -I${_ksrcdir}/include " 2>/dev/null ; then
+	    linux_cv_k_cppflags="$linux_cv_k_cppflags -I${_ksrcdir}/include"
+	fi
+	linux_dir="${_kbuilddir}/include/generated/uapi" ; if test -d "$linux_dir" ; then
+	    if ! echo " $linux_cv_k_cppflags " | grep -q " -I${_kbuilddir}/include/generated/uapi " 2>/dev/null ; then
+	        linux_cv_k_cppflags="$linux_cv_k_cppflags -I${_kbuilddir}/include/generated/uapi"
+	    fi
+	fi
+	linux_dir="${_ksrcdir}/arch/${target_cpu}/include" ; if test -d "$linux_dir" ; then
+	    if ! echo " $linux_cv_k_cppflags " | grep -q " -I${_ksrcdir}/arch/${target_cpu}/include " 2>/dev/null ; then
+	        linux_cv_k_cppflags="$linux_cv_k_cppflags -I${_ksrcdir}/arch/${target_cpu}/include"
+	    fi
+	fi
+	linux_dir="${_kbuilddir}/arch/${target_cpu}/include/generated" ; if test -d "$linux_dir" ; then
+	    if ! echo " $linux_cv_k_cppflags " | grep -q " -I${_kbuilddir}/arch/${target_cpu}/include/generated " 2>/dev/null ; then
+	        linux_cv_k_cppflags="$linux_cv_k_cppflags -I${_kbuilddir}/arch/${target_cpu}/include/generated"
+	    fi
+	fi
+dnl
 dnl	Recent 2.6.15+ kernels include autoconf.h from the build directory instead of the source
 dnl	directory.  I suppose the idea is to allow you to configure in a separate directory as
 dnl	well as build.  Given 100 years, kbuild might catch up to autoconf.  SLES 10 for some silly
