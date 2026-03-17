@@ -1805,50 +1805,13 @@ __attribute__((section(\"__weak_versions\"))) = {\
 " text "\n};\n#endif" > file
 	}
     }
-    if (values["rip-symbols"]) {
-	text = ""
-	for (pair in mod_unds) {
-	    split(pair, ind, SUBSEP); name = ind[1]; sym = ind[2]
-	    if (name != mod) continue
-	    if (sym in crcs) continue
-	    if (sym in mapaddrs) { add = mapaddrs[sym] } else { add = "00000000" }
-	    if (add == "00000000") continue
-	    print_debug(3,sprintf(fmt, base, "0x" add, sym))
-	    text = text "\n\t{ " "0x" add ", \"" sym "\" },"
-	    count_unds++
-	}
-	if (text) {
-	    print "\n\
-#include <linux/version.h>\n\
-#ifdef CONFIG_MODVERSIONS\n\
-static const struct modversion_info ____absolute[]\n\
-__attribute_used__\n\
-__attribute__((section(\"__absolute\"))) = {\
-" text "\n};\n#endif" > file
-	}
-    }
-    if (values["rip-weak"]) {
-	text = ""
-	for (pair in mod_weak) {
-	    split(pair, ind, SUBSEP); name = ind[1]; sym = ind[2]
-	    if (name != mod) continue
-	    if (sym in crcs) continue
-	    if (sym in mapaddrs) { add = mapaddrs[sym] } else { add = "00000000" }
-	    if (add == "00000000") continue
-	    print_debug(3,sprintf(fmt, base, "0x" add, sym))
-	    text = text "\n\t{ " "0x" add ", \"" sym "\" },"
-	    count_weak++
-	}
-	if (text) {
-	    print "\n\
-#include <linux/version.h>\n\
-#ifdef CONFIG_MODVERSIONS\n\
-static const struct modversion_info ____weak_absolute[]\n\
-__attribute_used__\n\
-__attribute__((section(\"__weak_absolute\"))) = {\
-" text "\n};\n#endif" > file
-	}
-    }
+    # NOTE: ____absolute and ____weak_absolute sections are disabled on
+    # kernel 6.7+ because they use runtime kernel virtual addresses as
+    # compile-time constant initializers, which modern gcc rejects with
+    # "initializer element is not computable at load time". These sections
+    # were an OpenSS7-specific mechanism for resolving symbols without
+    # proper modversion CRCs and are not used by the standard kernel
+    # module loader.
     print_debug(1, "w: mymodules, " base ": unds " count_unds ", weak " count_weak)
 }
 function write_dependencies(file, mod, base,	count, deps, sep, pair, ind, name, dep) {
