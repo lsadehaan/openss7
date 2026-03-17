@@ -1067,31 +1067,19 @@ specfs_dname(struct dentry *dentry, char *buffer, int buflen)
 		struct devnode *cmin;
 
 		if ((cmin = cmin_get(cdev, getminor(dentry->d_inode->i_ino)))) {
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(6,6,0)
-			retn = dynamic_dname(buffer, buflen, "STR %s/%s", cdev->d_name, cmin->n_name);
-#else
-			retn = dynamic_dname(dentry, buffer, buflen, "STR %s/%s", cdev->d_name, cmin->n_name);
-#endif
+			snprintf(buffer, buflen, "STR %s/%s", cdev->d_name, cmin->n_name);
+			retn = buffer;
 		} else {
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(6,6,0)
-			retn = dynamic_dname(buffer, buflen, "STR %s/%lu", cdev->d_name,
+			snprintf(buffer, buflen, "STR %s/%lu", cdev->d_name,
 					     (unsigned long) getminor(dentry->d_inode->i_ino));
-#else
-			retn = dynamic_dname(dentry, buffer, buflen, "STR %s/%lu", cdev->d_name,
-					     (unsigned long) getminor(dentry->d_inode->i_ino));
-#endif
+			retn = buffer;
 		}
 		cdrv_put(cdev);
 	} else {
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(6,6,0)
-		retn = dynamic_dname(buffer, buflen, "STR %lu/%lu",
+		snprintf(buffer, buflen, "STR %lu/%lu",
 				     (unsigned long) getmajor(dentry->d_inode->i_ino),
 				     (unsigned long) getminor(dentry->d_inode->i_ino));
-#else
-		retn = dynamic_dname(dentry, buffer, buflen, "STR %lu/%lu",
-				     (unsigned long) getmajor(dentry->d_inode->i_ino),
-				     (unsigned long) getminor(dentry->d_inode->i_ino));
-#endif
+		retn = buffer;
 	}
 	return (retn);
 }
