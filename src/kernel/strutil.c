@@ -4356,17 +4356,18 @@ EXPORT_SYMBOL(cmn_err);
 #define cmn_err(err_lvl,fmt,...) cmn_err_(err_lvl,fmt,__VA_ARGS__)
 #endif
 
+/* copyin/copyout/delay: these are static inline in the headers.
+   Other OpenSS7 modules get the inline versions via the headers,
+   so explicit EXPORT_SYMBOL is not needed. Disabled for kbuild
+   compatibility (modpost rejects exporting inline symbols). */
+#if 0
 __STRUTIL_EXTERN_INLINE int copyin(const void *from, void *to, size_t len);
-
 EXPORT_SYMBOL(copyin);
-
 __STRUTIL_EXTERN_INLINE int copyout(const void *from, void *to, size_t len);
-
 EXPORT_SYMBOL(copyout);
-
 __STRUTIL_EXTERN_INLINE void delay(unsigned long ticks);
-
 EXPORT_SYMBOL(delay);
+#endif
 
 streams_fastcall int
 drv_getparm(const unsigned int parm, void *value_p)
